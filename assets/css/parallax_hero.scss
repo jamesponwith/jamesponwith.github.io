@@ -50,7 +50,6 @@ input[type=checkbox]:checked + label:before {
   max-width: 600px;
   padding: 10px;
   position: relative;
-  text-align: center;
 }
 
 .container--offset {
@@ -83,6 +82,7 @@ button {
 .scene {
   margin: 0;
   padding: 0;
+  text-align: center;
 
   button {
     left: 10%;
