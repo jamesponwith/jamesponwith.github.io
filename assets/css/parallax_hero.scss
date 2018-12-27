@@ -6,7 +6,6 @@ $color-green: #00ffaa;
 $color-background: #111;
 $color-text: #555;
 
-
 body {
   background: $color-background;
   color: $color-text;
@@ -51,6 +50,7 @@ input[type=checkbox]:checked + label:before {
   max-width: 600px;
   padding: 10px;
   position: relative;
+  text-align: center;
 }
 
 .container--offset {
