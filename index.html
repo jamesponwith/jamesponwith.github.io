@@ -9,6 +9,8 @@
 	<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
 	<link rel="stylesheet" type="text/css" href="assets/css/parallax_hero.css">
 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
+
 	<link rel="icon" type="image/x-icon" href="assets/img/mush_head.jpg">
 	<meta name="author" content="James Ponwith">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,9 +53,28 @@
 			</span>
 		</nav>
 
-		<div class="parallax-container">
+		<div id="container" class="container">
+			<div id="scene" class="scene">
+				<div data-depth="1.00"><img src="images/layer1.png"></div>
+				<div data-depth="0.80"><img src="images/layer2.png"></div>
+				<div data-depth="0.60"><img src="images/layer3.png"></div>
+				<div data-depth="0.40"><img src="images/layer4.png"></div>
+				<div data-depth="0.20"><img src="images/layer5.png"></div>
+				<div data-depth="0.00"><img src="images/layer6.png"></div>
+			</div>
+		</div>
+
+		<!-- Scripts -->
+		<script src="./parallax.js"></script>
+		<script>
+		// Pretty simple huh?
+		var scene = document.getElementById('scene');
+		var parallax = new Parallax(scene);
+		</script>
+
+		<!-- <div class="parallax-container">
 		 <div class="parallax"><img src="assets/img/bg.jpg"></div>
-	 </div>
+	 </div> -->
 
 		<!-- About Me -->
 		<section id="about" class="section section-1">
@@ -142,6 +163,7 @@
 
 		<!-- Scripts  -->
 		<script src="controller.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
 		<!-- <script src="assets/js/parallax_hero.js"></script> -->
 	</body>
 </html>
