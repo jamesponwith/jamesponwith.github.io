@@ -124,3 +124,30 @@ a.nav-item:hover {
 	height: 100%;
 	z-index: -1; position:relative;
 }
+
+.caption{
+	color: #fff;
+}
+
+.caption h1{
+	margin: 20px auto;
+	font-weight: 100;
+	font-size: 100px;
+	text-transform: uppercase;
+}
+
+.caption h3{
+	font-weight: 100;
+}
+
+.v-middle {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 0;
+    -webkit-transform: translate(0%, -50%);
+    -moz-transform: translate(0%, -50%);
+    -ms-transform: translate(0%, -50%);
+    -o-transform: translate(0%, -50%);
+    transform: translate(0%, -50%);
+}
