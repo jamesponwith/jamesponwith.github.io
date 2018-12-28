@@ -55,9 +55,9 @@
 		</nav>
 
 		<!-- ***************************First Option******************************** -->
-			<div class="parallax-container">
+			<!-- <div class="parallax-container">
 				 <div class="parallax"><img src="assets/img/bg.jpg"></div>
-			 </div>
+			 </div> -->
 		<!-- *********************************************************** -->
 <!-- ***************************Second Option******************************** -->
 <!--
@@ -80,6 +80,50 @@
 		var parallax = new Parallax(scene);
 		</script> -->
 <!-- *********************************************************** -->
+
+
+
+<!-- BEG OF PARALLAX SECTION -->
+<style type="text/css">
+.parallaxParent {
+	height: 100vh;
+	overflow: hidden;
+}
+.parallaxParent > * {
+	height: 200%;
+	position: relative;
+	top: -100%;
+}
+</style>
+
+<div id="parallax1" class="parallaxParent">
+	<div style="background-image: url(assets/img/bg.jpg);"></div>
+</div>
+
+
+<script>
+	// init controller
+	var controller = new ScrollMagic.Controller({globalSceneOptions: {triggerHook: "onEnter", duration: "200%"}});
+
+	// build scenes
+	new ScrollMagic.Scene({triggerElement: "#parallax1"})
+					.setTween("#parallax1 > div", {y: "80%", ease: Linear.easeNone})
+					.addIndicators()
+					.addTo(controller);
+
+	new ScrollMagic.Scene({triggerElement: "#parallax2"})
+					.setTween("#parallax2 > div", {y: "80%", ease: Linear.easeNone})
+					.addIndicators()
+					.addTo(controller);
+
+	new ScrollMagic.Scene({triggerElement: "#parallax3"})
+					.setTween("#parallax3 > div", {y: "80%", ease: Linear.easeNone})
+					.addIndicators()
+					.addTo(controller);
+</script>
+
+
+<!-- END OF PARALLAX SECTION -->
 
 
 		<!-- About Me -->
