@@ -27,7 +27,6 @@ section{
 	background-blend-mode: overlay;
 	position: relative;
 	overflow: hidden;
-	background-position: 50% 0% !important;
 }
 
 .section-1 {
