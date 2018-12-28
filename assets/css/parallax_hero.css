@@ -1,3 +1,4 @@
 .parallax-container {
   height: "500px";
+  scroll-behavior: auto;
 }
