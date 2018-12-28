@@ -77,6 +77,12 @@
 		<div class="parallax-container">
 		 <div class="parallax"><img src="assets/img/bg.jpg"></div>
 	 </div>
+	 <script>
+		document.addEventListener('DOMContentLoaded', function() {
+	      var elems = document.querySelectorAll('.parallax');
+	      var instances = M.Parallax.init(elems, options);
+	    });
+		</script>
 <!-- *********************************************************** -->
 		<!-- About Me -->
 		<section id="about" class="section section-1">
