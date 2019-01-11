@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>James Ponwith</title>
+
+	<!-- css files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.1/css/bulma.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/parallax_hero.css">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
+
+	<link rel="icon" type="image/x-icon" href="assets/img/mush_head.jpg">
+	<meta name="author" content="James Ponwith">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+	<body>
+		<!-- Navbar -->
+		<nav class="nav container void-background">
+			<!-- This "nav-menu" is hidden on mobile -->
+			<!-- Add the modifier "is-active" to display it on mobile -->
+			<div class="nav-left">
+				<a href="https://www.youtube.com/watch?v=u0-pfzKbh2k" class="nav-item">
+					<span class="icon">
+						<i class="fa fa-rocket" style="font-size:24px;color:white"></i>
+					</span>
+				</a>
+				<a href="https://github.com/jamesponwith" class="nav-item">
+					<span class="icon">
+						<i class="fa fa-github"></i>
+					</span>
+				</a>
+				<a href="https://www.youtube.com/watch?v=CTFtOOh47oo" class="nav-item">
+					<span class="icon">
+						<i class="fa fa-youtube" aria-hidden="true"></i>
+					</span>
+				</a>
+			</div>
+
+			<div class="nav-right nav-menu">
+				<a class="nav-item" href="#about">About</a>
+				<a class="nav-item" href="#projects">Projects</a>
+				<a class="nav-item" href="#social">Social</a>
+			</div>
+
+			<!-- This "nav-toggle" hamburger menu is only visible on mobile -->
+			<!-- You need JavaScript to toggle the "is-active" class on "nav-menu" -->
+			<span class="nav-toggle">
+				<span></span>
+				<span></span>
+				<span></span>
+			</span>
+		</nav>
+
+		<!-- ***************************First Option******************************** -->
+			<!-- <div class="parallax-container">
+				 <div class="parallax"><img src="assets/img/bg.jpg"></div>
+			 </div> -->
+		<!-- *********************************************************** -->
+<!-- ***************************Second Option******************************** -->
+<!--
+		<div id="container" class="container">
+			<div id="scene" class="scene">
+				<div data-depth="1.00"><img src="assets/images/layer1.png"></div>
+				<div data-depth="0.80"><img src="assets/images/layer2.png"></div>
+				<div data-depth="0.60"><img src="assets/images/layer3.png"></div>
+				<div data-depth="0.40"><img src="assets/images/layer4.png"></div>
+				<div data-depth="0.20"><img src="assets/images/layer5.png"></div>
+				<div data-depth="0.00"><img src="assets/images/layer6.png"></div>
+			</div>
+		</div> -->
+
+		<!-- Scripts -->
+		<!-- <script src="./parallax.js"></script>
+		<script>
+		// Pretty simple huh?
+		var scene = document.getElementById('scene');
+		var parallax = new Parallax(scene);
+		</script> -->
+<!-- *********************************************************** -->
+<!-- BEG OF PARALLAX SECTION -->
+<!-- <style type="text/css">
+.parallaxParent {
+	height: 100vh;
+	overflow: hidden;
+}
+.parallaxParent > * {
+	height: 300%;
+	position: relative;
+	top: -100%;
+}
+</style>
+
+<div id="parallax1" class="parallaxParent">
+	<div style="background-image: url(assets/img/bg.jpg);"></div>
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/ScrollMagic.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/plugins/addIndicators.min.js"></script>
+
+<script>
+	// init controller
+	var controller = new ScrollMagic.Controller({globalSceneOptions: {triggerHook: "onEnter", duration: "200%"}});
+
+	// build scenes
+	new ScrollMagic.Scene({triggerElement: "#parallax1"})
+					.setTween("#parallax1 > div", {y: "80%", ease: Linear.easeNone})
+					.addIndicators()
+					.addTo(controller);
+
+	// new ScrollMagic.Scene({triggerElement: "#parallax2"})
+	// 				.setTween("#parallax2 > div", {y: "80%", ease: Linear.easeNone})
+	// 				.addIndicators()
+	// 				.addTo(controller);
+	//
+	// new ScrollMagic.Scene({triggerElement: "#parallax3"})
+	// 				.setTween("#parallax3 > div", {y: "80%", ease: Linear.easeNone})
+	// 				.addIndicators()
+	// 				.addTo(controller);
+</script> -->
+<!-- END OF PARALLAX SECTION -->
+
+
+<!-- BEG OF PARALLAX SECTION -->
+
+<!-- END OF PARALLAX SECTION -->
+
+		<!-- About Me -->
+		<section id="about" class="section section-1">
+			<div class="container"></br>
+				<p class="intro">
+					This is a extensive excel workbook analyzing Microsoft and Apple.
+				</p>
+			</div>
+		</section>
+
+		<!-- Projects -->
+		<section  id="projects" class="section section-2">
+			<div class="container">
+				<div class="has-text-centered">
+					<h3 class="title is-3">Excel File</h3>
+				</div>
+
+				<div class="columns is-multiline is-desktop">
+					<!-- Project 1 -->
+					<!-- Project 2 -->
+					<div class="column">
+						<div class="box project-text">
+							<article>
+								<div>
+									<figure class="image project-figure">
+										<!-- <img src="assets/img/project-2.jpg" alt="Image"> -->
+										<iframe src="https://drive.google.com/file/d/1Tg7lSDyQ--AFjG3XIKCAfBKQcCAv8Fqz/preview"></iframe>
+									</figure>
+								</div>
+								<div>
+									<p>
+										This is my second project.
+									</p>
+								</div>
+							</article>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<section class="section-4 has-text-centered container">
+			<a href="https://github.com/jamesponwith">James Ponwith</a>
+		</section>
+
+		<!-- Scripts  -->
+
+		<!-- <script src="js/particle_controller.js"></script> -->
+		<script src="assets/js/jquery.stellar.min.js"></script>
+		<script src="assets/js/particles.min.js"></script>
+		<script src="assets/js/app.js"></script>
+		<script src="controller.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
+		<!-- <script src="js/jquery.stellar.min.js"></script> -->
+
+		<!-- <script src="assets/js/parallax_hero.js"></script> -->
+	</body>
+</html>
