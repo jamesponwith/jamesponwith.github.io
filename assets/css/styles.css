@@ -126,6 +126,14 @@ a.nav-item:hover {
 	position:relative;
 }
 
+#logo_copyright{
+	bottom: 10px;
+	position: absolute;
+	background: rgba(255,255,255,.4);
+	padding: 5px;
+	right: 0px;
+}
+
 /* .caption{
 	color: #fff;
 }
