@@ -170,7 +170,7 @@
 		var outputStride = 16;
 		var flipHorizontal = false;
 
-		var imageElement = document.getElementById('portrait_pic');
+		var imageElement = document.getElementById('port');
 
 		posenet.load().then(function(net){
 			return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
