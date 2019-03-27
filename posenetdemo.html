@@ -162,22 +162,22 @@
 
 	<!-- Projects -->
 
-<img id='port' src='/images/portrait_pic.jpg '/>
+	<img id='port' src='/images/portrait_pic.jpg '/>
 
-<!-- Place your code in the script tag below. You can also use an external .js file -->
-<script>
-	var imageScaleFactor = 0.5;
-	var outputStride = 16;
-	var flipHorizontal = false;
+	<!-- Place your code in the script tag below. You can also use an external .js file -->
+	<script>
+		var imageScaleFactor = 0.5;
+		var outputStride = 16;
+		var flipHorizontal = false;
 
-	var imageElement = document.getElementById('cat');
+		var imageElement = document.getElementById('cat');
 
-	posenet.load().then(function(net){
-		return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
-	}).then(function(pose){
-		console.log(pose);
-	})
-</script>
+		posenet.load().then(function(net){
+			return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
+		}).then(function(pose){
+			console.log(pose);
+		})
+	</script>
 
 
 
