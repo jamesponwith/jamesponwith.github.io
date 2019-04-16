@@ -159,29 +159,25 @@
 	}
 	</style>
 	<!-- Projects -->
-<div class="container">
-	<img id='port' src='assets/img/nate_p_backhand.jpg'/>
-
-	<!-- Place your code in the script tag below. You can also use an external .js file -->
-	<script>
+	
+	<img id='pic' src='/assets/img/nate_p_backhand.jpg '/>
+	
+	  <!-- Place your code in the script tag below. You can also use an external .js file -->
+	  <script>
 		var imageScaleFactor = 0.5;
 		var outputStride = 16;
 		var flipHorizontal = false;
-
-		var imageElement = document.getElementById('port');
-
+	
+		var imageElement = document.getElementById('pic');
+	
 		posenet.load().then(function(net){
-			return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
+		  return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
 		}).then(function(pose){
-			console.log(pose);
+		  console.log(pose);
 		})
-	</script>
-</div>
-
-
+	  </script>
 
 <!-- END OF PARALLAX SECTION -->
-
 
 		<!-- Footer -->
 		<section class="section-4 has-text-centered container">
