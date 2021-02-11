@@ -87,8 +87,7 @@ a.nav-item:hover {
 
 .box {
 	background-color: transparent;
-	/* border: 2px solid rgba(7, 59, 79, 0.5); */
-	border: 2px solid rgba(255, 255, 255, 0.5);
+	border: 2px solid rgba(7, 59, 79, 0.5);
 }
 
 .title {
