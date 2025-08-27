@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>James Ponwith — Principal Software Engineer</title>
-  <meta name="description" content="James Ponwith — Principal Software Engineer specializing in resiliency engines, real‑time systems, AWS, and Golang." />
+  <meta name="description" content="James Ponwith — Principal Software Engineer specializing in resiliency engines, real-time systems, AWS, and Golang." />
   <link rel="icon" href="assets/img/teddy_bear.PNG" />
   <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -22,33 +22,34 @@
               500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
             }
           },
-          boxShadow: {
-            soft: '0 8px 30px rgba(0,0,0,0.08)',
-          }
+          boxShadow: { soft: '0 8px 30px rgba(0,0,0,0.08)' }
         }
       }
     };
   </script>
-  <style>
-    html { color-scheme: light dark; }
-    /* subtle animated dot field */
-    .dots {
-      background-image: radial-gradient(currentColor 1px, transparent 1px);
-      background-size: 22px 22px;
-      opacity:.06;
-      animation: drift 48s linear infinite;
-    }
-    @keyframes drift {
-      from { background-position: 0 0 }
-      to { background-position: 1000px 1000px }
-    }
-  </style>
+  <!-- tsParticles -->
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
+
   <!-- Open Graph -->
   <meta property="og:title" content="James Ponwith — Principal Software Engineer" />
-  <meta property="og:description" content="Resiliency & real‑time systems. AWS • Go • New Relic • ECS/Fargate • Route53 • DynamoDB." />
+  <meta property="og:description" content="Resiliency & real-time systems. AWS • Go • New Relic • ECS/Fargate • Route53 • DynamoDB." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/img/portrait_pic.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <style>
+    html { color-scheme: light dark; }
+    #tsparticles {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-layer {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -100,17 +101,17 @@
     </nav>
   </header>
 
-  <!-- HERO -->
+  <!-- HERO with particles -->
   <section id="home" class="relative">
-    <div class="absolute inset-0 dots"></div>
-    <div class="mx-auto max-w-6xl px-4 py-20 md:py-28">
-      <p class="text-sm uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">Resiliency • Real‑Time • AWS</p>
+    <div id="tsparticles" aria-hidden="true"></div>
+    <div class="hero-layer mx-auto max-w-6xl px-4 py-20 md:py-28">
+      <p class="text-sm uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">Resiliency • Real-Time • AWS</p>
       <h1 class="mt-3 text-4xl md:text-6xl font-extrabold leading-tight">
-        Building fault‑tolerant, low‑latency systems
+        Building fault-tolerant, low-latency systems
         <span class="block bg-gradient-to-r from-brand-500 via-blue-400 to-emerald-400 bg-clip-text text-transparent">that keep traffic flowing.</span>
       </h1>
       <p class="mt-6 max-w-2xl text-lg text-neutral-600 dark:text-neutral-300">
-        Principal Software Engineer focused on enterprise‑grade resiliency engines (Go, ECS/Fargate, Route 53,
+        Principal Software Engineer focused on enterprise-grade resiliency engines (Go, ECS/Fargate, Route 53,
         CloudWatch, DynamoDB, New Relic). I design systems that detect failure quickly and route around it—
         at scale.
       </p>
@@ -121,21 +122,21 @@
 
       <!-- Quick stats -->
       <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="rounded-2xl border p-4">
+        <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
           <div class="text-3xl font-bold">6</div>
-          <div class="text-sm text-neutral-500 dark:text-neutral-400">Availability Zones managed</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">Availability Zones managed</div>
         </div>
-        <div class="rounded-2xl border p-4">
-          <div class="text-3xl font-bold">Sub‑55ms</div>
-          <div class="text-sm text-neutral-500 dark:text-neutral-400">Cross‑domain failover</div>
+        <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
+          <div class="text-3xl font-bold">Sub-55ms</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">Cross-domain failover</div>
         </div>
-        <div class="rounded-2xl border p-4">
+        <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
           <div class="text-3xl font-bold">Go • AWS</div>
-          <div class="text-sm text-neutral-500 dark:text-neutral-400">ECS, Route 53, DynamoDB</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">ECS, Route 53, DynamoDB</div>
         </div>
-        <div class="rounded-2xl border p-4">
+        <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
           <div class="text-3xl font-bold">NYC</div>
-          <div class="text-sm text-neutral-500 dark:text-neutral-400">Based in New York</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">Based in New York</div>
         </div>
       </div>
     </div>
@@ -158,7 +159,7 @@
             </a>
             <div class="p-6">
               <h3 class="text-xl font-semibold">All About Tennis — Ecommerce site</h3>
-              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">I developed the site and produced media assets for a family‑owned shop. Modernized UX and brand presence.</p>
+              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">I developed the site and produced media assets for a family-owned shop. Modernized UX and brand presence.</p>
               <div class="mt-3 text-xs text-neutral-500">Shopify • Media • SEO</div>
             </div>
           </article>
@@ -194,14 +195,14 @@
             </a>
             <div class="p-6">
               <h3 class="text-xl font-semibold">PoseNet — TensorFlow.js</h3>
-              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">In‑browser pose estimation demo using TF.js PoseNet.</p>
+              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">In-browser pose estimation demo using TF.js PoseNet.</p>
               <div class="mt-3 text-xs text-neutral-500">JS • TF.js</div>
             </div>
           </article>
 
           <!-- Financial Analysis -->
           <article class="group rounded-3xl border overflow-hidden">
-            <a href="https://drive.google.com/file/d/1AHZ7kr1tmIA-ti577meVyHZRNlQq2Vwz/view?usp=sharing" target="_blank" class="block">
+            <a href="excelPreview.html" class="block">
               <img src="assets/img/appl_micro.jpeg" alt="Apple vs Microsoft workbook" class="w-full aspect-[16/10] object-cover" loading="lazy" decoding="async">
             </a>
             <div class="p-6">
@@ -232,9 +233,9 @@
         <div>
           <h2 class="text-3xl md:text-4xl font-extrabold">About</h2>
           <p class="mt-4 text-neutral-600 dark:text-neutral-300">
-            I'm a systems‑minded engineer with a sports background and a love for building
-            real‑world systems that withstand failure. I lead the design & evolution of a
-            Go‑based resiliency engine that monitors multi‑region AWS deployments and dynamically
+            I'm a systems-minded engineer with a sports background and a love for building
+            real-world systems that withstand failure. I lead the design & evolution of a
+            Go-based resiliency engine that monitors multi-region AWS deployments and dynamically
             routes traffic to healthy resources.
           </p>
           <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
@@ -249,7 +250,7 @@
           </div>
         </div>
         <div class="md:col-span-2">
-          <img src="assets/img/JandE.JPEG" alt="Portrait of James Ponwith" class="w-full max-w-md rounded-3xl shadow-soft" loading="lazy" decoding="async">
+          <img src="assets/img/portrait_pic.jpg" alt="Portrait of James Ponwith" class="w-full max-w-md rounded-3xl shadow-soft" loading="lazy" decoding="async">
         </div>
       </div>
     </section>
@@ -260,7 +261,7 @@
         <h2 class="text-3xl md:text-4xl font-extrabold">Let’s build something resilient.</h2>
         <p class="mt-4 text-neutral-600 dark:text-neutral-300">Open to consulting, speaking, and collaborations.</p>
         <div class="mt-8 flex items-center justify-center gap-3">
-          <a href="mailto:jamesponwith@gmail.com" class="inline-flex items-center rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700">Email me</a>
+          <a href="mailto:jponwith24@gmail.com" class="inline-flex items-center rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700">Email me</a>
           <a href="https://github.com/jamesponwith" class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">GitHub</a>
           <a href="https://www.linkedin.com/in/james-ponwith24/" class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">LinkedIn</a>
         </div>
@@ -282,7 +283,6 @@
     const root = document.documentElement;
     const stored = localStorage.getItem('theme');
     if (!stored) {
-      // follow system on first load
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.classList.toggle('dark', prefersDark);
     } else {
@@ -291,6 +291,7 @@
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      loadParticles(isDark);
     }
     document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
     document.getElementById('themeToggleMobile')?.addEventListener('click', toggleTheme);
@@ -298,12 +299,68 @@
     // Mobile menu
     const btn = document.getElementById('menuBtn');
     const menu = document.getElementById('mobileMenu');
-    btn?.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
-    });
+    btn?.addEventListener('click', () => { menu.classList.toggle('hidden'); });
 
     // Current year
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===== tsParticles config with light/dark aware theme =====
+    async function loadParticles(isDark = document.documentElement.classList.contains('dark')) {
+      const primary = isDark ? '#93c5fd' : '#3b82f6'; // brand-300 vs brand-500
+      const link = isDark ? '#64748b' : '#94a3b8';    // slate-ish
+      const bg = isDark ? '#0a0a0a' : '#ffffff';
+
+      const options = {
+        fpsLimit: 45,
+        detectRetina: true,
+        background: { color: { value: 'transparent' } },
+        particles: {
+          number: { value: 60, density: { enable: true, area: 800 } },
+          color: { value: primary },
+          shape: { type: 'circle' },
+          opacity: { value: 0.6, random: false, animation: { enable: false } },
+          size: { value: { min: 1, max: 3 } },
+          links: {
+            enable: true,
+            color: link,
+            opacity: 0.25,
+            width: 1,
+            distance: 140
+          },
+          move: {
+            enable: true,
+            speed: 0.8,
+            direction: 'none',
+            random: false,
+            straight: false,
+            outModes: { default: 'out' },
+            attract: { enable: false }
+          }
+        },
+        interactivity: {
+          detectsOn: 'window',
+          events: {
+            onHover: { enable: true, mode: 'repulse' },
+            onClick: { enable: false },
+            resize: true
+          },
+          modes: {
+            repulse: { distance: 90, duration: 0.4 }
+          }
+        }
+      };
+
+      // If already initialized, just update options (keeps it smooth)
+      const existing = tsParticles.domItem(0);
+      if (existing) {
+        await existing.loadOptions(options);
+        return;
+      }
+      await tsParticles.load('tsparticles', options);
+    }
+
+    // Initialize particles once the page is ready
+    window.addEventListener('load', () => loadParticles());
   </script>
 </body>
 </html>
