@@ -1,143 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="scroll-smooth">
 <head>
-	<title>James Ponwith</title>
-
-	<!-- css files -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.1/css/bulma.min.css">
-	<link rel="stylesheet" type="text/css" href="assets/css/styles.css">
-	<link rel="stylesheet" type="text/css" href="assets/css/parallax_hero.css">
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
-
-	<link rel="icon" type="image/x-icon" href="assets/img/teddy_bear.PNG">
-	<meta name="author" content="James Ponwith">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>James Ponwith — James Ponwith</title>
+  <meta name="description" content="Apple vs Microsoft comparative financial workbook preview." />
+  <link rel="icon" href="assets/img/teddy_bear.PNG" />
+  <!-- Fonts & Tailwind -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] } } } };
+  </script>
 </head>
+<body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-blue-600 text-white px-3 py-2 rounded-md">Skip to content</a>
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 backdrop-blur bg-white/75 dark:bg-neutral-950/60 border-b border-black/5 dark:border-white/5">
+    <nav class="mx-auto max-w-6xl px-4">
+      <div class="flex h-16 items-center justify-between">
+        <a href="index.html" class="font-semibold tracking-tight text-lg">← Back to Home</a>
+        <div class="hidden md:flex items-center gap-6">
+          <a href="https://github.com/jamesponwith" class="hover:text-blue-600">GitHub</a>
+          <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-blue-600">LinkedIn</a>
+        </div>
+      </div>
+    </nav>
+  </header>
 
-	<body>
-		<!-- Navbar -->
-		<nav class="nav container void-background">
-			<!-- This "nav-menu" is hidden on mobile -->
-			<!-- Add the modifier "is-active" to display it on mobile -->
-			<div class="nav-left">
-				<a href="https://youtu.be/u0-pfzKbh2k?t=24" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-rocket" style="font-size:24px;color:white"></i>
-					</span>
-				</a>
-				<a href="https://github.com/jamesponwith" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-github"></i>
-					</span>
-				</a>
-				<a href="https://www.youtube.com/watch?v=CTFtOOh47oo" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-youtube" aria-hidden="true"></i>
-					</span>
-				</a>
-			</div>
+  <main id="main">
+    <!-- HERO -->
+    <section class="mx-auto max-w-6xl px-4 py-14 md:py-20">
+      <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">James Ponwith</h1>
+      <p class="mt-4 max-w-3xl text-neutral-600 dark:text-neutral-300">A comparative deep dive into Apple vs Microsoft—KPIs and trends in an interactive workbook.</p>
+      <img src="assets/img/appl_micro.jpeg" alt="Apple vs Microsoft" class="mt-6 w-full max-w-3xl rounded-2xl shadow" loading="lazy" decoding="async">
+    </section>
 
-			<div class="nav-right nav-menu">
-				<a class="nav-item" href="index.html">Home</a>
-				<a class="nav-item" href="#about">About</a>
-				<a class="nav-item" href="#projects">Projects</a>
-				<a class="nav-item" href="#social">Social</a>
-			</div>
-
-			<!-- This "nav-toggle" hamburger menu is only visible on mobile -->
-			<!-- You need JavaScript to toggle the "is-active" class on "nav-menu" -->
-			<span class="nav-toggle">
-				<span></span>
-				<span></span>
-				<span></span>
-			</span>
-		</nav>
-
-		<!-- ***************************First Option******************************** -->
-			<!-- <div class="parallax-container">
-				 <div class="parallax"><img src="assets/img/bg.jpg"></div>
-			 </div> -->
-		<!-- *********************************************************** -->
-<!-- ***************************Second Option******************************** -->
-<!--
-		<div id="container" class="container">
-			<div id="scene" class="scene">
-				<div data-depth="1.00"><img src="assets/images/layer1.png"></div>
-				<div data-depth="0.80"><img src="assets/images/layer2.png"></div>
-				<div data-depth="0.60"><img src="assets/images/layer3.png"></div>
-				<div data-depth="0.40"><img src="assets/images/layer4.png"></div>
-				<div data-depth="0.20"><img src="assets/images/layer5.png"></div>
-				<div data-depth="0.00"><img src="assets/images/layer6.png"></div>
-			</div>
-		</div> -->
-
-		<!-- Scripts -->
-		<!-- <script src="./parallax.js"></script>
-		<script>
-		// Pretty simple huh?
-		var scene = document.getElementById('scene');
-		var parallax = new Parallax(scene);
-		</script> -->
-<!-- *********************************************************** -->
-<!-- BEG OF PARALLAX SECTION -->
-<!-- <style type="text/css">
-.parallaxParent {
-	height: 100vh;
-	overflow: hidden;
-}
-.parallaxParent > * {
-	height: 300%;
-	position: relative;
-	top: -100%;
-}
-</style>
-
-<div id="parallax1" class="parallaxParent">
-	<div style="background-image: url(assets/img/bg.jpg);"></div>
-</div>
-
-<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/ScrollMagic.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/plugins/addIndicators.min.js"></script>
-
-<script>
-	// init controller
-	var controller = new ScrollMagic.Controller({globalSceneOptions: {triggerHook: "onEnter", duration: "200%"}});
-
-	// build scenes
-	new ScrollMagic.Scene({triggerElement: "#parallax1"})
-					.setTween("#parallax1 > div", {y: "80%", ease: Linear.easeNone})
-					.addIndicators()
-					.addTo(controller);
-
-	// new ScrollMagic.Scene({triggerElement: "#parallax2"})
-	// 				.setTween("#parallax2 > div", {y: "80%", ease: Linear.easeNone})
-	// 				.addIndicators()
-	// 				.addTo(controller);
-	//
-	// new ScrollMagic.Scene({triggerElement: "#parallax3"})
-	// 				.setTween("#parallax3 > div", {y: "80%", ease: Linear.easeNone})
-	// 				.addIndicators()
-	// 				.addTo(controller);
-</script> -->
-<!-- END OF PARALLAX SECTION -->
-
-
-<!-- BEG OF PARALLAX SECTION -->
-<!-- <header id="home" class="header" data-stellar-background-ratio="0.5"> -->
-	<!-- <section id="about" class="section section-1">
-		<div class="container"></br>
-			<p class="intro">
-				This is a extensive excel workbook analyzing Microsoft and Apple.
-			</p>
-		</div>
-	</section> -->
-
-	<!-- Projects -->
-	<section  id="projects" class="section section-2">
-		<div class="container">
-			<div class="has-text-centered">
+    <!-- CONTENT -->
+    <section class="border-t border-black/5 dark:border-white/5">
+      <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <article class="prose prose-neutral dark:prose-invert max-w-none">
+<div class="has-text-centered">
 				<h3 class="title is-3">Microsoft and Apple Financial Analysis</h3>
 			</div>
 
@@ -160,28 +65,23 @@
 					</div>
 				</div>
 			</div>
-		</div>
-	</section>
+        </article>
+      </div>
+    </section>
+  </main>
 
+  <footer class="border-t border-black/5 dark:border-white/5">
+    <div class="mx-auto max-w-6xl px-4 py-10 text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>© <span id="year"></span> James Ponwith</div>
+      <div class="flex items-center gap-4">
+        <a href="#main" class="hover:text-blue-600">Back to top</a>
+      </div>
+    </div>
+  </footer>
 
-<!-- END OF PARALLAX SECTION -->
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 
-
-		<!-- Footer -->
-		<section class="section-4 has-text-centered container">
-			<a href="https://github.com/jamesponwith">James Ponwith</a>
-		</section>
-
-		<!-- Scripts  -->
-
-		<!-- <script src="js/particle_controller.js"></script> -->
-		<script src="assets/js/jquery.stellar.min.js"></script>
-		<script src="assets/js/particles.min.js"></script>
-		<script src="assets/js/app.js"></script>
-		<script src="controller.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
-		<!-- <script src="js/jquery.stellar.min.js"></script> -->
-
-		<!-- <script src="assets/js/parallax_hero.js"></script> -->
-	</body>
+</body>
 </html>
