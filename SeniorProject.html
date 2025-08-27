@@ -12,20 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
-    tailwind.config = { theme: { extend: {
-      fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] }
-    } } };
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] } } } };
   </script>
-  <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/parallax_hero.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
-  <link rel="icon" type="image/x-icon" href="assets/img/teddy_bear.PNG">
-  <script src="js/particle_controller.js"></script>
-  <script src="assets/js/particles.min.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="controller.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
-  <script src="assets/js/parallax_hero.js"></script>
 </head>
 <body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
   <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-blue-600 text-white px-3 py-2 rounded-md">Skip to content</a>
@@ -53,50 +41,8 @@
     <!-- CONTENT -->
     <section class="border-t border-black/5 dark:border-white/5">
       <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <div class="grid gap-10">
-          <article class="prose prose-neutral dark:prose-invert max-w-none">
-            <!-- Navbar -->
-		<nav class="nav container void-background">
-			<!-- This "nav-menu" is hidden on mobile -->
-			<!-- Add the modifier "is-active" to display it on mobile -->
-			<div class="nav-left">
-				<a href="https://youtu.be/u0-pfzKbh2k?t=24" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-rocket" style="font-size:24px;color:white"></i>
-					</span>
-				</a>
-				<a href="https://github.com/jamesponwith" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-github"></i>
-					</span>
-				</a>
-				<a href="https://www.youtube.com/watch?v=CTFtOOh47oo" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-youtube" aria-hidden="true"></i>
-					</span>
-				</a>
-			</div>
-
-			<div class="nav-right nav-menu">
-				<a class="nav-item" href="index.html">Home</a>
-				<a class="nav-item" href="#about">About</a>
-				<a class="nav-item" href="#projects">Projects</a>
-				<a class="nav-item" href="#social">Social</a>
-			</div>
-
-			<!-- This "nav-toggle" hamburger menu is only visible on mobile -->
-			<!-- You need JavaScript to toggle the "is-active" class on "nav-menu" -->
-			<span class="nav-toggle">
-				<span></span>
-				<span></span>
-				<span></span>
-			</span>
-		</nav>
-
-	<!-- Projects -->
-	<section  id="projects" class="section section-2">
-		<div class="container">
-			<div class="has-text-centered">
+        <article class="prose prose-neutral dark:prose-invert max-w-none">
+<div class="has-text-centered">
 				<h1 class="title is-3">Senior Project</h1>
 			</div>
 
@@ -110,31 +56,7 @@
                             <img src="assets/img/SeniorProject.jpg" alt="Image"> </a>
 					</div>
 				</div>
-        </div>
-	</section>
-
-
-<!-- END OF PARALLAX SECTION -->
-
-
-		<!-- Footer -->
-		<section class="section-4 has-text-centered container">
-			<a href="https://github.com/jamesponwith">James Ponwith</a>
-		</section>
-
-		<!-- Scripts  -->
-
-		<!--  -->
-		
-		
-		
-		
-		
-		<!--  -->
-
-		<!--  -->
-          </article>
-        </div>
+        </article>
       </div>
     </section>
   </main>
@@ -151,6 +73,6 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-  
+
 </body>
 </html>

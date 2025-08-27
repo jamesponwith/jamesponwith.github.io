@@ -12,93 +12,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
-    tailwind.config = { theme: { extend: {
-      fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] }
-    } } };
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] } } } };
   </script>
-  <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/parallax_hero.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
-  <link rel="icon" type="image/x-icon" href="assets/img/teddy_bear.PNG">
-  <script src="./parallax.js"></script>
-  <script>
-		// Pretty simple huh?
-		var scene = document.getElementById('scene');
-		var parallax = new Parallax(scene);
-		</script>
-  <style type="text/css">
-.parallaxParent {
-	height: 100vh;
-	overflow: hidden;
-}
-.parallaxParent > * {
-	height: 300%;
-	position: relative;
-	top: -100%;
-}
-</style>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/ScrollMagic.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.2/plugins/addIndicators.min.js"></script>
-  <script>
-	// init controller
-	var controller = new ScrollMagic.Controller({globalSceneOptions: {triggerHook: "onEnter", duration: "200%"}});
 
-	// build scenes
-	new ScrollMagic.Scene({triggerElement: "#parallax1"})
-					.setTween("#parallax1 > div", {y: "80%", ease: Linear.easeNone})
-					.addIndicators()
-					.addTo(controller);
-
-	// new ScrollMagic.Scene({triggerElement: "#parallax2"})
-	// 				.setTween("#parallax2 > div", {y: "80%", ease: Linear.easeNone})
-	// 				.addIndicators()
-	// 				.addTo(controller);
-	//
-	// new ScrollMagic.Scene({triggerElement: "#parallax3"})
-	// 				.setTween("#parallax3 > div", {y: "80%", ease: Linear.easeNone})
-	// 				.addIndicators()
-	// 				.addTo(controller);
-</script>
   <style>
-	.footer {
-			position: fixed;
-			left: 0;
-			bottom: 0;
-			width: 100%;
-			color: black;
-	}
-	.footer-text {
-			max-width: 600px;
-			text-align: center;
-			margin: auto;
-	}
-	@media only screen and (max-width: 600px) {
-		.footer-text, .dg {
-			display: none;
-		}
-	}
-	</style>
-  <script>
-		var imageScaleFactor = 0.5;
-		var outputStride = 16;
-		var flipHorizontal = false;
-	
-		var imageElement = document.getElementById('pic');
-	
-		posenet.load().then(function(net){
-		  return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
-		}).then(function(pose){
-		  console.log(pose);
-		})
-	  </script>
-  <script src="js/particle_controller.js"></script>
-  <script src="assets/js/particles.min.js"></script>
-  <script src="assets/js/app.js"></script>
-  <script src="controller.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
-  <script src="assets/js/parallax_hero.js"></script>
+    .prose canvas, .prose video { max-width: 100%; height: auto; display: block; }
+  </style>
+
 </head>
 <body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
   <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-blue-600 text-white px-3 py-2 rounded-md">Skip to content</a>
@@ -126,45 +46,9 @@
     <!-- CONTENT -->
     <section class="border-t border-black/5 dark:border-white/5">
       <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <div class="grid gap-10">
-          <article class="prose prose-neutral dark:prose-invert max-w-none">
-            <!-- Navbar -->
-		<nav class="nav container void-background">
-			<!-- This "nav-menu" is hidden on mobile -->
-			<!-- Add the modifier "is-active" to display it on mobile -->
-			<div class="nav-left">
-				<a href="https://youtu.be/u0-pfzKbh2k?t=24" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-rocket" style="font-size:24px;color:white"></i>
-					</span>
-				</a>
-				<a href="https://github.com/jamesponwith" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-github"></i>
-					</span>
-				</a>
-				<a href="https://www.youtube.com/watch?v=CTFtOOh47oo" class="nav-item">
-					<span class="icon">
-						<i class="fa fa-youtube" aria-hidden="true"></i>
-					</span>
-				</a>
-			</div>
-
-			<div class="nav-right nav-menu">
-				<a class="nav-item" href="index.html">Home</a>
-				<a class="nav-item" href="#about">About</a>
-				<a class="nav-item" href="#projects">Projects</a>
-				<a class="nav-item" href="#social">Social</a>
-			</div>
-
-			<!-- This "nav-toggle" hamburger menu is only visible on mobile -->
-			<!-- You need JavaScript to toggle the "is-active" class on "nav-menu" -->
-			<span class="nav-toggle">
-				<span></span>
-				<span></span>
-				<span></span>
-			</span>
-		</nav>
+        <article class="prose prose-neutral dark:prose-invert max-w-none">
+<!-- Navbar -->
+		
 
 		<!-- ***************************First Option******************************** -->
 			<!-- <div class="parallax-container">
@@ -189,17 +73,7 @@
 		 -->
 <!-- *********************************************************** -->
 <!-- BEG OF PARALLAX SECTION -->
-<!-- <style type="text/css">
-.parallaxParent {
-	height: 100vh;
-	overflow: hidden;
-}
-.parallaxParent > * {
-	height: 300%;
-	position: relative;
-	top: -100%;
-}
-</style>
+<!-- 
 
 <div id="parallax1" class="parallaxParent">
 	<div style="background-image: url(assets/img/bg.jpg);"></div>
@@ -221,25 +95,7 @@
 			</p>
 		</div>
 	</section> -->
-	<!-- <style>
-	.footer {
-			position: fixed;
-			left: 0;
-			bottom: 0;
-			width: 100%;
-			color: black;
-	}
-	.footer-text {
-			max-width: 600px;
-			text-align: center;
-			margin: auto;
-	}
-	@media only screen and (max-width: 600px) {
-		.footer-text, .dg {
-			display: none;
-		}
-	}
-	</style> -->
+	<!--  -->
 	<!-- Projects -->
 	
 	<img id='pic' src='/assets/img/nate_p_backhand.jpg '/>
@@ -265,8 +121,7 @@
 		<!--  -->
 
 		<!--  -->
-          </article>
-        </div>
+        </article>
       </div>
     </section>
   </main>
@@ -283,18 +138,7 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-  <script>
-		var imageScaleFactor = 0.5;
-		var outputStride = 16;
-		var flipHorizontal = false;
-	
-		var imageElement = document.getElementById('pic');
-	
-		posenet.load().then(function(net){
-		  return net.estimateSinglePose(imageElement, imageScaleFactor, flipHorizontal, outputStride)
-		}).then(function(pose){
-		  console.log(pose);
-		})
-	  </script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
 </body>
 </html>
