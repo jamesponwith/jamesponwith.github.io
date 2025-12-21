@@ -229,6 +229,7 @@
         </a>
 
         <div class="hidden md:flex items-center gap-6">
+          <a href="#home" data-face-target="home" class="hover:text-brand-600">Home</a>
           <a href="#work" data-face-target="work" class="hover:text-brand-600">Work</a>
           <a href="#about" data-face-target="about" class="hover:text-brand-600">About</a>
           <a href="#contact" data-face-target="contact" class="hover:text-brand-600">Contact</a>
@@ -246,13 +247,14 @@
 
       <div id="mobileMenu" class="hidden pb-4 md:hidden">
         <div class="flex flex-col gap-2">
+          <a href="#home" data-face-target="home" class="py-2">Home</a>
           <a href="#work" data-face-target="work" class="py-2">Work</a>
           <a href="#about" data-face-target="about" class="py-2">About</a>
           <a href="#contact" data-face-target="contact" class="py-2">Contact</a>
           <div class="flex gap-4 py-2">
             <a href="https://github.com/jamesponwith" class="underline">GitHub</a>
             <a href="https://www.linkedin.com/in/james-ponwith24/" class="underline">LinkedIn</a>
-            <button id="themeToggleMobile" class="rounded-lg border px-3 py-1.5 text-sm">Toggle theme</button>
+            <!-- <button id="themeToggleMobile" class="rounded-lg border px-3 py-1.5 text-sm">Toggle theme</button> -->
           </div>
         </div>
       </div>
@@ -276,17 +278,16 @@
                   Resiliency • Real-Time • AWS
                 </p>
 
-                <h1 class="mt-3 text-4xl md:text-6xl font-extrabold leading-tight">
-                  Building fault-tolerant, low-latency systems
-                  <span class="block bg-gradient-to-r from-brand-500 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                    that keep traffic flowing.
+                <h1 class="mt-3 text-4xl md:text-6xl font-extrabold leading-[1.1] md:leading-[1.05]">
+                  Hi, I'm James! 
+                  <span class="block md:inline-block pb-1 bg-gradient-to-r from-brand-500 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                     Technology • Finance • Sport
                   </span>
                 </h1>
 
                 <p class="mt-6 max-w-2xl text-lg text-neutral-600 dark:text-neutral-300">
-                  Principal Software Engineer focused on enterprise-grade resiliency engines (Go, ECS/Fargate, Route 53,
-                  CloudWatch, DynamoDB, New Relic). I design systems that detect failure quickly and route around it—
-                  at scale.
+                  Principal Software Engineer focused on building fault-tolerant, low-latency, enterprise-grade systems with cloud-based technology (Go, ECS/Fargate, Route 53,
+                  CloudWatch, DynamoDB, New Relic) that keeps customer authorizations flowing. At Capital One, I design highly resilient and performant mission-critical systems responsible for payment authorization flow.
                 </p>
 
                 <div class="mt-8 flex flex-wrap gap-3">
@@ -302,16 +303,16 @@
 
                 <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
-                    <div class="text-3xl font-bold">6</div>
-                    <div class="text-sm text-neutral-600 dark:text-neutral-400">Availability Zones managed</div>
+                    <div class="text-3xl font-bold">University of San Diego</div>
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">Computer Science • Finance</div>
                   </div>
                   <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
-                    <div class="text-3xl font-bold">Sub-55ms</div>
-                    <div class="text-sm text-neutral-600 dark:text-neutral-400">Cross-domain failover</div>
+                    <div class="text-3xl font-bold">Silicon • Payments</div>
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">Qualcomm | Capital One</div>
                   </div>
                   <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
-                    <div class="text-3xl font-bold">Go • AWS</div>
-                    <div class="text-sm text-neutral-600 dark:text-neutral-400">ECS, Route 53, DynamoDB</div>
+                    <div class="text-3xl font-bold">Go • Python</div>
+                    <div class="text-sm text-neutral-600 dark:text-neutral-400">AWS, Kubernetes, Docker</div>
                   </div>
                   <div class="rounded-2xl border p-4 bg-white/60 dark:bg-neutral-900/50 backdrop-blur">
                     <div class="text-3xl font-bold">NYC</div>
@@ -469,13 +470,18 @@
                     Email me
                   </a>
                   <a href="https://github.com/jamesponwith"
-                     class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">
-                    GitHub
-                  </a>
-                  <a href="https://www.linkedin.com/in/james-ponwith24/"
-                     class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg:white/10">
-                    LinkedIn
-                  </a>
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">
+                  GitHub
+                </a>
+
+                <a href="https://www.linkedin.com/in/james-ponwith24/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">
+                  LinkedIn
+                </a>
                 </div>
               </div>
             </div>
@@ -498,7 +504,7 @@
     <div class="mx-auto max-w-6xl px-4 py-6 md:py-8 text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
       <div>© <span id="year"></span> James Ponwith</div>
       <div class="flex items-center gap-4">
-        <a href="#home" data-face-target="home" class="hover:text-brand-600">Back to top</a>
+        <a href="#home" data-face-target="home" class="hover:text-brand-600">Home</a>
       </div>
     </div>
   </footer>
