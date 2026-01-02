@@ -3,142 +3,218 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PoseNet - Camera Feed Demo — James Ponwith</title>
+  <title>PoseNet — Camera Feed Demo · James Ponwith</title>
   <meta name="description" content="In-browser human pose estimation demo built with TensorFlow.js and PoseNet." />
   <link rel="icon" href="assets/img/teddy_bear.PNG" />
+
   <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
-    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] } } } };
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial']
+          },
+          colors: {
+            brand: {
+              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
+              500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
+            }
+          },
+          boxShadow: {
+            soft: '0 18px 45px rgba(15,23,42,0.16)'
+          }
+        }
+      }
+    };
   </script>
 
   <style>
-    .prose canvas, .prose video { max-width: 100%; height: auto; display: block; }
-  </style>
+    html { color-scheme: light dark; }
 
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at top, #e5f0ff 0, #ffffff 45%, #f3f4f6 100%);
+    }
+    .dark body {
+      background:
+        radial-gradient(circle at top, #020617 0, #020617 45%, #000000 100%);
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #6b7280;
+    }
+    .dark .section-label {
+      color: #9ca3af;
+    }
+
+    .panel {
+      border-radius: 1.4rem;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+      box-shadow: 0 18px 45px rgba(15,23,42,0.12);
+    }
+    .dark .panel {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(2,6,23,0.98));
+      border-color: rgba(30,64,175,0.8);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.7rem;
+      gap: 0.35rem;
+    }
+
+    .prose canvas,
+    .prose video {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
 </head>
+
 <body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-blue-600 text-white px-3 py-2 rounded-md">Skip to content</a>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-brand-600 text-white px-3 py-2 rounded-md">
+    Skip to content
+  </a>
+
   <!-- NAV -->
-  <header class="sticky top-0 z-40 backdrop-blur bg-white/75 dark:bg-neutral-950/60 border-b border-black/5 dark:border-white/5">
+  <header class="sticky top-0 z-40 backdrop-blur bg-white/80 dark:bg-neutral-950/75 border-b border-black/5 dark:border-white/5">
     <nav class="mx-auto max-w-6xl px-4">
       <div class="flex h-16 items-center justify-between">
-        <a href="index.html" class="font-semibold tracking-tight text-lg">← Back to Home</a>
-        <div class="hidden md:flex items-center gap-6">
-          <a href="https://github.com/jamesponwith" class="hover:text-blue-600">GitHub</a>
-          <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-blue-600">LinkedIn</a>
+        <a href="index.html#work" class="font-semibold tracking-tight text-sm md:text-base">
+          ← Back to dashboard
+        </a>
+        <div class="hidden md:flex items-center gap-6 text-sm">
+          <a href="https://github.com/jamesponwith" class="hover:text-brand-600">GitHub</a>
+          <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-brand-600">LinkedIn</a>
         </div>
       </div>
     </nav>
   </header>
 
-  <main id="main">
-    <!-- HERO -->
-    <section class="mx-auto max-w-6xl px-4 py-14 md:py-20">
-      <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">PoseNet - Camera Feed Demo</h1>
-      <p class="mt-4 max-w-3xl text-neutral-600 dark:text-neutral-300">Real-time, in-browser pose estimation using TensorFlow.js PoseNet—no server needed.</p>
-      <img src="assets/img/posenetgif.gif" alt="PoseNet demo" class="mt-6 w-full max-w-3xl rounded-2xl shadow" loading="lazy" decoding="async">
-    </section>
+  <main id="main" class="relative">
+    <div class="mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-10">
+      <!-- HERO -->
+      <section class="space-y-5">
+        <p class="section-label">PROJECT · MOTION &amp; WEB ML</p>
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+          PoseNet — Camera Feed Demo
+        </h1>
+        <p class="max-w-2xl text-sm md:text-base text-neutral-700 dark:text-neutral-200">
+          Real-time, in-browser pose estimation using TensorFlow.js PoseNet. The browser grabs your camera feed,
+          runs PoseNet on each frame, and draws keypoints and skeleton overlays without sending any pixels to a server.
+        </p>
+        <div class="flex flex-wrap gap-2 text-[0.72rem]">
+          <span class="chip">JavaScript</span>
+          <span class="chip">TensorFlow.js</span>
+          <span class="chip">PoseNet</span>
+          <span class="chip">Webcam</span>
+        </div>
+      </section>
 
-    <!-- CONTENT -->
-    <section class="border-t border-black/5 dark:border-white/5">
-      <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <article class="prose prose-neutral dark:prose-invert max-w-none">
-<!-- Navbar -->
-		
+      <!-- LAYOUT -->
+      <section class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-start">
+        <!-- Demo / Description -->
+        <article class="panel p-5 md:p-6 space-y-5">
+          <div class="space-y-3">
+            <h2 class="text-lg md:text-xl font-semibold">What this demo does</h2>
+            <p class="text-sm md:text-base text-neutral-700 dark:text-neutral-200">
+              The PoseNet demo uses the browser's camera feed as input into TensorFlow.js' PoseNet model.
+              For each frame, PoseNet returns a set of keypoints for major joints (shoulders, hips, knees, etc.).
+              Those keypoints are drawn on top of the video, giving a live view of how the model perceives your posture.
+            </p>
+          </div>
 
-		<!-- ***************************First Option******************************** -->
-			<!-- <div class="parallax-container">
-				 <div class="parallax"><img src="assets/img/bg.jpg"></div>
-			 </div> -->
-		<!-- *********************************************************** -->
-<!-- ***************************Second Option******************************** -->
-<!--
-		<div id="container" class="container">
-			<div id="scene" class="scene">
-				<div data-depth="1.00"><img src="assets/images/layer1.png"></div>
-				<div data-depth="0.80"><img src="assets/images/layer2.png"></div>
-				<div data-depth="0.60"><img src="assets/images/layer3.png"></div>
-				<div data-depth="0.40"><img src="assets/images/layer4.png"></div>
-				<div data-depth="0.20"><img src="assets/images/layer5.png"></div>
-				<div data-depth="0.00"><img src="assets/images/layer6.png"></div>
-			</div>
-		</div> -->
+          <div class="space-y-3">
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-neutral-500 dark:text-neutral-400">
+              Implementation notes
+            </h3>
+            <ul class="list-disc pl-5 text-sm text-neutral-700 dark:text-neutral-200 space-y-1.5">
+              <li>Camera feed captured via <code>getUserMedia</code>.</li>
+              <li>Frames piped into PoseNet using TensorFlow.js, all on-device.</li>
+              <li>Skeleton and keypoints drawn to a canvas overlay.</li>
+              <li>Performance tuned by adjusting input resolution and stride.</li>
+            </ul>
+          </div>
 
-		<!-- Scripts -->
-		<!-- 
-		 -->
-<!-- *********************************************************** -->
-<!-- BEG OF PARALLAX SECTION -->
-<!-- 
-
-<div id="parallax1" class="parallaxParent">
-	<div style="background-image: url(assets/img/bg.jpg);"></div>
-</div>
-
-
-
-
- -->
-<!-- END OF PARALLAX SECTION -->
-
-
-<!-- BEG OF PARALLAX SECTION -->
-<!-- <header id="home" class="header" data-stellar-background-ratio="0.5"> -->
-	<!-- <section id="about" class="section section-1">
-		<div class="container"></br>
-			<p class="intro">
-				This is a extensive excel workbook analyzing Microsoft and Apple.
-			</p>
-		</div>
-	</section> -->
-	<!--  -->
-	<!-- Projects -->
-	
-	<img id='pic' src='/assets/img/nate_p_backhand.jpg '/>
-	
-	  <!-- Place your code in the script tag below. You can also use an external .js file -->
-	  
-
-<!-- END OF PARALLAX SECTION -->
-
-		<!-- Footer -->
-		<section class="section-4 has-text-centered container">
-			<a href="https://github.com/jamesponwith">James Ponwith</a>
-		</section>
-
-		<!-- Scripts  -->
-
-		<!--  -->
-		
-		
-		
-		
-		
-		<!--  -->
-
-		<!--  -->
+          <div class="space-y-3">
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-neutral-500 dark:text-neutral-400">
+              Why it exists
+            </h3>
+            <p class="text-sm text-neutral-700 dark:text-neutral-200">
+              This project sits at the intersection of motion and engineering. It's a playground for thinking
+              about posture, movement quality, and how real-time inference might support training, coaching,
+              or interactive sport experiences in the browser.
+            </p>
+          </div>
         </article>
-      </div>
-    </section>
+
+        <!-- Visual / Callouts -->
+        <aside class="space-y-4">
+          <div class="panel p-4 md:p-5 flex flex-col gap-3">
+            <img src="assets/img/posenetgif.gif"
+                 alt="PoseNet demo in the browser"
+                 class="w-full rounded-2xl shadow-soft"
+                 loading="lazy"
+                 decoding="async" />
+            <p class="text-xs text-neutral-600 dark:text-neutral-300">
+              Sample of PoseNet tracking keypoints on a moving subject. The actual demo runs live in the browser
+              against your own camera feed.
+            </p>
+          </div>
+          <div class="panel p-4 space-y-2 text-xs text-neutral-600 dark:text-neutral-300">
+            <div class="section-label mb-1">STACK</div>
+            <p><span class="font-semibold">Model:</span> PoseNet via TensorFlow.js</p>
+            <p><span class="font-semibold">Runtime:</span> Browser, JavaScript</p>
+            <p><span class="font-semibold">Focus:</span> Real-time inference, visual feedback, motion tracking</p>
+          </div>
+        </aside>
+      </section>
+    </div>
   </main>
 
   <footer class="border-t border-black/5 dark:border-white/5">
-    <div class="mx-auto max-w-6xl px-4 py-10 text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="mx-auto max-w-6xl px-4 py-6 md:py-8 text-xs md:text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
       <div>© <span id="year"></span> James Ponwith</div>
       <div class="flex items-center gap-4">
-        <a href="#main" class="hover:text-blue-600">Back to top</a>
+        <a href="#main" class="hover:text-brand-600">Back to top</a>
       </div>
     </div>
   </footer>
 
   <script>
+    // Theme based on system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.classList.toggle('dark', prefersDark);
+
+    // Current year
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+  <!-- PoseNet / TF.js libraries (demo wiring can be added in a separate script) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
 </body>
 </html>
+

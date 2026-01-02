@@ -3,76 +3,212 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>James Ponwith — James Ponwith</title>
-  <meta name="description" content="DJI Tello drone controlled with Python, OpenCV, and YOLO for face tracking." />
+  <title>Tello Drone — Senior Project · James Ponwith</title>
+  <meta name="description" content="DJI Tello drone controlled with Python, OpenCV, and YOLO for real-time face tracking." />
   <link rel="icon" href="assets/img/teddy_bear.PNG" />
+
   <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
-    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial'] } } } };
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial']
+          },
+          colors: {
+            brand: {
+              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
+              500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
+            }
+          },
+          boxShadow: {
+            soft: '0 18px 45px rgba(15,23,42,0.16)'
+          }
+        }
+      }
+    };
   </script>
+
+  <style>
+    html { color-scheme: light dark; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at top, #e5f0ff 0, #ffffff 45%, #f3f4f6 100%);
+    }
+    .dark body {
+      background:
+        radial-gradient(circle at top, #020617 0, #020617 45%, #000000 100%);
+    }
+
+    main {
+      flex: 1;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #6b7280;
+    }
+    .dark .section-label {
+      color: #9ca3af;
+    }
+
+    .panel {
+      border-radius: 1.4rem;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+      box-shadow: 0 18px 45px rgba(15,23,42,0.12);
+    }
+    .dark .panel {
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(2,6,23,0.98));
+      border-color: rgba(30,64,175,0.8);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 0.25rem 0.7rem;
+      font-size: 0.7rem;
+      gap: 0.35rem;
+    }
+  </style>
 </head>
+
 <body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-blue-600 text-white px-3 py-2 rounded-md">Skip to content</a>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-brand-600 text-white px-3 py-2 rounded-md">
+    Skip to content
+  </a>
+
   <!-- NAV -->
-  <header class="sticky top-0 z-40 backdrop-blur bg-white/75 dark:bg-neutral-950/60 border-b border-black/5 dark:border-white/5">
+  <header class="sticky top-0 z-40 backdrop-blur bg-white/80 dark:bg-neutral-950/75 border-b border-black/5 dark:border-white/5">
     <nav class="mx-auto max-w-6xl px-4">
       <div class="flex h-16 items-center justify-between">
-        <a href="index.html" class="font-semibold tracking-tight text-lg">← Back to Home</a>
-        <div class="hidden md:flex items-center gap-6">
-          <a href="https://github.com/jamesponwith" class="hover:text-blue-600">GitHub</a>
-          <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-blue-600">LinkedIn</a>
+        <a href="index.html#work" class="font-semibold tracking-tight text-sm md:text-base">
+          ← Back to dashboard
+        </a>
+        <div class="hidden md:flex items-center gap-6 text-sm">
+          <a href="https://github.com/jamesponwith" class="hover:text-brand-600">GitHub</a>
+          <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-brand-600">LinkedIn</a>
         </div>
       </div>
     </nav>
   </header>
 
-  <main id="main">
-    <!-- HERO -->
-    <section class="mx-auto max-w-6xl px-4 py-14 md:py-20">
-      <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">James Ponwith</h1>
-      <p class="mt-4 max-w-3xl text-neutral-600 dark:text-neutral-300">Python control stack for the DJI Tello with computer vision—real-time face tracking using OpenCV + YOLO.</p>
-      <img src="assets/img/SeniorProject.jpg" alt="Senior Project Tello drone" class="mt-6 w-full max-w-3xl rounded-2xl shadow" loading="lazy" decoding="async">
-    </section>
+  <main id="main" class="relative">
+    <div class="mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-10">
+      <!-- HERO -->
+      <section class="space-y-5">
+        <p class="section-label">PROJECT · COMPUTER VISION</p>
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+          Tello Drone — Senior Project
+        </h1>
+        <p class="max-w-2xl text-sm md:text-base text-neutral-700 dark:text-neutral-200">
+          A Python control stack for the DJI Tello, using OpenCV and YOLO to track faces in real time and adjust
+          the drone’s position based on a moving subject.
+        </p>
+        <div class="flex flex-wrap gap-2 text-[0.72rem]">
+          <span class="chip">Python</span>
+          <span class="chip">OpenCV</span>
+          <span class="chip">YOLO</span>
+          <span class="chip">DJI Tello</span>
+        </div>
+      </section>
 
-    <!-- CONTENT -->
-    <section class="border-t border-black/5 dark:border-white/5">
-      <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <article class="prose prose-neutral dark:prose-invert max-w-none">
-<div class="has-text-centered">
-				<h1 class="title is-3">Senior Project</h1>
-			</div>
+      <!-- LAYOUT -->
+      <section class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-start">
+        <!-- Description -->
+        <article class="panel p-5 md:p-6 space-y-5">
+          <div class="space-y-3">
+            <h2 class="text-lg md:text-xl font-semibold">Face tracking in the loop</h2>
+            <p class="text-sm md:text-base text-neutral-700 dark:text-neutral-200">
+              The project connects directly to the DJI Tello video stream, runs YOLO-based face detection via OpenCV,
+              and then uses those detections to drive control signals. The drone attempts to keep a face centered in
+              the frame by adjusting yaw, altitude, and distance.
+            </p>
+          </div>
 
-			<div class="columns is-multiline is-desktop">
-				<!-- Project 1 -->
-				<!-- Project 2 -->
-				<div class="column">
-					<h3><a href="https://github.com/jamesponwith/TelloDroneCv/tree/master/opencv_control">Face Tracker</a></h3>
-					<div class="box centered">
-                        <a href="https://github.com/jamesponwith/TelloDroneCv/tree/master/opencv_control">
-                            <img src="assets/img/SeniorProject.jpg" alt="Image"> </a>
-					</div>
-				</div>
+          <div class="space-y-3">
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-neutral-500 dark:text-neutral-400">
+              System design
+            </h3>
+            <ul class="list-disc pl-5 text-sm text-neutral-700 dark:text-neutral-200 space-y-1.5">
+              <li>Video frames pulled from the Tello via UDP and decoded in Python.</li>
+              <li>Faces detected using YOLO + OpenCV; bounding box position used as a control signal.</li>
+              <li>Control loop sends velocity and rotation commands back to the drone over its SDK.</li>
+              <li>Safety and bounds checks to avoid overly aggressive movements.</li>
+            </ul>
+          </div>
+
+          <div class="space-y-3">
+            <h3 class="text-sm font-semibold tracking-wide uppercase text-neutral-500 dark:text-neutral-400">
+              Lessons &amp; takeaways
+            </h3>
+            <p class="text-sm text-neutral-700 dark:text-neutral-200">
+              This was a hands-on way to explore latency, feedback loops, and the difference between a
+              model that “just detects” something and a full system that has to respond physically and safely.
+            </p>
+          </div>
+
+          <div class="space-y-2 text-sm">
+            <h3 class="text-xs font-semibold tracking-wide uppercase text-neutral-500 dark:text-neutral-400">
+              Repository
+            </h3>
+            <a href="https://github.com/jamesponwith/TelloDroneCv/tree/master/opencv_control"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700">
+              <span>View Face Tracker code on GitHub</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </article>
-      </div>
-    </section>
+
+        <!-- Visual -->
+        <aside class="space-y-4">
+          <a href="https://github.com/jamesponwith/TelloDroneCv/tree/master/opencv_control"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="panel p-3 md:p-4 block">
+            <img src="assets/img/SeniorProject.jpg"
+                 alt="Screenshot / photo from the Tello drone senior project"
+                 class="w-full rounded-2xl shadow-soft"
+                 loading="lazy"
+                 decoding="async" />
+            <p class="mt-3 text-xs text-neutral-600 dark:text-neutral-300">
+              Visual from the senior project. The GitHub repo includes the control scripts and tracking logic.
+            </p>
+          </a>
+        </aside>
+      </section>
+    </div>
   </main>
 
   <footer class="border-t border-black/5 dark:border-white/5">
-    <div class="mx-auto max-w-6xl px-4 py-10 text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="mx-auto max-w-6xl px-4 py-6 md:py-8 text-xs md:text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
       <div>© <span id="year"></span> James Ponwith</div>
       <div class="flex items-center gap-4">
-        <a href="#main" class="hover:text-blue-600">Back to top</a>
+        <a href="#main" class="hover:text-brand-600">Back to top</a>
       </div>
     </div>
   </footer>
 
   <script>
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.classList.toggle('dark', prefersDark);
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-
 </body>
 </html>
+
