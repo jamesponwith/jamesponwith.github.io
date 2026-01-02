@@ -36,7 +36,7 @@
   <meta property="og:title" content="James Ponwith — Principal Software Engineer" />
   <meta property="og:description" content="Resiliency & real-time systems. AWS • Go • New Relic • ECS/Fargate • Route53 • DynamoDB." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/img/portrait_pic.jpg" />
+  <meta property="og:image" content="assets/img/JandE.JPEG" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <style>
@@ -113,7 +113,12 @@
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       background: transparent;
-      pointer-events: auto;
+      pointer-events: none;      /* 🔒 faces not active cannot be clicked */
+    }
+
+    /* Only the currently active face can receive mouse/hover/focus events */
+    .cube-face.is-active {
+      pointer-events: auto;      /* ✅ active face is clickable */
     }
 
     .cube-face > .face-panel {
@@ -203,7 +208,7 @@
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "James Ponwith",
-    "image": "assets/img/portrait_pic.jpg",
+    "image": "assets/img/JandE.JPEG",
     "jobTitle": "Principal Software Engineer",
     "worksFor": { "@type": "Organization", "name": "Capital One" },
     "url": "https://jamesponwith.github.io",
@@ -235,7 +240,7 @@
           <a href="#contact" data-face-target="contact" class="hover:text-brand-600">Contact</a>
           <a href="https://github.com/jamesponwith" class="hover:text-brand-600" aria-label="GitHub">GitHub</a>
           <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-brand-600" aria-label="LinkedIn">LinkedIn</a>
-          <button id="themeToggle" class="rounded-lg border px-3 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/10" aria-label="Toggle theme">☾</button>
+          <!-- <button id="themeToggle" class="rounded-lg border px-3 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/10" aria-label="Toggle theme">☾</button> -->
         </div>
 
         <button id="menuBtn" class="md:hidden inline-flex items-center justify-center rounded-md p-2 hover:bg-black/5 dark:hover:bg:white/10" aria-label="Open menu">
@@ -271,7 +276,7 @@
 
         <div id="cube" data-face="home">
           <!-- HOME (Front) -->
-          <section id="home" class="cube-face cube-front">
+          <section id="home" class="cube-face cube-front is-active">
             <div class="face-panel">
               <div class="mx-auto max-w-6xl px-4 py-16 md:py-22">
                 <p class="text-sm uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
@@ -378,6 +383,34 @@
                   </article>
 
                   <article class="group rounded-3xl border overflow-hidden">
+                    <a href="MusicVisualizer.html" class="block">
+                      <img src="assets/img/MusicVisuals.mp4" alt="Music Visualizer project"
+                           class="w-full aspect-[16/10] object-cover" loading="lazy" decoding="async">
+                    </a>
+                    <div class="p-6">
+                      <h3 class="text-xl font-semibold">Music Visualizer — Arduino</h3>
+                      <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
+                        Built a music visualizer using an Arduino and programmable light strips.
+                      </p>
+                      <div class="mt-3 text-xs text-neutral-500">Arduino • Lighting + Acoustic Hardware </div>
+                    </div>
+                  </article>
+
+                  <article class="group rounded-3xl border overflow-hidden">
+                    <a href="SelfDrivingCar.html" class="block">
+                      <img src="assets/demos/Car_Simulation.mp4" alt="Self Driving Car project"
+                           class="w-full aspect-[16/10] object-cover" loading="lazy" decoding="async">
+                    </a>
+                    <div class="p-6">
+                      <h3 class="text-xl font-semibold">Self-Driving Car Simulation — PyTorch</h3>
+                      <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
+                        Built a Self-Driving car simulation using Python, PyTorch and PyGame to most effectively naviage an environment.
+                      </p>
+                      <div class="mt-3 text-xs text-neutral-500">Python • PyTorch • PyGame </div>
+                    </div>
+                  </article>
+
+                  <article class="group rounded-3xl border overflow-hidden">
                     <a href="posenetdemo.html" class="block">
                       <img src="assets/img/posenetgif.gif" alt="PoseNet demo"
                            class="w-full aspect-[16/10] object-cover" loading="lazy" decoding="async">
@@ -449,7 +482,7 @@
                   </div>
                 </div>
                 <div class="md:col-span-2">
-                  <img src="assets/img/portrait_pic.jpg" alt="Portrait of James Ponwith"
+                  <img src="assets/img/JandE.JPEG" alt="Portrait of James Ponwith"
                        class="w-full max-w-md rounded-3xl shadow-soft" loading="lazy" decoding="async">
                 </div>
               </div>
@@ -596,6 +629,12 @@
         d.classList.toggle('active', d.getAttribute('data-face-dot') === face);
       });
     }
+    
+    function setActiveFace(face) {
+      document.querySelectorAll('.cube-face').forEach(sec => {
+        sec.classList.toggle('is-active', sec.id === face);
+      });
+    }
 
     async function rotateTo(face) {
       if (!cube || isAnimating || !face || face === currentFace) return;
@@ -636,6 +675,7 @@
 
       currentFace = face;
       updateDots(face);
+      setActiveFace(face);   
       isAnimating = false;
     }
 
@@ -683,6 +723,7 @@
       cube.setAttribute('data-face', initialHash);
       scene?.setAttribute('data-active', initialHash);
       updateDots(initialHash);
+      setActiveFace(initialHash);
       void cube.offsetHeight;
       cube.style.transition = `transform 0.85s cubic-bezier(0.22, 0.61, 0.36, 1)`;
     } else if (cube) {
@@ -690,6 +731,7 @@
       cube.setAttribute('data-face', 'home');
       scene?.setAttribute('data-active', 'home');
       updateDots('home');
+      setActiveFace('home');
     }
 
     // ===== Forward mouse wheel to active face-panel (Work / About scroll) =====
