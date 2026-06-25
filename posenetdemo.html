@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PoseNet — Camera Feed Demo · James Ponwith</title>
+  <title>PoseNet — Image Demo · James Ponwith</title>
   <meta name="description" content="In-browser human pose estimation demo built with TensorFlow.js and PoseNet." />
   <link rel="icon" href="assets/img/teddy_bear.PNG" />
 
@@ -119,11 +119,11 @@
       <section class="space-y-5">
         <p class="section-label">PROJECT · MOTION &amp; WEB ML</p>
         <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-          PoseNet — Camera Feed Demo
+          PoseNet — Image Demo
         </h1>
         <p class="max-w-2xl text-sm md:text-base text-neutral-700 dark:text-neutral-200">
-          Real-time, in-browser pose estimation using TensorFlow.js PoseNet. The browser grabs your camera feed,
-          runs PoseNet on each frame, and draws keypoints and skeleton overlays without sending any pixels to a server.
+          In-browser pose estimation using TensorFlow.js PoseNet. This page includes a still-image demo (tennis backhand)
+          that runs entirely on-device and draws keypoints + skeleton overlays without sending any pixels to a server.
         </p>
         <div class="flex flex-wrap gap-2 text-[0.72rem]">
           <span class="chip">JavaScript</span>
@@ -136,7 +136,8 @@
       <!-- LAYOUT -->
       <section class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-start">
         <!-- Demo / Description -->
-        <article class="panel p-5 md:p-6 space-y-5">
+<div class="space-y-6">
+  <article class="panel p-5 md:p-6 space-y-5">
           <div class="space-y-3">
             <h2 class="text-lg md:text-xl font-semibold">What this demo does</h2>
             <p class="text-sm md:text-base text-neutral-700 dark:text-neutral-200">
@@ -151,7 +152,7 @@
               Implementation notes
             </h3>
             <ul class="list-disc pl-5 text-sm text-neutral-700 dark:text-neutral-200 space-y-1.5">
-              <li>Camera feed captured via <code>getUserMedia</code>.</li>
+              <li>Still-image input (plus optional webcam experiments).</li>
               <li>Frames piped into PoseNet using TensorFlow.js, all on-device.</li>
               <li>Skeleton and keypoints drawn to a canvas overlay.</li>
               <li>Performance tuned by adjusting input resolution and stride.</li>
@@ -168,9 +169,45 @@
               or interactive sport experiences in the browser.
             </p>
           </div>
-        </article>
+        
+  </article>
 
-        <!-- Visual / Callouts -->
+  <!-- Still image PoseNet demo -->
+  <article class="panel p-5 md:p-6 space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 class="text-lg md:text-xl font-semibold">PoseNet on a still image</h2>
+      <div class="flex items-center gap-2">
+        <button id="runPose"
+          class="inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700">
+          Run PoseNet
+        </button>
+        <button id="clearPose"
+          class="inline-flex items-center rounded-lg border border-black/10 dark:border-white/10 px-3 py-2 text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <p class="text-sm md:text-base text-neutral-700 dark:text-neutral-200">
+      This runs PoseNet once against <code>an action shot</code> and overlays detected keypoints + skeleton.
+      (Tip: if you replace the image, keep the same aspect ratio for best alignment.)
+    </p>
+
+    <div class="relative w-full overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 bg-white/40 dark:bg-black/20">
+      <img id="poseImage"
+           src="assets/img/nate_p_backhand.jpg"
+           alt="Tennis backhand still image for PoseNet"
+           class="block w-full h-auto"
+           loading="lazy"
+           decoding="async" />
+      <canvas id="poseCanvas" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
+
+    <p id="poseStatus" class="text-xs text-neutral-600 dark:text-neutral-300">
+      Ready. Click “Run PoseNet”.
+    </p>
+  </article>
+</div><!-- Visual / Callouts -->
         <aside class="space-y-4">
           <div class="panel p-4 md:p-5 flex flex-col gap-3">
             <img src="assets/img/posenetgif.gif"
@@ -215,6 +252,126 @@
   <!-- PoseNet / TF.js libraries (demo wiring can be added in a separate script) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+
+  <script>
+    // Still image PoseNet demo wiring
+    (function () {
+      const img = document.getElementById('poseImage');
+      const canvas = document.getElementById('poseCanvas');
+      const statusEl = document.getElementById('poseStatus');
+      const runBtn = document.getElementById('runPose');
+      const clearBtn = document.getElementById('clearPose');
+
+      if (!img || !canvas || !runBtn || !clearBtn) return;
+
+      const ctx = canvas.getContext('2d', { willReadFrequently: false });
+      let net = null;
+
+      const MIN_KEYPOINT_SCORE = 0.35;
+      const POINT_RADIUS = 5;
+
+      function setStatus(msg) {
+        if (statusEl) statusEl.textContent = msg;
+      }
+
+      function syncCanvasToImage() {
+        if (!img.naturalWidth || !img.naturalHeight) return;
+        // Match PoseNet output coordinates (natural image space)
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+      }
+
+      function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function drawPoint(x, y, r) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+
+      function drawSegment(a, b) {
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      function drawPose(pose) {
+        clearCanvas();
+
+        // Keypoints
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.95)'; // brand-600-ish
+        pose.keypoints.forEach((kp) => {
+          if (kp.score >= MIN_KEYPOINT_SCORE) {
+            drawPoint(kp.position.x, kp.position.y, POINT_RADIUS);
+          }
+        });
+
+        // Skeleton
+        const adjacent = posenet.getAdjacentKeyPoints(pose.keypoints, MIN_KEYPOINT_SCORE);
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.9)'; // emerald-ish
+        ctx.lineWidth = 3;
+
+        adjacent.forEach(([kp1, kp2]) => {
+          drawSegment(kp1.position, kp2.position);
+        });
+      }
+
+      async function loadModelOnce() {
+        if (net) return net;
+        setStatus('Loading PoseNet model…');
+
+        // MobileNetV1 is fast and works well for demos.
+        net = await posenet.load({
+          architecture: 'MobileNetV1',
+          outputStride: 16,
+          inputResolution: { width: 513, height: 513 },
+          multiplier: 0.75
+        });
+
+        setStatus('Model loaded. Click “Run PoseNet”.');
+        return net;
+      }
+
+      async function runOnce() {
+        try {
+          // Ensure image & canvas are ready
+          if (!img.complete) {
+            setStatus('Waiting for image to load…');
+            await new Promise((resolve, reject) => {
+              img.addEventListener('load', resolve, { once: true });
+              img.addEventListener('error', reject, { once: true });
+            });
+          }
+          syncCanvasToImage();
+
+          const model = await loadModelOnce();
+          setStatus('Running inference…');
+
+          const pose = await model.estimateSinglePose(img, { flipHorizontal: false });
+          drawPose(pose);
+
+          const score = typeof pose.score === 'number' ? pose.score.toFixed(2) : '—';
+          setStatus(`Done. Pose score: ${score}`);
+        } catch (err) {
+          console.error(err);
+          setStatus('Error running PoseNet. Check console for details.');
+        }
+      }
+
+      // Init
+      if (img.complete) syncCanvasToImage();
+      img.addEventListener('load', syncCanvasToImage);
+
+      runBtn.addEventListener('click', runOnce);
+      clearBtn.addEventListener('click', () => {
+        clearCanvas();
+        setStatus('Cleared. Click “Run PoseNet”.');
+      });
+    })();
+  </script>
 </body>
 </html>
 
