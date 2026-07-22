@@ -36,6 +36,9 @@
   <!-- tsParticles -->
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
 
+  <!-- Matter.js (tennis-ball physics in hero) -->
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+
   <!-- Open Graph -->
   <meta property="og:title" content="James Ponwith — Principal Software Engineer" />
   <meta property="og:description" content="Resiliency & real-time systems. AWS • Go • New Relic • ECS/Fargate • Route53 • DynamoDB." />
@@ -254,6 +257,31 @@
         gap: 1.75rem;
       }
     }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; }
+    .revealed { animation: rise 0.6s ease both; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+    }
+
+    /* Filter animation (View Transitions API) */
+    ::view-transition-group(*) { animation-duration: 280ms; }
+
+    /* Tennis-ball physics canvas */
+    #heroCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; }
+      .revealed { animation: none; }
+    }
   </style>
 
   <script type="application/ld+json">
@@ -325,8 +353,9 @@
     <div class="mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-16 md:space-y-22">
 
       <!-- HOME / HERO DASHBOARD -->
-      <section id="home" class="space-y-8">
-        <div class="grid hero-grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
+      <section id="home" class="relative space-y-8">
+        <canvas id="heroCanvas" aria-hidden="true"></canvas>
+        <div class="relative z-10 grid hero-grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
           <!-- Text -->
           <div>
             <div class="section-label">OVERVIEW</div>
@@ -929,15 +958,27 @@
     const filterButtons = document.querySelectorAll('.filter-pill');
     const projectCards = document.querySelectorAll('#projectGrid .project-card');
 
+    // Unique names let the View Transitions API animate cards to their new grid spots
+    projectCards.forEach((card, i) => card.style.viewTransitionName = 'card-' + i);
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     function applyFilter(filter) {
-      projectCards.forEach(card => {
-        const tags = (card.getAttribute('data-tags') || '').split(/\s+/);
-        if (filter === 'all' || tags.includes(filter)) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
-      });
+      const update = () => {
+        projectCards.forEach(card => {
+          const tags = (card.getAttribute('data-tags') || '').split(/\s+/);
+          if (filter === 'all' || tags.includes(filter)) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      };
+      if (document.startViewTransition && !reducedMotion.matches) {
+        document.startViewTransition(update);
+      } else {
+        update();
+      }
     }
 
     filterButtons.forEach(btn => {
@@ -994,7 +1035,97 @@
       await tsParticles.load('tsparticles', options);
     }
 
-    window.addEventListener('load', () => loadParticles());
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.project-card, .metric-card, .panel');
+    revealEls.forEach(el => el.classList.add('reveal'));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.filter(e => e.isIntersecting).forEach((entry, i) => {
+        entry.target.style.animationDelay = `${(i % 6) * 70}ms`;
+        entry.target.classList.add('revealed');
+        entry.target.classList.remove('reveal');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // Tennis-ball physics in the hero
+    function initTennisBalls() {
+      if (!window.Matter || reducedMotion.matches) return;
+      const hero = document.getElementById('home');
+      const canvas = document.getElementById('heroCanvas');
+      const { Engine, Render, Runner, Bodies, Body, Composite, Mouse, MouseConstraint } = Matter;
+
+      let w = hero.clientWidth, h = hero.clientHeight;
+      const engine = Engine.create();
+      const render = Render.create({
+        canvas, engine,
+        options: { width: w, height: h, wireframes: false, background: 'transparent', pixelRatio: window.devicePixelRatio }
+      });
+
+      const ballSvg =
+        "<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'>" +
+        "<defs><radialGradient id='g' cx='35%' cy='30%' r='75%'>" +
+        "<stop offset='0%' stop-color='#eaff70'/><stop offset='100%' stop-color='#b3d431'/></radialGradient></defs>" +
+        "<circle cx='32' cy='32' r='31' fill='url(#g)'/>" +
+        "<path d='M11 8 A42 42 0 0 1 11 56' fill='none' stroke='#fff' stroke-width='3.5'/>" +
+        "<path d='M53 8 A42 42 0 0 0 53 56' fill='none' stroke='#fff' stroke-width='3.5'/></svg>";
+      const texture = 'data:image/svg+xml;utf8,' + encodeURIComponent(ballSvg);
+
+      const balls = Array.from({ length: 8 }, (_, i) => {
+        const r = 13 + (i % 3) * 3;
+        return Bodies.circle(60 + ((w - 120) / 7) * i, -60 - i * 80, r, {
+          restitution: 0.85, friction: 0.05, frictionAir: 0.002,
+          render: { sprite: { texture, xScale: r / 32, yScale: r / 32 } }
+        });
+      });
+
+      const wallOpts = { isStatic: true, render: { visible: false } };
+      const floor = Bodies.rectangle(w / 2, h + 30, w * 3, 60, wallOpts);
+      const leftWall = Bodies.rectangle(-30, h / 2, 60, h * 6, wallOpts);
+      const rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 6, wallOpts);
+      Composite.add(engine.world, [...balls, floor, leftWall, rightWall]);
+
+      // Mouse listens on the hero section (canvas is pointer-events: none, so links keep working)
+      const mouse = Mouse.create(hero);
+      const grab = MouseConstraint.create(engine, {
+        mouse, constraint: { stiffness: 0.15, render: { visible: false } }
+      });
+      Composite.add(engine.world, grab);
+      // give scroll and touch back to the page; ball-dragging is desktop-only candy
+      hero.removeEventListener('wheel', mouse.mousewheel);
+      hero.removeEventListener('mousewheel', mouse.mousewheel);
+      hero.removeEventListener('DOMMouseScroll', mouse.mousewheel);
+      hero.removeEventListener('touchstart', mouse.mousedown);
+      hero.removeEventListener('touchmove', mouse.mousemove);
+      hero.removeEventListener('touchend', mouse.mouseup);
+
+      Render.run(render);
+      Runner.run(Runner.create(), engine);
+
+      window.addEventListener('resize', () => {
+        w = hero.clientWidth; h = hero.clientHeight;
+        render.bounds.max.x = w; render.bounds.max.y = h;
+        render.options.width = w; render.options.height = h;
+        Render.setPixelRatio(render, window.devicePixelRatio);
+        Body.setPosition(floor, { x: w / 2, y: h + 30 });
+        Body.setPosition(rightWall, { x: w + 30, y: h / 2 });
+      });
+
+      // ponytail: hard throws can tunnel through walls; cheap respawn beats tuning the solver
+      setInterval(() => {
+        balls.forEach(b => {
+          if (b.position.y > h + 300 || b.position.x < -300 || b.position.x > w + 300) {
+            Body.setPosition(b, { x: 60 + Math.random() * (w - 120), y: -60 });
+            Body.setVelocity(b, { x: 0, y: 0 });
+          }
+        });
+      }, 3000);
+    }
+
+    window.addEventListener('load', () => {
+      loadParticles();
+      initTennisBalls();
+    });
   </script>
 </body>
 </html>
