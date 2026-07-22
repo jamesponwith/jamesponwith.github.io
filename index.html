@@ -10,7 +10,7 @@
   <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
     tailwind.config = {
@@ -18,12 +18,13 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial']
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
           },
           colors: {
             brand: {
-              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
-              500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
+              50:'#ecfeff',100:'#cffafe',200:'#a5f3fc',300:'#67e8f9',400:'#22d3ee',
+              500:'#06b6d4',600:'#0891b2',700:'#0e7490',800:'#155e75',900:'#164e63'
             }
           },
           boxShadow: {
@@ -54,12 +55,22 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background:
-        radial-gradient(circle at top, #e5f0ff 0, #ffffff 45%, #f3f4f6 100%);
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(rgba(8,145,178,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(8,145,178,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
     .dark body {
-      background:
-        radial-gradient(circle at top, #020617 0, #020617 45%, #000000 100%);
+      background-color: #030712;
+      background-image:
+        linear-gradient(rgba(34,211,238,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,0.05) 1px, transparent 1px);
+    }
+
+    h1, h2, h3, .font-head {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      letter-spacing: -0.03em;
     }
 
     main {
@@ -77,91 +88,103 @@
     }
 
     .section-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: #6b7280;
+      color: #0891b2;
     }
+    .section-label::before { content: '// '; opacity: 0.6; }
     .dark .section-label {
-      color: #9ca3af;
+      color: #22d3ee;
     }
 
     .panel {
-      border-radius: 1.4rem;
-      border: 1px solid rgba(148,163,184,0.35);
-      background: radial-gradient(circle at top left, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
-      box-shadow: 0 18px 45px rgba(15,23,42,0.12);
+      border-radius: 0.6rem;
+      border: 1px solid rgba(8,145,178,0.25);
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.08);
     }
     .dark .panel {
-      background: radial-gradient(circle at top left, rgba(15,23,42,0.96), rgba(2,6,23,0.98));
-      border-color: rgba(30,64,175,0.8);
-      box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+      background: rgba(3,7,18,0.85);
+      border-color: rgba(34,211,238,0.22);
+      box-shadow: 0 0 30px rgba(34,211,238,0.05);
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      padding: 0.25rem 0.7rem;
-      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      border-radius: 0.3rem;
+      border: 1px solid rgba(8,145,178,0.35);
+      background: rgba(8,145,178,0.07);
+      color: #0e7490;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.68rem;
       gap: 0.35rem;
+    }
+    .dark .chip {
+      border-color: rgba(34,211,238,0.3);
+      background: rgba(34,211,238,0.08);
+      color: #67e8f9;
     }
 
     .pill {
       display: inline-flex;
       align-items: center;
-      border-radius: 999px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.75rem;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: rgba(255,255,255,0.8);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      border-radius: 0.4rem;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.72rem;
+      border: 1px solid rgba(8,145,178,0.3);
+      background: rgba(255,255,255,0.85);
+      gap: 0.4rem;
     }
     .dark .pill {
-      background: rgba(15,23,42,0.8);
-      border-color: rgba(75,85,99,0.9);
+      background: rgba(3,7,18,0.85);
+      border-color: rgba(34,211,238,0.25);
     }
 
     .metric-card {
       position: relative;
       overflow: hidden;
-      border-radius: 1.4rem;
-      border: 1px solid rgba(148,163,184,0.35);
-      background: rgba(255,255,255,0.95);
+      border-radius: 0.6rem;
+      border: 1px solid rgba(8,145,178,0.25);
+      background: rgba(255,255,255,0.92);
       padding: 1.1rem 1.2rem;
-      box-shadow: 0 14px 30px rgba(15,23,42,0.1);
       transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
     }
     .dark .metric-card {
-      background: rgba(15,23,42,0.98);
-      border-color: rgba(30,64,175,0.8);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+      background: rgba(3,7,18,0.88);
+      border-color: rgba(34,211,238,0.22);
     }
     .metric-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 18px 45px rgba(15,23,42,0.18);
-      border-color: rgba(59,130,246,0.85);
-      background: rgba(255,255,255,0.98);
-    }
-    .dark .metric-card:hover {
-      background: rgba(15,23,42,1);
+      border-color: rgba(34,211,238,0.7);
+      box-shadow: 0 0 0 1px rgba(34,211,238,0.3), 0 0 28px rgba(34,211,238,0.16);
     }
 
     .metric-pill {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
       font-size: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 0.18em;
-      padding: 0.15rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.7);
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.3rem;
+      border: 1px solid rgba(8,145,178,0.4);
+      color: #0891b2;
+    }
+    .dark .metric-pill {
+      color: #22d3ee;
+      border-color: rgba(34,211,238,0.4);
     }
 
     .project-card {
       position: relative;
       overflow: hidden;
-      border-radius: 1.4rem;
-      border: 1px solid rgba(148,163,184,0.35);
-      background: rgba(255,255,255,0.9);
+      border-radius: 0.6rem;
+      border: 1px solid rgba(8,145,178,0.25);
+      background: rgba(255,255,255,0.92);
       transition:
         transform 200ms ease,
         box-shadow 200ms ease,
@@ -169,18 +192,13 @@
         background 200ms ease;
     }
     .dark .project-card {
-      background: rgba(15,23,42,0.96);
-      border-color: rgba(30,64,175,0.8);
+      background: rgba(3,7,18,0.88);
+      border-color: rgba(34,211,238,0.22);
     }
     .project-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 18px 45px rgba(15,23,42,0.24);
-      border-color: rgba(59,130,246,0.8);
-      background: rgba(255,255,255,0.98);
-    }
-    .dark .project-card:hover {
-      box-shadow: 0 22px 60px rgba(0,0,0,0.85);
-      background: rgba(15,23,42,1);
+      border-color: rgba(34,211,238,0.7);
+      box-shadow: 0 0 0 1px rgba(34,211,238,0.3), 0 0 32px rgba(34,211,238,0.18);
     }
 
     .project-thumb {
@@ -198,10 +216,11 @@
     }
 
     .filter-pill {
-      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.72rem;
       padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.7);
+      border-radius: 0.4rem;
+      border: 1px solid rgba(8,145,178,0.35);
       background: rgba(255,255,255,0.9);
       display: inline-flex;
       align-items: center;
@@ -210,8 +229,8 @@
       transition: background 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
     }
     .dark .filter-pill {
-      background: rgba(15,23,42,0.9);
-      border-color: rgba(51,65,85,0.9);
+      background: rgba(3,7,18,0.9);
+      border-color: rgba(34,211,238,0.25);
     }
     .filter-pill-dot {
       width: 8px;
@@ -220,24 +239,25 @@
       background: rgba(148,163,184,0.9);
     }
     .filter-pill[data-active="true"] {
-      border-color: rgba(59,130,246,0.9);
-      background: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(56,189,248,0.15));
-      color: #0f172a;
-      box-shadow: 0 0 0 1px rgba(59,130,246,0.15);
+      border-color: rgba(34,211,238,0.8);
+      background: rgba(34,211,238,0.1);
+      color: #0e7490;
+      box-shadow: 0 0 0 1px rgba(34,211,238,0.3), 0 0 16px rgba(34,211,238,0.2);
     }
     .dark .filter-pill[data-active="true"] {
-      color: #e5e7eb;
+      color: #a5f3fc;
     }
     .filter-pill[data-active="true"] .filter-pill-dot {
-      background: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59,130,246,0.38);
+      background: #22d3ee;
+      box-shadow: 0 0 0 4px rgba(34,211,238,0.3);
     }
 
     .divider-label {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.18em;
       color: #9ca3af;
@@ -252,6 +272,39 @@
     .divider-label::after {
       background: linear-gradient(to left, transparent, rgba(148,163,184,0.6));
     }
+
+    /* Terminal window (always dark — it's a terminal) */
+    .terminal {
+      border-radius: 0.6rem;
+      border: 1px solid rgba(34,211,238,0.3);
+      background: #050a14;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.8rem;
+      box-shadow: 0 0 32px rgba(34,211,238,0.12);
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0.55rem 0.8rem;
+      background: rgba(34,211,238,0.06);
+      border-bottom: 1px solid rgba(34,211,238,0.18);
+    }
+    .tdot { width: 11px; height: 11px; border-radius: 50%; }
+    .terminal-title {
+      margin-left: auto;
+      font-size: 0.68rem;
+      color: rgba(165,243,252,0.55);
+    }
+    .terminal-body {
+      padding: 0.9rem 1rem;
+      color: #a5f3fc;
+      line-height: 1.7;
+    }
+    .terminal .prompt { color: #34d399; font-weight: 600; }
+    .tcursor { color: #22d3ee; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
 
     @media (max-width: 768px) {
       .hero-grid {
@@ -311,8 +364,8 @@
   <header class="sticky top-0 z-50 backdrop-blur bg-white/80 dark:bg-neutral-950/75 border-b border-black/5 dark:border-white/5">
     <nav class="mx-auto max-w-6xl px-4">
       <div class="flex h-16 items-center justify-between">
-        <a href="#home" class="font-semibold tracking-tight text-lg">
-          James Ponwith
+        <a href="#home" class="font-head font-semibold tracking-tight text-base">
+          james@ponwith<span class="text-brand-500">:~$</span>
         </a>
 
         <div class="flex items-center gap-1">
@@ -368,10 +421,21 @@
         <div class="grid hero-grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
           <!-- Text -->
           <div>
-            <div class="section-label">OVERVIEW</div>
+            <div class="terminal mb-6 max-w-xl">
+              <div class="terminal-bar">
+                <span class="tdot" style="background:#ff5f56"></span>
+                <span class="tdot" style="background:#ffbd2e"></span>
+                <span class="tdot" style="background:#27c93f"></span>
+                <span class="terminal-title">james@ponwith: ~</span>
+              </div>
+              <div class="terminal-body">
+                <div><span class="prompt">➜ ~</span> <span id="typedCmd"></span><span class="tcursor">▋</span></div>
+                <div id="cmdOut" hidden>james · nyc · resiliency &amp; real-time payments · go / aws / k8s</div>
+              </div>
+            </div>
             <h1 class="mt-3 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
               Hi, I'm James.
-              <span class="block bg-gradient-to-r from-brand-500 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+              <span class="block bg-gradient-to-r from-emerald-400 via-cyan-400 to-brand-500 bg-clip-text text-transparent">
                 Principal Software Engineer.
               </span>
             </h1>
@@ -398,12 +462,12 @@
 
             <div class="mt-7 flex flex-wrap gap-3">
               <a href="#work"
-                 class="inline-flex items-center rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700">
-                Go to work dashboard
+                 class="font-head inline-flex items-center rounded-lg bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700">
+                $ cd ~/work
               </a>
               <a href="#contact"
-                 class="inline-flex items-center rounded-xl border px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">
-                Get in touch
+                 class="font-head inline-flex items-center rounded-lg border border-brand-600/40 px-5 py-3 hover:bg-black/5 dark:hover:bg-white/10">
+                $ ./contact
               </a>
             </div>
           </div>
@@ -935,10 +999,9 @@
   </footer>
 
   <script>
-    // Theme: saved choice wins, otherwise system preference
+    // Theme: saved choice wins, otherwise dark (it's the intended look)
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.classList.toggle('dark', savedTheme ? savedTheme === 'dark' : prefersDark);
+    document.documentElement.classList.toggle('dark', savedTheme !== 'light');
 
     document.getElementById('themeBtn').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark');
@@ -955,6 +1018,26 @@
 
     // Current year
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Hero terminal: type `whoami`, then show output
+    {
+      const typedEl = document.getElementById('typedCmd');
+      const outEl = document.getElementById('cmdOut');
+      const cmd = 'whoami';
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        typedEl.textContent = cmd;
+        outEl.hidden = false;
+      } else {
+        let i = 0;
+        const t = setInterval(() => {
+          typedEl.textContent = cmd.slice(0, ++i);
+          if (i >= cmd.length) {
+            clearInterval(t);
+            setTimeout(() => { outEl.hidden = false; }, 350);
+          }
+        }, 95);
+      }
+    }
 
     // Smooth scroll for hash links
     document.querySelectorAll('a[href^="#"]').forEach(link => {
@@ -1011,8 +1094,8 @@
 
     // tsParticles background
     async function loadParticles(isDark = document.documentElement.classList.contains('dark')) {
-      const primary = isDark ? '#93c5fd' : '#3b82f6';
-      const linkColor = isDark ? '#64748b' : '#94a3b8';
+      const primary = isDark ? '#22d3ee' : '#0891b2';
+      const linkColor = isDark ? '#155e75' : '#94a3b8';
 
       const options = {
         fpsLimit: 45,
