@@ -270,7 +270,7 @@
     ::view-transition-group(*) { animation-duration: 280ms; }
 
     /* Tennis-ball physics canvas */
-    #heroCanvas {
+    #pageCanvas {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -360,12 +360,12 @@
 
   <!-- MAIN -->
   <main id="main" class="relative">
-    <div class="mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-16 md:space-y-22">
+    <canvas id="pageCanvas" aria-hidden="true"></canvas>
+    <div class="relative z-10 mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-16 md:space-y-22">
 
       <!-- HOME / HERO DASHBOARD -->
       <section id="home" class="relative space-y-8">
-        <canvas id="heroCanvas" aria-hidden="true"></canvas>
-        <div class="relative z-10 grid hero-grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
+        <div class="grid hero-grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
           <!-- Text -->
           <div>
             <div class="section-label">OVERVIEW</div>
@@ -996,6 +996,8 @@
       } else {
         update();
       }
+      // physics tiles must track the new layout (350ms ≈ after the view transition settles)
+      setTimeout(() => window.rebuildTennisTiles && window.rebuildTennisTiles(), 350);
     }
 
     filterButtons.forEach(btn => {
@@ -1079,15 +1081,16 @@
     }, { threshold: 0.15 });
     revealEls.forEach(el => revealObserver.observe(el));
 
-    // Tennis-ball physics in the hero
+    // Tennis-ball physics down the whole page, bouncing off the tiles
     function initTennisBalls() {
       if (!window.Matter || reducedMotion.matches) return;
-      const hero = document.getElementById('home');
-      const canvas = document.getElementById('heroCanvas');
+      const mainEl = document.getElementById('main');
+      const canvas = document.getElementById('pageCanvas');
       const { Engine, Render, Runner, Bodies, Body, Composite, Mouse, MouseConstraint } = Matter;
 
-      let w = hero.clientWidth, h = hero.clientHeight;
-      const engine = Engine.create();
+      let w = mainEl.clientWidth, h = mainEl.clientHeight;
+      const engine = Engine.create({ enableSleeping: true });
+      engine.gravity.y = 0.5;
       const render = Render.create({
         canvas, engine,
         options: { width: w, height: h, wireframes: false, background: 'transparent', pixelRatio: window.devicePixelRatio }
@@ -1102,45 +1105,71 @@
         "<path d='M53 8 A42 42 0 0 0 53 56' fill='none' stroke='#fff' stroke-width='3.5'/></svg>";
       const texture = 'data:image/svg+xml;utf8,' + encodeURIComponent(ballSvg);
 
-      const balls = Array.from({ length: 8 }, (_, i) => {
+      const balls = Array.from({ length: 10 }, (_, i) => {
         const r = 13 + (i % 3) * 3;
-        return Bodies.circle(60 + ((w - 120) / 7) * i, -60 - i * 80, r, {
-          restitution: 0.85, friction: 0.05, frictionAir: 0.002,
+        return Bodies.circle(60 + ((w - 120) / 9) * i, -80 - i * 120, r, {
+          restitution: 0.85, friction: 0.05, frictionAir: 0.003,
           render: { sprite: { texture, xScale: r / 32, yScale: r / 32 } }
         });
       });
 
       const wallOpts = { isStatic: true, render: { visible: false } };
       const floor = Bodies.rectangle(w / 2, h + 30, w * 3, 60, wallOpts);
-      const leftWall = Bodies.rectangle(-30, h / 2, 60, h * 6, wallOpts);
-      const rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 6, wallOpts);
-      Composite.add(engine.world, [...balls, floor, leftWall, rightWall]);
+      const leftWall = Bodies.rectangle(-30, h / 2, 60, h * 3, wallOpts);
+      const rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 3, wallOpts);
+      const tiles = Composite.create();
+      Composite.add(engine.world, [...balls, floor, leftWall, rightWall, tiles]);
 
-      // Mouse listens on the hero section (canvas is pointer-events: none, so links keep working)
-      const mouse = Mouse.create(hero);
+      // Invisible static bodies matching each visible card/panel, so balls bounce down the layout
+      function rebuildTiles() {
+        w = mainEl.clientWidth; h = mainEl.clientHeight;
+        render.options.width = w; render.options.height = h;
+        render.bounds.max.x = w; render.bounds.max.y = h;
+        Render.setPixelRatio(render, window.devicePixelRatio);
+        Body.setPosition(floor, { x: w / 2, y: h + 30 });
+        Body.setPosition(leftWall, { x: -30, y: h / 2 });
+        Body.setPosition(rightWall, { x: w + 30, y: h / 2 });
+
+        const mainRect = mainEl.getBoundingClientRect();
+        Composite.clear(tiles, false);
+        document.querySelectorAll('.project-card, .metric-card, .panel').forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height) return; // hidden by filter
+          Composite.add(tiles, Bodies.rectangle(
+            r.left - mainRect.left + r.width / 2,
+            r.top - mainRect.top + r.height / 2,
+            r.width, r.height,
+            { isStatic: true, chamfer: { radius: 18 }, render: { visible: false } }
+          ));
+        });
+      }
+      rebuildTiles();
+      window.rebuildTennisTiles = rebuildTiles;
+
+      // Mouse listens on main (canvas is pointer-events: none, so links keep working)
+      const mouse = Mouse.create(mainEl);
       const grab = MouseConstraint.create(engine, {
         mouse, constraint: { stiffness: 0.15, render: { visible: false } }
       });
       Composite.add(engine.world, grab);
       // give scroll and touch back to the page; ball-dragging is desktop-only candy
-      hero.removeEventListener('wheel', mouse.mousewheel);
-      hero.removeEventListener('mousewheel', mouse.mousewheel);
-      hero.removeEventListener('DOMMouseScroll', mouse.mousewheel);
-      hero.removeEventListener('touchstart', mouse.mousedown);
-      hero.removeEventListener('touchmove', mouse.mousemove);
-      hero.removeEventListener('touchend', mouse.mouseup);
+      mainEl.removeEventListener('wheel', mouse.mousewheel);
+      mainEl.removeEventListener('mousewheel', mouse.mousewheel);
+      mainEl.removeEventListener('DOMMouseScroll', mouse.mousewheel);
+      mainEl.removeEventListener('touchstart', mouse.mousedown);
+      mainEl.removeEventListener('touchmove', mouse.mousemove);
+      mainEl.removeEventListener('touchend', mouse.mouseup);
 
       Render.run(render);
       Runner.run(Runner.create(), engine);
 
-      window.addEventListener('resize', () => {
-        w = hero.clientWidth; h = hero.clientHeight;
-        render.bounds.max.x = w; render.bounds.max.y = h;
-        render.options.width = w; render.options.height = h;
-        Render.setPixelRatio(render, window.devicePixelRatio);
-        Body.setPosition(floor, { x: w / 2, y: h + 30 });
-        Body.setPosition(rightWall, { x: w + 30, y: h / 2 });
-      });
+      window.addEventListener('resize', rebuildTiles);
+      // lazy-loaded card images shift layout after init; re-sync tiles when they arrive
+      let imgTimer;
+      document.addEventListener('load', () => {
+        clearTimeout(imgTimer);
+        imgTimer = setTimeout(rebuildTiles, 200);
+      }, true);
 
       // ponytail: hard throws can tunnel through walls; cheap respawn beats tuning the solver
       setInterval(() => {
