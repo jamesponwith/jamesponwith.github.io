@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "jamesponwith_github_io",
+  "project_id": "dace706c-1cd1-4530-8287-904e7367aa56"
+}

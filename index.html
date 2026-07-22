@@ -14,6 +14,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -35,6 +36,9 @@
 
   <!-- tsParticles -->
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
+
+  <!-- Matter.js (tennis-ball physics in hero) -->
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 
   <!-- Open Graph -->
   <meta property="og:title" content="James Ponwith — Principal Software Engineer" />
@@ -254,6 +258,31 @@
         gap: 1.75rem;
       }
     }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; }
+    .revealed { animation: rise 0.6s ease both; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+    }
+
+    /* Filter animation (View Transitions API) */
+    ::view-transition-group(*) { animation-duration: 280ms; }
+
+    /* Tennis-ball physics canvas */
+    #pageCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; }
+      .revealed { animation: none; }
+    }
   </style>
 
   <script type="application/ld+json">
@@ -286,20 +315,29 @@
           James Ponwith
         </a>
 
-        <div class="hidden md:flex items-center gap-6 text-sm">
-          <a href="#home" class="hover:text-brand-600">Home</a>
-          <a href="#work" class="hover:text-brand-600">Work</a>
-          <a href="#about" class="hover:text-brand-600">About</a>
-          <a href="#contact" class="hover:text-brand-600">Contact</a>
-          <a href="https://github.com/jamesponwith" class="hover:text-brand-600" aria-label="GitHub">GitHub</a>
-          <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-brand-600" aria-label="LinkedIn">LinkedIn</a>
+        <div class="flex items-center gap-1">
+          <div class="hidden md:flex items-center gap-6 text-sm mr-3">
+            <a href="#home" class="hover:text-brand-600">Home</a>
+            <a href="#work" class="hover:text-brand-600">Work</a>
+            <a href="#about" class="hover:text-brand-600">About</a>
+            <a href="#contact" class="hover:text-brand-600">Contact</a>
+            <a href="https://github.com/jamesponwith" class="hover:text-brand-600" aria-label="GitHub">GitHub</a>
+            <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-brand-600" aria-label="LinkedIn">LinkedIn</a>
+          </div>
+          <button id="themeBtn" class="inline-flex items-center justify-center rounded-md p-2 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Toggle dark mode">
+            <svg class="h-5 w-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <svg class="h-5 w-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+          <button id="menuBtn" class="md:hidden inline-flex items-center justify-center rounded-md p-2 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Open menu">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
         </div>
-
-        <button id="menuBtn" class="md:hidden inline-flex items-center justify-center rounded-md p-2 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Open menu">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
       </div>
 
       <div id="mobileMenu" class="hidden pb-4 md:hidden">
@@ -322,10 +360,11 @@
 
   <!-- MAIN -->
   <main id="main" class="relative">
-    <div class="mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-16 md:space-y-22">
+    <canvas id="pageCanvas" aria-hidden="true"></canvas>
+    <div class="relative z-10 mx-auto max-w-6xl px-4 py-10 md:py-14 space-y-16 md:space-y-22">
 
       <!-- HOME / HERO DASHBOARD -->
-      <section id="home" class="space-y-8">
+      <section id="home" class="relative space-y-8">
         <div class="grid hero-grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
           <!-- Text -->
           <div>
@@ -896,9 +935,16 @@
   </footer>
 
   <script>
-    // Theme based on system preference
+    // Theme: saved choice wins, otherwise system preference
+    const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.classList.toggle('dark', prefersDark);
+    document.documentElement.classList.toggle('dark', savedTheme ? savedTheme === 'dark' : prefersDark);
+
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      loadParticles(isDark);
+    });
 
     // Mobile menu
     const menuBtn = document.getElementById('menuBtn');
@@ -929,15 +975,29 @@
     const filterButtons = document.querySelectorAll('.filter-pill');
     const projectCards = document.querySelectorAll('#projectGrid .project-card');
 
+    // Unique names let the View Transitions API animate cards to their new grid spots
+    projectCards.forEach((card, i) => card.style.viewTransitionName = 'card-' + i);
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     function applyFilter(filter) {
-      projectCards.forEach(card => {
-        const tags = (card.getAttribute('data-tags') || '').split(/\s+/);
-        if (filter === 'all' || tags.includes(filter)) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
-      });
+      const update = () => {
+        projectCards.forEach(card => {
+          const tags = (card.getAttribute('data-tags') || '').split(/\s+/);
+          if (filter === 'all' || tags.includes(filter)) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      };
+      if (document.startViewTransition && !reducedMotion.matches) {
+        document.startViewTransition(update);
+      } else {
+        update();
+      }
+      // physics tiles must track the new layout (350ms ≈ after the view transition settles)
+      setTimeout(() => window.rebuildTennisTiles && window.rebuildTennisTiles(), 350);
     }
 
     filterButtons.forEach(btn => {
@@ -994,7 +1054,138 @@
       await tsParticles.load('tsparticles', options);
     }
 
-    window.addEventListener('load', () => loadParticles());
+    // Card tilt on hover — inline transform overrides the CSS hover lift, so include it
+    if (!reducedMotion.matches) {
+      projectCards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          card.style.transform =
+            `perspective(900px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 5).toFixed(2)}deg) translateY(-4px)`;
+        });
+        card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+      });
+    }
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.project-card, .metric-card, .panel');
+    revealEls.forEach(el => el.classList.add('reveal'));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.filter(e => e.isIntersecting).forEach((entry, i) => {
+        entry.target.style.animationDelay = `${(i % 6) * 70}ms`;
+        entry.target.classList.add('revealed');
+        entry.target.classList.remove('reveal');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // Tennis-ball physics down the whole page, bouncing off the tiles
+    function initTennisBalls() {
+      if (!window.Matter || reducedMotion.matches) return;
+      const mainEl = document.getElementById('main');
+      const canvas = document.getElementById('pageCanvas');
+      const { Engine, Render, Runner, Bodies, Body, Composite, Mouse, MouseConstraint } = Matter;
+
+      let w = mainEl.clientWidth, h = mainEl.clientHeight;
+      const engine = Engine.create({ enableSleeping: true });
+      engine.gravity.y = 0.5;
+      const render = Render.create({
+        canvas, engine,
+        options: { width: w, height: h, wireframes: false, background: 'transparent', pixelRatio: window.devicePixelRatio }
+      });
+
+      const ballSvg =
+        "<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'>" +
+        "<defs><radialGradient id='g' cx='35%' cy='30%' r='75%'>" +
+        "<stop offset='0%' stop-color='#eaff70'/><stop offset='100%' stop-color='#b3d431'/></radialGradient></defs>" +
+        "<circle cx='32' cy='32' r='31' fill='url(#g)'/>" +
+        "<path d='M11 8 A42 42 0 0 1 11 56' fill='none' stroke='#fff' stroke-width='3.5'/>" +
+        "<path d='M53 8 A42 42 0 0 0 53 56' fill='none' stroke='#fff' stroke-width='3.5'/></svg>";
+      const texture = 'data:image/svg+xml;utf8,' + encodeURIComponent(ballSvg);
+
+      const balls = Array.from({ length: 10 }, (_, i) => {
+        const r = 13 + (i % 3) * 3;
+        return Bodies.circle(60 + ((w - 120) / 9) * i, -80 - i * 120, r, {
+          restitution: 0.85, friction: 0.05, frictionAir: 0.003,
+          render: { sprite: { texture, xScale: r / 32, yScale: r / 32 } }
+        });
+      });
+
+      const wallOpts = { isStatic: true, render: { visible: false } };
+      const floor = Bodies.rectangle(w / 2, h + 30, w * 3, 60, wallOpts);
+      const leftWall = Bodies.rectangle(-30, h / 2, 60, h * 3, wallOpts);
+      const rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 3, wallOpts);
+      const tiles = Composite.create();
+      Composite.add(engine.world, [...balls, floor, leftWall, rightWall, tiles]);
+
+      // Invisible static bodies matching each visible card/panel, so balls bounce down the layout
+      function rebuildTiles() {
+        w = mainEl.clientWidth; h = mainEl.clientHeight;
+        render.options.width = w; render.options.height = h;
+        render.bounds.max.x = w; render.bounds.max.y = h;
+        Render.setPixelRatio(render, window.devicePixelRatio);
+        Body.setPosition(floor, { x: w / 2, y: h + 30 });
+        Body.setPosition(leftWall, { x: -30, y: h / 2 });
+        Body.setPosition(rightWall, { x: w + 30, y: h / 2 });
+
+        const mainRect = mainEl.getBoundingClientRect();
+        Composite.clear(tiles, false);
+        document.querySelectorAll('.project-card, .metric-card, .panel').forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height) return; // hidden by filter
+          Composite.add(tiles, Bodies.rectangle(
+            r.left - mainRect.left + r.width / 2,
+            r.top - mainRect.top + r.height / 2,
+            r.width, r.height,
+            { isStatic: true, chamfer: { radius: 18 }, render: { visible: false } }
+          ));
+        });
+      }
+      rebuildTiles();
+      window.rebuildTennisTiles = rebuildTiles;
+
+      // Mouse listens on main (canvas is pointer-events: none, so links keep working)
+      const mouse = Mouse.create(mainEl);
+      const grab = MouseConstraint.create(engine, {
+        mouse, constraint: { stiffness: 0.15, render: { visible: false } }
+      });
+      Composite.add(engine.world, grab);
+      // give scroll and touch back to the page; ball-dragging is desktop-only candy
+      mainEl.removeEventListener('wheel', mouse.mousewheel);
+      mainEl.removeEventListener('mousewheel', mouse.mousewheel);
+      mainEl.removeEventListener('DOMMouseScroll', mouse.mousewheel);
+      mainEl.removeEventListener('touchstart', mouse.mousedown);
+      mainEl.removeEventListener('touchmove', mouse.mousemove);
+      mainEl.removeEventListener('touchend', mouse.mouseup);
+
+      Render.run(render);
+      Runner.run(Runner.create(), engine);
+
+      window.addEventListener('resize', rebuildTiles);
+      // lazy-loaded card images shift layout after init; re-sync tiles when they arrive
+      let imgTimer;
+      document.addEventListener('load', () => {
+        clearTimeout(imgTimer);
+        imgTimer = setTimeout(rebuildTiles, 200);
+      }, true);
+
+      // ponytail: hard throws can tunnel through walls; cheap respawn beats tuning the solver
+      setInterval(() => {
+        balls.forEach(b => {
+          if (b.position.y > h + 300 || b.position.x < -300 || b.position.x > w + 300) {
+            Body.setPosition(b, { x: 60 + Math.random() * (w - 120), y: -60 });
+            Body.setVelocity(b, { x: 0, y: 0 });
+          }
+        });
+      }, 3000);
+    }
+
+    window.addEventListener('load', () => {
+      loadParticles();
+      initTennisBalls();
+    });
   </script>
 </body>
 </html>
