@@ -305,6 +305,20 @@
     .terminal .prompt { color: #34d399; font-weight: 600; }
     .tcursor { color: #22d3ee; animation: blink 1s steps(1) infinite; }
     @keyframes blink { 50% { opacity: 0; } }
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: #a5f3fc;
+      font: inherit;
+      caret-color: #22d3ee;
+      padding: 0;
+      min-width: 0;
+    }
+    .terminal-input::placeholder { color: rgba(165,243,252,0.35); }
+    .term-line { white-space: pre-wrap; word-break: break-word; }
+    .term-echo { opacity: 0.65; }
 
     @media (max-width: 768px) {
       .hero-grid {
@@ -428,9 +442,14 @@
                 <span class="tdot" style="background:#27c93f"></span>
                 <span class="terminal-title">james@ponwith: ~</span>
               </div>
-              <div class="terminal-body">
-                <div><span class="prompt">➜ ~</span> <span id="typedCmd"></span><span class="tcursor">▋</span></div>
+              <div class="terminal-body" id="termBody">
+                <div><span class="prompt">➜ ~</span> <span id="typedCmd"></span><span class="tcursor" id="typeCursor">▋</span></div>
                 <div id="cmdOut" hidden>james · nyc · resiliency &amp; real-time payments · go / aws / k8s</div>
+                <div id="termLive" class="flex items-center gap-2" hidden>
+                  <span class="prompt">➜ ~</span>
+                  <input id="termInput" class="terminal-input" autocomplete="off" spellcheck="false"
+                         aria-label="Terminal input" placeholder="type `help`">
+                </div>
               </div>
             </div>
             <h1 class="mt-3 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
@@ -964,7 +983,7 @@
             </p>
           </div>
           <div class="flex flex-col items-center md:items-end gap-3">
-            <a href="mailto:jponwith24@gmail.com"
+            <a href="mailto:jamesponwith@gmail.com"
                class="inline-flex items-center rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700 text-sm">
               Email me
             </a>
@@ -992,6 +1011,10 @@
   <footer class="border-t border-black/5 dark:border-white/5">
     <div class="mx-auto max-w-6xl px-4 py-6 md:py-8 text-sm text-neutral-500 dark:text-neutral-400 flex flex-col md:flex-row items-center justify-between gap-4">
       <div>© <span id="year"></span> James Ponwith</div>
+      <div class="font-head text-xs flex items-center gap-2" aria-hidden="true">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <span id="statusLine">booting…</span>
+      </div>
       <div class="flex items-center gap-4">
         <a href="#home" class="hover:text-brand-600">Back to top</a>
       </div>
@@ -1003,10 +1026,13 @@
     const savedTheme = localStorage.getItem('theme');
     document.documentElement.classList.toggle('dark', savedTheme !== 'light');
 
+    function setTheme(dark) {
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      loadParticles(dark);
+    }
     document.getElementById('themeBtn').addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      loadParticles(isDark);
+      setTheme(!document.documentElement.classList.contains('dark'));
     });
 
     // Mobile menu
@@ -1019,25 +1045,91 @@
     // Current year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Hero terminal: type `whoami`, then show output
+    // Hero terminal: type `whoami`, show output, then hand over a real prompt
     {
       const typedEl = document.getElementById('typedCmd');
       const outEl = document.getElementById('cmdOut');
+      const termBody = document.getElementById('termBody');
+      const termLive = document.getElementById('termLive');
+      const termInput = document.getElementById('termInput');
       const cmd = 'whoami';
+
+      const goLive = () => {
+        outEl.hidden = false;
+        document.getElementById('typeCursor').hidden = true;
+        termLive.hidden = false;
+      };
+
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         typedEl.textContent = cmd;
-        outEl.hidden = false;
+        goLive();
       } else {
         let i = 0;
         const t = setInterval(() => {
           typedEl.textContent = cmd.slice(0, ++i);
           if (i >= cmd.length) {
             clearInterval(t);
-            setTimeout(() => { outEl.hidden = false; }, 350);
+            setTimeout(goLive, 350);
           }
         }, 95);
       }
+
+      function termPrint(text, echo) {
+        const d = document.createElement('div');
+        d.className = 'term-line' + (echo ? ' term-echo' : '');
+        d.textContent = text;
+        termBody.insertBefore(d, termLive);
+        const lines = termBody.querySelectorAll('.term-line');
+        if (lines.length > 8) lines[0].remove();
+      }
+
+      const go = id => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      function runCommand(raw) {
+        const c = raw.trim().toLowerCase();
+        if (!c) return;
+        termPrint('➜ ~ ' + raw, true);
+        if (c.startsWith('sudo')) { termPrint('permission denied: this incident will be reported.'); return; }
+        switch (c) {
+          case 'help':
+            termPrint('commands: work · about · contact · light · dark · balls · whoami · clear'); break;
+          case 'work': case 'about': case 'contact': case 'home':
+            go(c); break;
+          case 'light': setTheme(false); break;
+          case 'dark': setTheme(true); break;
+          case 'balls':
+            if (window.dropTennisBalls) { window.dropTennisBalls(12); termPrint('deploying tennis balls…'); }
+            else termPrint('physics engine offline (reduced motion).');
+            break;
+          case 'whoami':
+            termPrint('james — principal software engineer'); break;
+          case 'devtools':
+            termPrint('open the real console (⌘⌥J) — there’s something in there for you.'); break;
+          case 'clear':
+            termBody.querySelectorAll('.term-line').forEach(l => l.remove()); break;
+          default:
+            termPrint(`command not found: ${c} — try \`help\``);
+        }
+      }
+
+      termInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { runCommand(termInput.value); termInput.value = ''; }
+      });
+
+      // `/` anywhere focuses the terminal
+      document.addEventListener('keydown', e => {
+        if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey &&
+            !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
+          e.preventDefault();
+          termLive.hidden = false;
+          termInput.focus();
+        }
+      });
     }
+
+    // Devtools easter egg
+    console.log('%c➜ ~ whoami', 'color:#34d399;font-family:monospace;font-size:14px');
+    console.log('%cjames — nice, you opened the console. Say hi: jamesponwith@gmail.com',
+      'color:#22d3ee;font-family:monospace;font-size:13px');
 
     // Smooth scroll for hash links
     document.querySelectorAll('a[href^="#"]').forEach(link => {
@@ -1188,13 +1280,20 @@
         "<path d='M53 8 A42 42 0 0 0 53 56' fill='none' stroke='#fff' stroke-width='3.5'/></svg>";
       const texture = 'data:image/svg+xml;utf8,' + encodeURIComponent(ballSvg);
 
-      const balls = Array.from({ length: 10 }, (_, i) => {
-        const r = 13 + (i % 3) * 3;
-        return Bodies.circle(60 + ((w - 120) / 9) * i, -80 - i * 120, r, {
-          restitution: 0.85, friction: 0.05, frictionAir: 0.003,
-          render: { sprite: { texture, xScale: r / 32, yScale: r / 32 } }
-        });
+      const makeBall = (x, y, r) => Bodies.circle(x, y, r, {
+        restitution: 0.85, friction: 0.05, frictionAir: 0.003,
+        render: { sprite: { texture, xScale: r / 32, yScale: r / 32 } }
       });
+      const balls = Array.from({ length: 10 }, (_, i) =>
+        makeBall(60 + ((w - 120) / 9) * i, -80 - i * 120, 13 + (i % 3) * 3));
+
+      // `balls` terminal command drops more; respawn loop tracks them too
+      window.dropTennisBalls = (n = 8) => {
+        const fresh = Array.from({ length: n }, () =>
+          makeBall(60 + Math.random() * (w - 120), -60 - Math.random() * 250, 13 + Math.floor(Math.random() * 3) * 3));
+        balls.push(...fresh);
+        Composite.add(engine.world, fresh);
+      };
 
       const wallOpts = { isStatic: true, render: { visible: false } };
       const floor = Bodies.rectangle(w / 2, h + 30, w * 3, 60, wallOpts);
@@ -1268,6 +1367,18 @@
     window.addEventListener('load', () => {
       loadParticles();
       initTennisBalls();
+
+      // Footer status line: real boot time + live FPS
+      const statusEl = document.getElementById('statusLine');
+      const bootMs = Math.round(performance.now());
+      let frames = 0, last = performance.now(), fps = 60;
+      const paint = () => { statusEl.textContent = `all systems operational · boot ${bootMs}ms · ${fps}fps`; };
+      paint();
+      requestAnimationFrame(function tick(t) {
+        frames++;
+        if (t - last >= 1000) { fps = frames; frames = 0; last = t; paint(); }
+        requestAnimationFrame(tick);
+      });
     });
   </script>
 </body>
