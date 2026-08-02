@@ -11,29 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial'],
-            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
-          },
-          colors: {
-            brand: {
-              50:'#ecfeff',100:'#cffafe',200:'#a5f3fc',300:'#67e8f9',400:'#22d3ee',
-              500:'#06b6d4',600:'#0891b2',700:'#0e7490',800:'#155e75',900:'#164e63'
-            }
-          },
-          boxShadow: {
-            soft: '0 18px 45px rgba(15,23,42,0.16)'
-          }
-        }
-      }
-    };
-  </script>
+  <!-- Built locally: npx tailwindcss@3 -c tailwind.config.js -i assets/css/tailwind.src.css -o assets/css/tailwind.css --minify -->
+  <link rel="stylesheet" href="assets/css/tailwind.css">
 
   <!-- tsParticles -->
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
@@ -388,6 +367,7 @@
             <a href="#work" class="hover:text-brand-600">Work</a>
             <a href="#about" class="hover:text-brand-600">About</a>
             <a href="#contact" class="hover:text-brand-600">Contact</a>
+            <a href="assets/Resume/Resume_James_Ponwith.pdf" target="_blank" rel="noopener" class="hover:text-brand-600">Resume</a>
             <a href="https://github.com/jamesponwith" class="hover:text-brand-600" aria-label="GitHub">GitHub</a>
             <a href="https://www.linkedin.com/in/james-ponwith24/" class="hover:text-brand-600" aria-label="LinkedIn">LinkedIn</a>
           </div>
@@ -413,6 +393,7 @@
           <a href="#work" class="py-1.5">Work</a>
           <a href="#about" class="py-1.5">About</a>
           <a href="#contact" class="py-1.5">Contact</a>
+          <a href="assets/Resume/Resume_James_Ponwith.pdf" target="_blank" rel="noopener" class="py-1.5">Resume</a>
           <div class="flex gap-4 py-2">
             <a href="https://github.com/jamesponwith" class="underline">GitHub</a>
             <a href="https://www.linkedin.com/in/james-ponwith24/" class="underline">LinkedIn</a>
@@ -444,7 +425,7 @@
               </div>
               <div class="terminal-body" id="termBody">
                 <div><span class="prompt">➜ ~</span> <span id="typedCmd"></span><span class="tcursor" id="typeCursor">▋</span></div>
-                <div id="cmdOut" hidden>james · nyc · resiliency &amp; real-time payments · go / aws / k8s</div>
+                <div id="cmdOut" hidden>james · nyc • london · resiliency &amp; real-time payments · go / aws / k8s</div>
                 <div id="termLive" class="flex items-center gap-2" hidden>
                   <span class="prompt">➜ ~</span>
                   <input id="termInput" class="terminal-input" autocomplete="off" spellcheck="false"
@@ -501,7 +482,7 @@
               <div class="mt-3 text-xs text-neutral-500 dark:text-neutral-400">Primary focus</div>
               <div class="mt-1 text-lg font-semibold">Resiliency Engine</div>
               <p class="mt-1 text-xs text-neutral-600 dark:text-neutral-300">
-                Go + AWS + New Relic powering multi-AZ routing and health-based traffic for card authorizations.
+                Auto-detects failures and reroutes live traffic in ~1 minute across card auth systems processing $780B.
               </p>
             </div>
 
@@ -579,14 +560,15 @@
               </div>
               <h3 class="text-base md:text-lg font-semibold">Resiliency Engine — Card Authorizations</h3>
               <p class="text-neutral-700 dark:text-neutral-200">
-                Go-based engine monitoring multi-tenant ECS clusters across regions and availability zones,
-                evaluating health from CloudWatch &amp; New Relic and orchestrating traffic via Route&nbsp;53
-                for mission-critical card authorization flows.
+                Highly concurrent Go engine that auto-detects failures across multi-tenant ECS clusters and
+                routes live traffic to healthy cells — protecting card authorization systems processing
+                <strong>$780B</strong>.
               </p>
               <ul class="list-disc pl-4 text-neutral-600 dark:text-neutral-300 space-y-1">
-                <li>Cell-based routing across e1a/e1b/e1c and w2a/w2b/w2c.</li>
-                <li>Configurable Learn/Action modes for safe automation.</li>
-                <li>DynamoDB-backed state for visibility and auditability.</li>
+                <li>Cut MTTR <strong>95% to ~1 minute</strong>; protects <strong>$2M+ net income/yr</strong>.</li>
+                <li><strong>Zero Sev-3+ incidents</strong> across 12+ shielded services over the past year.</li>
+                <li>Platform spans <strong>8 tenant apps, 15+ teams, 3 orgs</strong> — built as sole lead engineer.</li>
+                <li>Strict cross-region consistency via DynamoDB MRSC, conditional writes, and a custom peer-to-peer lease protocol.</li>
               </ul>
             </div>
           </article>
@@ -622,8 +604,9 @@
               </div>
               <h3 class="font-semibold">Qualcomm — Hardware Validation Pipelines</h3>
               <p class="text-xs text-neutral-600 dark:text-neutral-300">
-                Built robust enterprise-grade CI/CD pipelines to enable automated hardware farm and
-                operator-initiated validations for Qualcomm system validation engineers.
+                Validated 5G/4G/3G modem subsystems on an FPGA farm — 3 timing &amp; power bugs caught
+                pre-tape-out, 7 production SoCs shipped, and triage time cut 90% via automation and
+                visualization pipelines.
               </p>
               <div class="flex flex-wrap gap-2 text-[0.72rem]">
                 <span class="chip">Python</span>
@@ -674,6 +657,48 @@
                 <span class="chip">Python</span>
                 <span class="chip">Keras</span>
                 <span class="chip">TensorFlow</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Resy Snipe Bot -->
+          <article class="project-card" data-tags="tech">
+            <!-- GIF preview -->
+            <a
+              href="assets/demos/demo.gif"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900"
+              aria-label="Watch demo gif"
+            >
+              <img
+                src="assets/demos/demo.gif"
+                alt="Resy Snipe Bot demo preview"
+                loading="lazy"
+                class="h-40 w-full object-cover object-[center_35%]"
+              />
+            </a>
+            <div class="p-4 space-y-2 text-sm">
+              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                Automation
+              </div>
+              <h3 class="font-semibold">Resy Snipe Bot — NYC Reservations</h3>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                Personal Go-based bot that monitors Resy availability and automatically snipes hard-to-get
+                restaurant reservations in New York City when slots open.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[0.72rem]">
+                <span class="chip">Go</span>
+                <span class="chip">HTTP / APIs</span>
+                <span class="chip">Scheduling</span>
+                <span class="chip">Automation</span>
+                <!-- Demo video link -->
+              <a href="assets/demos/demo.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center text-[0.75rem] text-brand-600 hover:underline mt-1">
+                Watch demo gif ↗
+              </a>
               </div>
             </div>
           </article>
@@ -875,47 +900,6 @@
             </div>
           </article>
 
-          <!-- Resy Snipe Bot -->
-          <article class="project-card" data-tags="tech">
-            <!-- GIF preview -->
-            <a
-              href="assets/demos/demo.gif"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900"
-              aria-label="Watch demo gif"
-            >
-              <img
-                src="assets/demos/demo.gif"
-                alt="Resy Snipe Bot demo preview"
-                loading="lazy"
-                class="h-40 w-full object-cover object-[center_35%]"
-              />
-            </a>            
-            <div class="p-4 space-y-2 text-sm">
-              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
-                Automation
-              </div>
-              <h3 class="font-semibold">Resy Snipe Bot — NYC Reservations</h3>
-              <p class="text-xs text-neutral-600 dark:text-neutral-300">
-                Personal Go-based bot that monitors Resy availability and automatically snipes hard-to-get
-                restaurant reservations in New York City when slots open.
-              </p>
-              <div class="flex flex-wrap gap-2 text-[0.72rem]">
-                <span class="chip">Go</span>
-                <span class="chip">HTTP / APIs</span>
-                <span class="chip">Scheduling</span>
-                <span class="chip">Automation</span>
-                <!-- Demo video link -->
-              <a href="assets/demos/demo.gif"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center text-[0.75rem] text-brand-600 hover:underline mt-1">
-                Watch demo gif ↗
-              </a>
-              </div>
-            </div>
-          </article>
         </div>
 
         <div class="mt-6 flex items-center justify-between gap-4 text-xs text-neutral-500 dark:text-neutral-400">
@@ -964,7 +948,7 @@
             <img src="assets/img/JandE.JPEG" alt="Portrait of James Ponwith"
                  class="w-full max-w-xs rounded-3xl shadow-soft" loading="lazy" decoding="async">
             <div class="text-xs text-neutral-500 dark:text-neutral-400 text-center">
-              Based in New York City. Outside work, you'll usually find me on a tennis court, planning
+              NYC • London. Outside work, you'll usually find me on a tennis court, planning
               the next trip, or tinkering with side projects that mix tech, sport, and storytelling.
             </div>
           </div>
@@ -1091,7 +1075,9 @@
         if (c.startsWith('sudo')) { termPrint('permission denied: this incident will be reported.'); return; }
         switch (c) {
           case 'help':
-            termPrint('commands: work · about · contact · light · dark · balls · whoami · clear'); break;
+            termPrint('commands: work · about · contact · resume · light · dark · balls · whoami · clear'); break;
+          case 'resume':
+            window.open('assets/Resume/Resume_James_Ponwith.pdf', '_blank'); termPrint('opening resume.pdf…'); break;
           case 'work': case 'about': case 'contact': case 'home':
             go(c); break;
           case 'light': setTheme(false); break;
