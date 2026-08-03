@@ -559,6 +559,16 @@
         <div id="projectGrid" class="grid gap-5 md:grid-cols-3">
           <!-- Resiliency Engine (text feature) -->
           <article class="project-card md:col-span-2" data-tags="tech finance">
+            <div class="terminal card-terminal" aria-hidden="true">
+              <div class="terminal-body">
+                <div><span class="prompt">$</span> tail -f resiliency-engine.log</div>
+                <div>14:02:11 e1b p99 breach — <span style="color:#fbbf24">degraded</span></div>
+                <div>14:02:14 quorum 3/3 · mode=<span style="color:#67e8f9">action</span></div>
+                <div>14:02:15 route53: e1b → e1a, e1c</div>
+                <div>14:02:16 <span style="color:#34d399">0 auths dropped</span></div>
+                <div>14:03:12 e1b healthy — <span style="color:#34d399">restored</span> <span class="tcursor">▋</span></div>
+              </div>
+            </div>
             <div class="p-5 md:p-6 space-y-3 text-sm">
               <div class="flex items-center justify-between gap-3">
                 <span class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -587,6 +597,16 @@
 
           <!-- Capital One Kubernetes Platform (moved up) -->
           <article class="project-card" data-tags="tech finance">
+            <div class="terminal card-terminal" aria-hidden="true">
+              <div class="terminal-body" style="white-space:pre">
+                <div><span class="prompt">$</span> kubectl get pods -n payments</div>
+                <div>NAME            READY  STATUS</div>
+                <div>auth-proc-0     2/2    <span style="color:#34d399">Running</span></div>
+                <div>auth-proc-1     2/2    <span style="color:#34d399">Running</span></div>
+                <div>ledger-sync-7f  2/2    <span style="color:#34d399">Running</span></div>
+                <div>rollout-canary  1/1    <span style="color:#34d399">Running</span> <span class="tcursor">▋</span></div>
+              </div>
+            </div>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
                 Platform &amp; SRE
