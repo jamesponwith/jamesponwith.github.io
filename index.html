@@ -1267,6 +1267,17 @@
     }, { threshold: 0.15 });
     revealEls.forEach(el => revealObserver.observe(el));
 
+    // Autoplay card videos while visible (muted + playsinline, so browsers allow it)
+    if (!reducedMotion.matches) {
+      const videoObserver = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.play().catch(() => {}); }
+          else { e.target.pause(); }
+        });
+      }, { threshold: 0.4 });
+      document.querySelectorAll('#projectGrid video').forEach(v => videoObserver.observe(v));
+    }
+
     // Tennis-ball physics down the whole page, bouncing off the tiles
     function initTennisBalls() {
       if (!window.Matter || reducedMotion.matches) return;
