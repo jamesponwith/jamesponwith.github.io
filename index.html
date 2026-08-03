@@ -296,6 +296,18 @@
       min-width: 0;
     }
     .terminal-input::placeholder { color: rgba(165,243,252,0.35); }
+    /* Flush mini-terminal used as a card visual */
+    .card-terminal {
+      border: 0;
+      border-bottom: 1px solid rgba(34,211,238,0.18);
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .card-terminal .terminal-body {
+      font-size: 0.66rem;
+      line-height: 1.65;
+      padding: 0.8rem 0.9rem;
+    }
     .term-line { white-space: pre-wrap; word-break: break-word; }
     .term-echo { opacity: 0.65; }
 
@@ -786,6 +798,16 @@
 
           <!-- Qualcomm CI/CD Pipelines -->
           <article class="project-card" data-tags="tech">
+            <div class="terminal card-terminal" aria-hidden="true">
+              <div class="terminal-body">
+                <div><span class="prompt">jenkins@farm</span> validate --target 5g-nr --fpga sdx-07</div>
+                <div>flash bitstream ........ <span style="color:#34d399">ok</span></div>
+                <div>boot modem subsystem ... <span style="color:#34d399">ok</span></div>
+                <div>timing checks .......... <span style="color:#34d399">412/412 pass</span></div>
+                <div>power rails ............ <span style="color:#fbbf24">1 warn → triage</span></div>
+                <div><span class="prompt">jenkins@farm</span> <span class="tcursor">▋</span></div>
+              </div>
+            </div>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
                 CI/CD &amp; Validation
