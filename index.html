@@ -1034,10 +1034,13 @@
             </p>
           </div>
           <div class="flex flex-col items-center md:items-end gap-3">
-            <a href="mailto:jamesponwith@gmail.com"
+            <a id="emailBtn" href="mailto:jamesponwith@gmail.com"
                class="inline-flex items-center rounded-xl bg-brand-600 px-5 py-3 text-white shadow-soft hover:bg-brand-700 text-sm">
               Email me
             </a>
+            <span id="copyNote" class="font-head text-xs" style="color:#34d399" role="status" hidden>
+              ✓ jamesponwith@gmail.com copied to clipboard
+            </span>
             <div class="flex gap-3">
               <a href="https://github.com/jamesponwith"
                  target="_blank"
@@ -1178,6 +1181,16 @@
         }
       });
     }
+
+    // Email button: also copy the address, for visitors (and owners) without a mail app
+    document.getElementById('emailBtn').addEventListener('click', () => {
+      navigator.clipboard?.writeText('jamesponwith@gmail.com').then(() => {
+        const note = document.getElementById('copyNote');
+        note.hidden = false;
+        clearTimeout(note._t);
+        note._t = setTimeout(() => { note.hidden = true; }, 3000);
+      }).catch(() => {}); // ponytail: clipboard needs HTTPS; mailto still works if copy fails
+    });
 
     // Devtools easter egg
     console.log('%c➜ ~ whoami', 'color:#34d399;font-family:monospace;font-size:14px');
