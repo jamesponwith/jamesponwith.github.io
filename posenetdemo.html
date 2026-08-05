@@ -11,27 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter','ui-sans-serif','system-ui','Segoe UI','Roboto','Helvetica Neue','Arial']
-          },
-          colors: {
-            brand: {
-              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
-              500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
-            }
-          },
-          boxShadow: {
-            soft: '0 18px 45px rgba(15,23,42,0.16)'
-          }
-        }
-      }
-    };
-  </script>
+  <link rel="stylesheet" href="assets/css/tailwind.css">
 
   <style>
     html { color-scheme: light dark; }
@@ -422,6 +402,10 @@
       }
 
       async function start() {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          setStatus('Camera access needs a secure context — open this page over HTTPS (the live site) or http://localhost, not from a file:// path.');
+          return;
+        }
         startBtn.disabled = true;
         try {
           const model = await loadModelOnce();
@@ -431,7 +415,9 @@
             audio: false
           });
           video.srcObject = stream;
-          await new Promise((r) => { video.onloadedmetadata = r; });
+          if (video.readyState < 1) {
+            await new Promise((r) => video.addEventListener('loadedmetadata', r, { once: true }));
+          }
           await video.play();
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
