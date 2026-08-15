@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teaching an agent to play tennis in JAX — Part 1 — James Ponwith</title>
+<meta name="description" content="Interception: 95.2% of serves met. And the three things that broke before any learning happened.">
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light dark; }
+body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
+  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
+h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+a { color: #0891b2; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
+  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
+blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
+  color: #6b7280; font-size: 0.95em; }
+hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+em { color: inherit; }
+@media (prefers-color-scheme: dark) {
+  body { color: #d1d5db; background: #030712; }
+  code { background: rgba(34,211,238,0.1); }
+  a { color: #22d3ee; }
+  blockquote { border-color: #22d3ee; color: #9ca3af; }
+  hr { border-top-color: #1f2937; }
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← jamesponwith.github.io</a>
+<h1>Teaching an agent to play tennis in JAX — Part 1: interception</h1>
+<p>I played NCAA D1 tennis. The first thing every coach teaches is not the
+swing — it's being where the ball will land. So when I set out to train an
+RL agent to play tennis in <a href="https://github.com/google/brax">Brax</a>, Phase 1
+was that skill and nothing else: <strong>95% of random serves intercepted, or it
+doesn't count.</strong></p>
+<p>Result: <strong>95.2% over 1000 serves.</strong> Stock PPO, 9.3M env steps, twenty
+minutes on a laptop CPU. The interesting part is the three things that broke
+before any learning happened.</p>
+<h2>The paddle IS the player</h2>
+<p>RL projects die from environment-engineering scope creep, so the env is
+deliberately minimal: a court, a served ball, and a paddle — an actuated box
+sliding in x/y. No humanoid, no arm, no pixels. Ten numbers in, two out.</p>
+<p>The reward carries the coaching insight directly: each step, the penalty is
+the distance from the paddle to the ball's <strong>predicted landing point</strong> —
+closed-form ballistics, re-predicted every step so bounces self-correct.
+Not distance-to-ball. Distance-to-where-the-ball-will-be. Split-step, read,
+move.</p>
+<h2>Three things that broke first</h2>
+<p><strong>The backend that couldn't bounce.</strong> My spec required a bounce-fidelity
+smoke test before committing to a physics backend. Good thing: the
+<code>positional</code> backend ignores restitution entirely — a ball dropped from 1m
+never leaves the floor. Disqualified by a 40-line script.</p>
+<p><strong>The solver that broke conservation of energy.</strong> Tuning MJX restitution:
+contact <code>dampratio</code> 0.3 rebounds 19%, 0.15 rebounds 33% — and 0.1 rebounds
+<strong>190%</strong>. The 1m drop bounces to 1.9m; at 0.05, to 37m. There's a cliff
+where the solver starts injecting energy, and it sits just past the setting
+you want. The operating point and the "never below 0.15" rule are an ADR
+now.</p>
+<p><strong>The trainer that outlived its dependency.</strong> brax 0.14's PPO crashes on
+jax ≥ 0.11 — <code>jax.device_put_replicated</code> is gone. The physics runs; only
+training explodes. Phase 0 existed to validate the loop before any custom
+code, and it caught exactly this.</p>
+<h2>Test the env like normal code</h2>
+<p>Env bugs masquerade as RL mysteries, so the env has unit tests: serve-cone
+distribution, both termination paths, reward-is-higher-under-the-landing-
+point, landing math against analytic cases. They paid off on day one —
+brax's training wrappers inject keys into the env's metrics dict, which
+surfaces as an opaque pytree error unless <code>step</code> updates metrics in place.
+Five minutes with a failing test; a lost evening without one.</p>
+<p>Per-term reward components are logged from day one, because Phase 2's risk
+register says reward hacking shows up in curves before it shows up in gifs.
+(It did. Three times. That's Part 2.)</p>
+<h2>The curve</h2>
+<p><img alt="interception rate" src="https://raw.githubusercontent.com/jamesponwith/brax-tennis-rl/main/docs/phase1_curve.png" /></p>
+<p>Random policy: 11.5%. Steep climb to ~4M steps, then a stable 94–95.6%
+plateau. The metric rides the evaluator itself — the env emits
+<code>interception</code> only on the contact step, so the episode-summed metric <em>is</em>
+the interception rate over 1000 fresh serves.</p>
+<p>Next: <a href="tennis-part2.html">Part 2</a> — the net goes up, and the agent starts
+cheating.</p>
+<p><em>Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>.
+The repo is <a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</em></p>
+</body>
+</html>

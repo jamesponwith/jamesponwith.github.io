@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a $780B payment system taught me about serving LLMs — James Ponwith</title>
+<meta name="description" content="Five resiliency-engine ideas applied to LLM serving: health cells, canaries, learn/action, hedging, chaos.">
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light dark; }
+body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
+  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
+h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+a { color: #0891b2; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
+  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
+blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
+  color: #6b7280; font-size: 0.95em; }
+hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+em { color: inherit; }
+@media (prefers-color-scheme: dark) {
+  body { color: #d1d5db; background: #030712; }
+  code { background: rgba(34,211,238,0.1); }
+  a { color: #22d3ee; }
+  blockquote { border-color: #22d3ee; color: #9ca3af; }
+  hr { border-top-color: #1f2937; }
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← jamesponwith.github.io</a>
+<h1>What a $780B payment system taught me about serving LLMs</h1>
+<p>At Capital One I worked on a resiliency engine that moved payment traffic
+between cells the moment one misbehaved. $780B a year flowed through
+decisions like "this cell is lying about being healthy." When I started
+routing my own LLM traffic across providers, the same failure shapes showed
+up within a week.</p>
+<p>So I rebuilt the same answers, small:
+<a href="https://github.com/jamesponwith/llm-resiliency-router">llm-resiliency-router</a>,
+an OpenAI-compatible proxy in ~1,500 lines of mostly-stdlib Go. Point any
+SDK at it by changing <code>base_url</code>. Five ideas carried over from payments.</p>
+<h2>1. Health is a state machine, not a boolean</h2>
+<p>Each upstream lives in a cell: a ring buffer of outcomes driving
+<code>healthy → degraded → ejected → half-open → healthy</code>, with hysteresis both
+ways. Ejection takes consecutive hard failures; recovery must be <em>earned</em>
+through a probe. Kill a provider mid-traffic and requests shift before any
+client sees an error — the <a href="https://raw.githubusercontent.com/jamesponwith/llm-resiliency-router/main/docs/failover-demo.gif">failover demo</a> is
+eight seconds long and shows the whole thing.</p>
+<h2>2. "Up" is not "working"</h2>
+<p>The failure availability checks cannot see: a provider returning <code>200 OK</code>
+full of garbage. A background canary asks every upstream a fixed prompt set
+— arithmetic, JSON compliance — and grades the answers. Canary failures
+feed the <em>same</em> health cells as real traffic, so a lobotomized provider is
+ejected within one cycle without ever returning an error
+(<a href="https://raw.githubusercontent.com/jamesponwith/llm-resiliency-router/main/docs/canary-demo.gif">recorded</a>). This is the line between a router
+and a load balancer: routing on quality, not liveness.</p>
+<h2>3. Automation earns trust by showing its work</h2>
+<p>The C1 engine shipped in observe mode before it touched traffic. The router
+does the same. In <code>learn</code> mode the full decision loop runs — would have
+skipped, would have failed over — but traffic never shifts, and every
+decision lands in <code>decisions.jsonl</code> with its inputs. When the log's judgment
+matches yours, one config line turns it on. There is no decision the router
+can't explain.</p>
+<h2>4. Tail latency is a race you can enter twice</h2>
+<p>Some hangs no timeout catches: <code>200</code>, headers, then never a first token.
+With <code>hedge_after: 1s</code>, a request with no first token by the deadline races
+the next healthy upstream — first token wins, the loser is cancelled and
+<em>not</em> blamed by the health model. We killed it; it didn't fail. The
+<a href="https://raw.githubusercontent.com/jamesponwith/llm-resiliency-router/main/docs/hedge-demo.gif">hedging demo</a> shows a stalled primary answered in
+one second instead of never. Off by default: hedging spends money.</p>
+<h2>5. Chaos is a first-class artifact</h2>
+<p>The fake provider speaks OpenAI wire format with scripted failure profiles —
+<code>flaky</code>, <code>slow</code>, <code>hang</code>, <code>stall</code>, <code>lobotomized</code> — as YAML. The same profiles
+drive the component tests and the recorded demos, so the tests and the
+marketing can't drift apart.</p>
+<hr />
+<p>The router was built end to end inside a
+<a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic development flywheel</a>:
+spec first, an AI pair with hard local hooks, a 30-second PR gate, goreleaser
+releases, weekly public DORA metrics. Eleven PRs, every one gated. That
+story has its own writeup.</p>
+<p><em>Numbers current as of v0.1.0.</em></p>
+</body>
+</html>

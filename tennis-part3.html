@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teaching an agent to play tennis in JAX — Part 3 — James Ponwith</title>
+<meta name="description" content="The rally: self-play generations, the wrist that buys aim, and the bug that beat every probe.">
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light dark; }
+body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
+  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
+h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+a { color: #0891b2; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
+  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
+blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
+  color: #6b7280; font-size: 0.95em; }
+hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+em { color: inherit; }
+@media (prefers-color-scheme: dark) {
+  body { color: #d1d5db; background: #030712; }
+  code { background: rgba(34,211,238,0.1); }
+  a { color: #22d3ee; }
+  blockquote { border-color: #22d3ee; color: #9ca3af; }
+  hr { border-top-color: #1f2937; }
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← jamesponwith.github.io</a>
+<h1>Teaching an agent to play tennis in JAX — Part 3: the rally</h1>
+<p>Part 2 ended with a paddle that returns 71.7% of serves. Part 3 puts a
+second paddle on the far baseline and asks the only question left: can two
+of them keep a point alive?</p>
+<p>Answer: yes, and each generation rallies longer than the last. But the best
+bug of the whole project came first, and it beat every probe I had.</p>
+<h2>The warm start that wouldn't</h2>
+<p>The plan was a curriculum: take the flat-face champion, surgically expand
+its network for a tilt-hinge wrist — new observation rows and action column
+initialized to zero, so step one plays identically — and fine-tune. The
+surgery verified perfectly offline: 73% returns, champion-level.</p>
+<p>Training evals: <strong>0.4%.</strong> Random-policy territory, from a 71.7% warm start.</p>
+<p>The forensics chain, each layer verified before the next: the surgery was
+correct (73% offline). The restore path was correct (params round-tripped
+through the trainer still scored 75%). The evaluator was honest (a flat
+control scored 69%). Per-step action distributions were <em>identical</em> between
+deterministic and stochastic modes. And yet: deterministic eval 68%,
+stochastic eval 0.4%.</p>
+<p>The action trace ended the mystery. Under stochastic control, the paddle
+was commanded at 6.4 m/s in x — and moved <strong>ten centimeters in 1.2
+seconds.</strong> Jammed. The paddle box sat exactly flush on the court; the tilt
+hinge's micro-pitch under jittery sampled actions dug its bottom edge into
+the plane, and floor friction locked the slides. Deterministic motion is
+smooth and never digs — which is why every deterministic probe sailed
+through while sampling collapsed. The paddle's own physics was the
+adversary.</p>
+<p>The fix was two centimeters: float the box off the court. The warm start
+immediately evaluated at 70.3%. That jam had been silently taxing every
+phase of the project.</p>
+<h2>The wrist buys aim, not consistency</h2>
+<p>With the physics honest, the tilt fine-tune ran clean — and produced my
+favorite kind of result: a split decision. Return rate: 67.5%, <em>below</em> the
+71.7% flat baseline. Episode reward: up two points. The wrist wasn't
+returning more balls; it was placing the ones it returned closer to the
+target. Aim, not consistency. The flat face stays the workhorse, and the
+spec's "flat-through-lob control" line gets an honest asterisk.</p>
+<h2>Two of me</h2>
+<p>Self-play needed no new network and no new tricks. The court is symmetric,
+so one policy can play both ends: the far paddle is driven inside the env
+by a frozen copy reading <em>mirrored</em> observations — y and vy negated, so the
+opponent believes it is the near paddle. The learner keeps Part 2's exact
+interface, which means the champion warm-starts with zero surgery. Rally
+length rides the evaluator the same way interception did: the metric fires
+only on net crossings, so the episode sum is the rally.</p>
+<p>Probe before training, as always: two frozen champions already rally — 1.80
+mean crossings, max 5, a returned return in 25 of 40 episodes.</p>
+<p>Then the league: train against the champion, freeze the result, train
+against <em>that</em>. Generation 1 grew rallies 1.77 → 1.86 in-round. Generation
+2 opened at 1.97 against its stronger opponent — reproduced across two
+independent runs — and held ~1.95. The spec's success bar for Phase 3 was
+"average rally length grows over training." It grows, generation over
+generation, with a plateau forming near two crossings — the sampled-league
+upgrade is the documented next rung.</p>
+<p><img alt="rally length across generations" src="https://raw.githubusercontent.com/jamesponwith/brax-tennis-rl/main/docs/phase3_curve.png" /></p>
+<h2>What I'd tell past me, part 3</h2>
+<ul>
+<li>Deterministic probes lie by omission. Anything that only fails under
+  sampled actions — friction jams, resonances — is invisible to them.
+  Validate with the noise you'll train with.</li>
+<li>Falsify in layers. Surgery, restore, evaluator, actions, physics: each
+  cleared before suspecting the next. The bug was in the last place, but
+  the chain made it a corner instead of a haystack.</li>
+<li>Warm starts must start warm. Check the step-zero eval against the
+  baseline before burning a single training hour.</li>
+</ul>
+<p>That closes the arc: a box that learned to be where the ball lands, then to
+put it back, then to keep a point alive against itself. The collegiate
+tennis player taught an agent to play — and the agent's best lessons were
+the ones it tried to cheat on.</p>
+<p><em>Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>
+— every fix above landed as a gated PR with tests. The repo is
+<a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</em></p>
+</body>
+</html>

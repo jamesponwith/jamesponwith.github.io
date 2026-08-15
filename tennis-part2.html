@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teaching an agent to play tennis in JAX — Part 2 — James Ponwith</title>
+<meta name="description" content="The return: six training runs, three reward hacks, 71.7% of serves returned.">
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light dark; }
+body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
+  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
+h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+a { color: #0891b2; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
+  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
+blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
+  color: #6b7280; font-size: 0.95em; }
+hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+em { color: inherit; }
+@media (prefers-color-scheme: dark) {
+  body { color: #d1d5db; background: #030712; }
+  code { background: rgba(34,211,238,0.1); }
+  a { color: #22d3ee; }
+  blockquote { border-color: #22d3ee; color: #9ca3af; }
+  hr { border-top-color: #1f2937; }
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← jamesponwith.github.io</a>
+<h1>Teaching an agent to play tennis in JAX — Part 2: the return</h1>
+<p>Part 1 ended with a paddle that meets 95% of serves. Part 2 asks it to put
+the ball back over the net into the far court, 70% of the time. Final:
+<strong>71.7% of 1000 random serves returned.</strong></p>
+<p>The number is the least interesting part. It took six training runs, and
+the agent cheated better than it played. My spec's risk register said reward
+hacking would show up in curves before it showed up in gifs. It was right
+three times.</p>
+<h2>Hack #1: the phantom return</h2>
+<p>First eval, <em>random</em> policy: "returned 85%." A random paddle does not
+return 85% of serves. The per-term metrics — logged from day one for
+exactly this — showed the returns weren't returns: low serves smacked into
+the far side of the net, rebounded, and landed beyond it, and my detector
+counted them. Fix: serves must analytically clear the net at spawn, plus a
+regression test. Honest baseline after fix: 0.0%.</p>
+<h2>The run that couldn't</h2>
+<p>The first real run flatlined at 0%. Instead of shotgunning hyperparameters,
+I wrote a 40-line probe — a scripted policy that chases the ball perfectly —
+and asked: can <em>anyone</em> return a serve here? No. 0/40 contacts. Three
+physical causes, found in order:</p>
+<ol>
+<li><strong>The paddle face was dead.</strong> I'd tuned restitution for the court and
+   ball but never the paddle, which kept MuJoCo's critically-damped
+   default: 8 m/s in, 1.5 m/s out. No return could reach the net. Ever.</li>
+<li><strong>Serves hopped the paddle.</strong> Net clearance made serves lobs; 21 of 30
+   crossed above the paddle's 1-meter top. The paddle grew to player
+   height.</li>
+<li><strong>The shaping pointed at the wrong spot.</strong> "Stand where the ball lands"
+   parks you where it touches down — not where it can be struck. Nothing
+   pushes the ball sideways in flight, so where it crosses the paddle's
+   plane is exact, even across bounces. Shape toward that.</li>
+</ol>
+<p>After the fixes, the scripted probe returned 20/40. Provably learnable.
+PPO still refused — until bisection against Phase 1's known-good config
+found the poison: <strong>the paddle-tilt action channel.</strong> Random exploration on
+the tilt hinge lays the face flat often enough to destroy the contact
+gradient everything else depends on. Dropped it. Flat-face swings clear the
+net fine. (The wrist came back later as a curriculum — it buys <em>aim</em>, not
+consistency. A story for Part 3.)</p>
+<h2>Hack #3: wall-ball</h2>
+<p>The next run played honest tennis for four million steps — 79% returns —
+then found something better than tennis. The contact metric read <strong>3170%</strong>:
+thirty-one contact events per episode. The policy had learned to drive to
+the net, pin the ball against it, and rattle it off the paddle face,
+farming the contact bonus into a reward of +282 while real returns crashed
+to 17%. My spec had predicted "micro-touches that maximize contact bonus
+without returning" almost verbatim.</p>
+<p>The fix was mechanical, not reward surgery: a joint limit keeps the
+receiver in the backcourt — where the honest 79% policy had been playing
+anyway. Net-pinning became physically impossible. The regression test
+charges the net for 1.2 seconds and asserts the paddle stays home.</p>
+<h2>Run six: tennis</h2>
+<p>Contact ~97%, no farming, returns grinding through the plateau to <strong>71.7%</strong>
+on the final 1000-serve eval. 10.9M env steps, about 90 minutes of laptop
+CPU.</p>
+<p><img alt="returned rate" src="https://raw.githubusercontent.com/jamesponwith/brax-tennis-rl/main/docs/phase2_curve.png" /></p>
+<h2>What I'd tell past me</h2>
+<ul>
+<li>Log per-term reward components before you need them. All three hacks were
+  diagnosed from a single metric line each.</li>
+<li>When a run flatlines, write the scripted probe before touching
+  hyperparameters. "Can a perfect policy even do this?" falsified my first
+  three theories for the price of one script.</li>
+<li>Bisect from known-good instead of theorizing. The tilt channel was
+  invisible to inspection and obvious to bisection.</li>
+<li>Prefer mechanical fixes — a joint limit, a taller paddle — over reward
+  surgery. Physics can't be reward-hacked.</li>
+</ul>
+<p>Next: <a href="tennis-part3.html">Part 3</a> — self-play, and the bug that beat every
+probe.</p>
+<p><em>Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>
+— every fix above landed as a gated PR with tests. The repo is
+<a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</em></p>
+</body>
+</html>

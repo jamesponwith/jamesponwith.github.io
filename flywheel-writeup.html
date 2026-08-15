@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An agentic development flywheel for one — James Ponwith</title>
+<meta name="description" content="The Capital One development flywheel, rebuilt lean for one person and a coding agent.">
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root { color-scheme: light dark; }
+body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
+  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
+h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+a { color: #0891b2; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
+  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
+blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
+  color: #6b7280; font-size: 0.95em; }
+hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+em { color: inherit; }
+@media (prefers-color-scheme: dark) {
+  body { color: #d1d5db; background: #030712; }
+  code { background: rgba(34,211,238,0.1); }
+  a { color: #22d3ee; }
+  blockquote { border-color: #22d3ee; color: #9ca3af; }
+  hr { border-top-color: #1f2937; }
+}
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← jamesponwith.github.io</a>
+<h1>An agentic development flywheel for one</h1>
+<p>At Capital One I worked inside a development flywheel: intent artifacts fed
+an agent-assisted build loop, a PR pipeline gated everything, releases
+promoted only what had proven itself, and DORA metrics fed back into what we
+built next. It ran across hundreds of engineers and a platform team.</p>
+<p>The question that followed me out the door: how much of that survives when
+the team is one person and a coding agent?</p>
+<p>Almost all of it. The catch is ruthlessness about what each stage costs to
+keep running. This is the working system:
+<a href="https://github.com/jamesponwith/flywheel-template">flywheel-template</a> (Go)
+and <a href="https://github.com/jamesponwith/flywheel-template-py">flywheel-template-py</a>
+(Python), template repos carrying all five stages, plus two pilot projects
+built entirely inside them — an
+<a href="https://github.com/jamesponwith/llm-resiliency-router">LLM resiliency router</a>
+and a <a href="https://github.com/jamesponwith/brax-tennis-rl">reinforcement-learning tennis agent</a>.</p>
+<h2>The five stages, translated</h2>
+<p><strong>Intent.</strong> Same artifacts, smaller. A SPEC.md per project. ADRs capped at
+20 lines. Issue tracking in <a href="https://github.com/steveyegge/beads">beads</a>
+with one rule: no bead, no build. Intent is a file the agent loads, not a
+meeting.</p>
+<p><strong>Build.</strong> Claude Code under a standing YAGNI discipline: stdlib first,
+shortest working diff, deliberate shortcuts marked in comments. Pre-commit
+runs fmt, vet, and short tests in about a second. Speed is a feature — when
+the tennis project's test suite grew a two-minute physics compile, the gate
+got a fast lane the same day, because a slow gate is a skipped gate.</p>
+<p><strong>Validate.</strong> The PR pipeline: lint plus tests, green in ~30 seconds, no
+green no merge. The one deliberate departure from the C1 shape: AI code
+review runs <em>locally, in a pre-push git hook</em> — no CI minutes, no API-key
+secrets, and findings land before the PR exists. It's advisory; I'm the
+merge authority. It earns its keep: across the pilots it caught duplicated
+types, dead config knobs, and a config bug that would have wasted an
+hour-long training run.</p>
+<p><strong>Release.</strong> Semver tag → goreleaser → binaries and changelog, 59 seconds
+end to end. A deploy script pulls the release asset and restarts a systemd
+unit. Verified against a real release the day it shipped.</p>
+<p><strong>Learn.</strong> ~150 lines of Go pull deploy frequency, lead time, change-failure
+rate, and MTTR from the GitHub API. A weekly Action commits the snapshot
+back to each repo — the file's git history <em>is</em> the trend line — and a
+<a href="https://jamesponwith.github.io/dora.html">public dashboard</a> renders all of
+it. Public DORA metrics for personal projects: unusual, and it closes the
+loop in the open.</p>
+<h2>What the pilots proved</h2>
+<p>The router went from template to released v0.1.0 — priority failover,
+quality canaries, learn/action modes, hedging — through eleven gated PRs.
+The tennis agent went from spec to three completed phases (95.2%
+interception, 71.7% returns, self-play rallies that lengthen across
+generations) through twenty-three more. Bootstrapping the tennis project
+from the Python template took <strong>2 minutes 55 seconds</strong> against a 30-minute
+budget. Every resilience and RL claim in both repos has a recorded demo or
+a curve behind it.</p>
+<h2>What transferred, what didn't</h2>
+<p>Transferred: intent-as-files, the fast inner loop, hard PR gates,
+observe-before-act rollout (the router ships in learn mode and earns the
+right to act — the C1 rollout story in miniature), DORA as the feedback
+signal.</p>
+<p>Adapted: AI review moved from the pipeline to the laptop. The component
+suite runs in-process against a chaos harness instead of docker-compose.</p>
+<p>Dropped: orchestration dashboards, agent fleets, inter-agent protocols. The
+personal version must stay cheap enough to actually use. Standing rule: if
+a gate gets bypassed twice, delete it or automate it — a
+documented-but-ignored process is worse than none.</p>
+<h2>The part that surprised me</h2>
+<p>The stages audit each other. CI caught a test race the local suite never
+hit. The AI reviewer flagged code the linter loved. A demo recording exposed
+a rendering bug no test would ever find. One person plus an agent doesn't
+get a team's diversity of eyes — but a well-built loop manufactures a
+surprising amount of it.</p>
+</body>
+</html>
