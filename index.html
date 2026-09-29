@@ -716,6 +716,37 @@
             </div>
           </article>
 
+          <!-- AEGIS Drone Dome -->
+          <article class="project-card" data-tags="tech">
+            <a href="https://jamesponwith.github.io/drone-dome/" target="_blank" rel="noopener noreferrer" class="project-thumb">
+              <img src="assets/demos/drone-dome-demo.gif"
+                   alt="AEGIS drone dome replay: twelve hostiles close in from every direction, interceptor drones leave the shell to capture all twelve, and the remaining drones re-space the shell"
+                   loading="lazy" decoding="async">
+            </a>
+            <div class="p-4 space-y-2 text-sm">
+              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                Simulation
+              </div>
+              <h3 class="font-semibold">AEGIS — Drone-Swarm Protective Dome</h3>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                A swarm of mini drones holds a hemispherical shell around an asset and intercepts inbound threats.
+                Noisy radar feeds IMM trackers, Hungarian assignment sends the best-placed drone to capture each
+                hostile, and the shell re-spaces itself to close the gap. 448/448 hostiles captured across a
+                16-seed sweep, with 3D replays of every scenario.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[0.72rem]">
+                <span class="chip">Python</span>
+                <span class="chip">NumPy · SciPy</span>
+                <span class="chip">IMM tracking</span>
+                <span class="chip">Hungarian assignment</span>
+                <span class="chip">Three.js</span>
+              </div>
+              <a href="https://jamesponwith.github.io/drone-dome/" target="_blank" rel="noopener noreferrer" class="inline-block text-xs font-medium text-cyan-600 hover:underline dark:text-cyan-400">
+                Watch the replays →
+              </a>
+            </div>
+          </article>
+
           <!-- Strata: Earth, layer by layer -->
           <article class="project-card" data-tags="tech">
             <a href="https://jamesponwith.github.io/world-layers/" target="_blank" rel="noopener noreferrer" class="project-thumb">
@@ -1305,13 +1336,15 @@
         if (c.startsWith('sudo')) { termPrint('permission denied: this incident will be reported.'); return; }
         switch (c) {
           case 'help':
-            termPrint('commands: work · about · contact · resume · courts · earth · light · dark · balls · whoami · clear'); break;
+            termPrint('commands: work · about · contact · resume · courts · earth · dome · light · dark · balls · whoami · clear'); break;
           case 'resume':
             window.open('assets/Resume/Resume_James_Ponwith.pdf', '_blank'); termPrint('opening resume.pdf…'); break;
           case 'courts': case 'court-finder':
             window.open('https://jamesponwith.github.io/court-finder/', '_blank'); termPrint('opening court-finder… find a public tennis court near you.'); break;
           case 'earth': case 'strata':
             window.open('https://jamesponwith.github.io/world-layers/', '_blank'); termPrint('opening strata… journey to the centre of the earth.'); break;
+          case 'dome': case 'drone-dome': case 'aegis':
+            window.open('https://jamesponwith.github.io/drone-dome/', '_blank'); termPrint('opening aegis… deploying the drone dome.'); break;
           case 'work': case 'about': case 'contact': case 'home':
             go(c); break;
           case 'light': setTheme(false); break;
