@@ -716,6 +716,37 @@
             </div>
           </article>
 
+          <!-- Power Unit Forge -->
+          <article class="project-card" data-tags="tech sport">
+            <a href="https://jamesponwith.github.io/f1-sim/" target="_blank" rel="noopener noreferrer" class="project-thumb">
+              <img src="assets/demos/f1-sim-demo.gif"
+                   alt="Power Unit Forge: a holographic F1 V6 hybrid engine runs a dyno sweep while the power and torque curves draw, then the assembly explodes into its components"
+                   loading="lazy" decoding="async">
+            </a>
+            <div class="p-4 space-y-2 text-sm">
+              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                Simulation
+              </div>
+              <h3 class="font-semibold">Power Unit Forge — F1 Engine Design Lab</h3>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                An Iron Man-style holographic workbench for designing a Formula 1 1.6 L V6 turbo hybrid. Tune
+                compression, ignition, boost, trumpet length and ERS deployment, and a physics model answers with
+                knock margin, fuel-flow limits, turbo balance, temperatures, engine life and lap time. Run the dyno,
+                explode the engine, switch between the 2014–25, 2026 and no-rules rulebooks, or let the optimizer
+                find the fastest legal design.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[0.72rem]">
+                <span class="chip">JavaScript</span>
+                <span class="chip">Three.js</span>
+                <span class="chip">Engine physics</span>
+                <span class="chip">Web Audio</span>
+              </div>
+              <a href="https://jamesponwith.github.io/f1-sim/" target="_blank" rel="noopener noreferrer" class="inline-block text-xs font-medium text-cyan-600 hover:underline dark:text-cyan-400">
+                Build an engine →
+              </a>
+            </div>
+          </article>
+
           <!-- AEGIS Drone Dome -->
           <article class="project-card" data-tags="tech">
             <a href="https://jamesponwith.github.io/drone-dome/" target="_blank" rel="noopener noreferrer" class="project-thumb">
@@ -1336,7 +1367,7 @@
         if (c.startsWith('sudo')) { termPrint('permission denied: this incident will be reported.'); return; }
         switch (c) {
           case 'help':
-            termPrint('commands: work · about · contact · resume · courts · earth · dome · light · dark · balls · whoami · clear'); break;
+            termPrint('commands: work · about · contact · resume · courts · earth · dome · f1 · light · dark · balls · whoami · clear'); break;
           case 'resume':
             window.open('assets/Resume/Resume_James_Ponwith.pdf', '_blank'); termPrint('opening resume.pdf…'); break;
           case 'courts': case 'court-finder':
@@ -1345,6 +1376,8 @@
             window.open('https://jamesponwith.github.io/world-layers/', '_blank'); termPrint('opening strata… journey to the centre of the earth.'); break;
           case 'dome': case 'drone-dome': case 'aegis':
             window.open('https://jamesponwith.github.io/drone-dome/', '_blank'); termPrint('opening aegis… deploying the drone dome.'); break;
+          case 'f1': case 'forge': case 'engine': case 'f1-sim':
+            window.open('https://jamesponwith.github.io/f1-sim/', '_blank'); termPrint('opening power unit forge… spinning up the hologram.'); break;
           case 'work': case 'about': case 'contact': case 'home':
             go(c); break;
           case 'light': setTheme(false); break;
