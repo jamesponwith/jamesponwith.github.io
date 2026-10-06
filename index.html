@@ -630,16 +630,11 @@
 
           <!-- card-auth-saga -->
           <article class="project-card" data-tags="tech finance">
-            <div class="terminal card-terminal" aria-hidden="true">
-              <div class="terminal-body" style="white-space:pre">
-                <div><span class="prompt">$</span> temporal workflow show -w auth-1</div>
-                <div>hold      40000  open-to-buy −40000</div>
-                <div>signal    capture 25000</div>
-                <div>capture   25000  release 15000</div>
-                <div>signal    refund r1 5000</div>
-                <div>ledger Σ = <span style="color:#34d399">0 · balanced</span> <span class="tcursor">▋</span></div>
-              </div>
-            </div>
+            <a href="https://github.com/jamesponwith/card-auth-saga" target="_blank" rel="noopener noreferrer" class="project-thumb">
+              <img src="assets/demos/card-auth-saga-demo.gif"
+                   alt="card-auth-saga run: a $400 hold, a $250 partial capture that survives an injected crash without double-posting, rewards points, a $50 refund with its points clawed back, a resent refund ignored, and the ledger balancing to zero"
+                   loading="lazy" decoding="async">
+            </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
                 Payments &amp; Workflows
@@ -649,7 +644,8 @@
                 A card issuer's backend as a Temporal saga in Go: authorize against the limit, place a hold, then
                 capture on a signal or release when the hold expires. Every money movement posts to a double-entry
                 MySQL ledger that always sums to zero, idempotency keys mean retries never double-post, and
-                reversals and refunds are compensating entries rather than rewrites of history.
+                reversals and refunds are compensating entries rather than rewrites of history. Partner rewards points
+                accrue on settlement and are clawed back on refund.
               </p>
               <div class="flex flex-wrap gap-2 text-[0.72rem]">
                 <span class="chip">Go</span>
