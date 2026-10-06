@@ -441,7 +441,7 @@
                 <div id="termLive" class="flex items-center gap-2" hidden>
                   <span class="prompt">➜ ~</span>
                   <input id="termInput" class="terminal-input" autocomplete="off" spellcheck="false"
-                         aria-label="Terminal input" placeholder="type `help`">
+                         aria-label="Terminal input" placeholder="type `help` or `rocket`">
                 </div>
               </div>
             </div>
@@ -625,6 +625,42 @@
                 <span class="chip">Splunk · New Relic · OTEL</span>
                 <span class="chip">AWS</span>
               </div>
+            </div>
+          </article>
+
+          <!-- card-auth-saga -->
+          <article class="project-card" data-tags="tech finance">
+            <div class="terminal card-terminal" aria-hidden="true">
+              <div class="terminal-body" style="white-space:pre">
+                <div><span class="prompt">$</span> temporal workflow show -w auth-1</div>
+                <div>hold      40000  open-to-buy −40000</div>
+                <div>signal    capture 25000</div>
+                <div>capture   25000  release 15000</div>
+                <div>signal    refund r1 5000</div>
+                <div>ledger Σ = <span style="color:#34d399">0 · balanced</span> <span class="tcursor">▋</span></div>
+              </div>
+            </div>
+            <div class="p-4 space-y-2 text-sm">
+              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                Payments &amp; Workflows
+              </div>
+              <h3 class="font-semibold">card-auth-saga — Card Authorization Saga</h3>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                A card issuer's backend as a Temporal saga in Go: authorize against the limit, place a hold, then
+                capture on a signal or release when the hold expires. Every money movement posts to a double-entry
+                MySQL ledger that always sums to zero, idempotency keys mean retries never double-post, and
+                reversals and refunds are compensating entries rather than rewrites of history.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[0.72rem]">
+                <span class="chip">Go</span>
+                <span class="chip">Temporal</span>
+                <span class="chip">MySQL</span>
+                <span class="chip">Double-entry ledger</span>
+                <span class="chip">Sagas</span>
+              </div>
+              <a href="https://github.com/jamesponwith/card-auth-saga" target="_blank" rel="noopener noreferrer" class="inline-block text-xs font-medium text-cyan-600 hover:underline dark:text-cyan-400">
+                View on GitHub →
+              </a>
             </div>
           </article>
 

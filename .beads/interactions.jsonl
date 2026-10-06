@@ -14,3 +14,4 @@
 {"id":"int-49f0f88d","kind":"field_change","created_at":"2026-09-10T20:37:47.222255Z","actor":"jamesponwith","issue_id":"jamesponwith_github_io-dci","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-e41e1ca6","kind":"field_change","created_at":"2026-09-27T21:32:06.137821Z","actor":"jamesponwith","issue_id":"jamesponwith_github_io-xzl","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Closed"}}
 {"id":"int-4268d2c4","kind":"field_change","created_at":"2026-10-02T11:46:54.967443Z","actor":"jamesponwith","issue_id":"jamesponwith_github_io-wlm","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Removed nav links"}}
+{"id":"int-3b10873f","kind":"field_change","created_at":"2026-10-06T01:11:44.094809Z","actor":"jamesponwith","issue_id":"jamesponwith_github_io-6ec","extra":{"field":"status","new_value":"closed","old_value":"open","reason":"Done"}}
