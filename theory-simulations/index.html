@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="An interactive atlas of foundational ideas in physics and mathematics."
+    />
+    <meta name="theme-color" content="#090d12" />
+    <title>Theory Simulations — An Interactive Atlas</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Theory Simulations home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>THEORY<span class="brand-slash">/</span>SIMULATIONS</span>
+        </a>
+        <div class="topbar-meta"><span class="status-dot"></span> INTERACTIVE ATLAS <span class="meta-divider">·</span> VOL. 10</div>
+      </header>
+
+      <main id="top">
+        <section class="hero">
+          <div class="eyebrow"><span>01</span> IDEAS YOU CAN EXPERIMENT WITH</div>
+          <h1>The universe,<br /><em>made interactive.</em></h1>
+          <p>
+            Turn the knobs. Follow the equations. Watch simple rules reveal
+            surprisingly deep structure.
+          </p>
+          <div class="hero-foot"><span class="hero-rule"></span> FIFTY-THREE MODELS · INFINITE QUESTIONS</div>
+          <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+          <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+          <div class="hero-core" aria-hidden="true"></div>
+        </section>
+
+        <section class="lab" aria-label="Simulation laboratory">
+          <aside class="index-panel">
+            <div class="section-label">THEORY INDEX <span id="theory-count"></span></div>
+            <nav class="theory-nav" aria-label="Choose a simulation"></nav>
+            <div class="index-note">
+              <span class="note-icon" aria-hidden="true">✳</span>
+              <p>Each simulation is a window into a model—not a substitute for the full theory.</p>
+            </div>
+            <div class="index-footer">SELECT A THEORY <span>THEN EXPERIMENT</span></div>
+          </aside>
+
+          <section class="experiment" aria-labelledby="theory-title">
+            <div class="experiment-topline">
+              <div class="breadcrumb"><span>LAB</span><span class="crumb-slash">/</span><span id="theory-category">QUANTUM PHYSICS</span></div>
+              <div class="live-indicator"><span></span> LIVE MODEL</div>
+            </div>
+            <div class="experiment-heading">
+              <div>
+                <div class="experiment-number" id="experiment-number">EXPERIMENT 01</div>
+                <h2 id="theory-title">The double-slit experiment</h2>
+                <p id="theory-description" class="experiment-description"></p>
+              </div>
+              <div class="heading-glyph" id="heading-glyph" aria-hidden="true">Ψ</div>
+            </div>
+
+            <div class="simulation-grid">
+              <div class="visual-card">
+                <div class="visual-card-head">
+                  <div><span class="micro-label">OBSERVATION WINDOW</span><strong id="visual-title">Single-particle detections</strong></div>
+                  <span class="frame-tag" id="frame-tag">SCREEN A</span>
+                </div>
+                <div class="canvas-wrap">
+                  <canvas id="simulation-canvas" width="960" height="460" aria-label="Interactive scientific visualization">
+                    Your browser does not support the canvas visualization.
+                  </canvas>
+                </div>
+                <div class="visual-caption">
+                  <span id="visual-caption-text">Each dot is one detected photon. The pattern emerges statistically.</span>
+                  <span class="coordinate-mark">Y <i>↕</i></span>
+                </div>
+              </div>
+
+              <aside class="controls-card" aria-label="Simulation controls">
+                <div class="controls-heading"><span class="micro-label">ADJUST PARAMETERS</span><span class="sliders-icon" aria-hidden="true">☷</span></div>
+                <div id="controls-content"></div>
+                <div class="control-foot"><span class="control-pulse"></span> CHANGES UPDATE THE MODEL IN REAL TIME</div>
+              </aside>
+            </div>
+
+            <div class="insight-grid">
+              <div class="equation-card">
+                <div class="insight-label"><span class="insight-symbol">∑</span> THE MODEL</div>
+                <div id="equation-content" class="equation-content"></div>
+                <p id="equation-note" class="equation-note"></p>
+              </div>
+              <div class="insight-card">
+                <div class="insight-label"><span class="insight-symbol insight-symbol-alt">↗</span> WHAT TO NOTICE</div>
+                <p id="insight-content" class="insight-content"></p>
+                <div class="model-boundary"><span>MODEL BOUNDARY</span><p id="boundary-content"></p></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="next-up" aria-label="Future simulations">
+          <div><span class="micro-label">THE ATLAS KEEPS GROWING</span><h2>Next: more worlds to explore.</h2></div>
+          <div class="next-tags"><span>SUPERCONDUCTIVITY</span><span>DOUBLE PENDULUM</span><span>NEUTRON STARS</span><span>CELLULAR RESPIRATION</span></div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>THEORY / SIMULATIONS</span><span>BUILT TO MAKE IDEAS VISIBLE</span><a href="README.md">ABOUT THE MODELS ↗</a>
+      </footer>
+    </div>
+    <script src="js/core.js"></script>
+    <script src="js/sims/01-quantum.js"></script>
+    <script src="js/sims/02-lensing.js"></script>
+    <script src="js/sims/03-chaos.js"></script>
+    <script src="js/sims/04-relativity.js"></script>
+    <script src="js/sims/05-bell.js"></script>
+    <script src="js/sims/06-evolution.js"></script>
+    <script src="js/sims/07-threebody.js"></script>
+    <script src="js/sims/08-entropy.js"></script>
+    <script src="js/sims/09-cosmos.js"></script>
+    <script src="js/sims/10-tunneling.js"></script>
+    <script src="js/sims/11-hawking.js"></script>
+    <script src="js/sims/12-turing.js"></script>
+    <script src="js/sims/13-shannon.js"></script>
+    <script src="js/sims/14-fourier.js"></script>
+    <script src="js/sims/15-galton.js"></script>
+    <script src="js/sims/16-grorbit.js"></script>
+    <script src="js/sims/17-maxwell.js"></script>
+    <script src="js/sims/18-epidemic.js"></script>
+    <script src="js/sims/19-cooperation.js"></script>
+    <script src="js/sims/20-brownian.js"></script>
+    <script src="js/sims/21-kuramoto.js"></script>
+    <script src="js/sims/22-ising.js"></script>
+    <script src="js/sims/23-percolation.js"></script>
+    <script src="js/sims/24-neural.js"></script>
+    <script src="js/sims/25-grover.js"></script>
+    <script src="js/sims/26-sandpile.js"></script>
+    <script src="js/sims/27-mandelbrot.js"></script>
+    <script src="js/sims/28-gravwaves.js"></script>
+    <script src="js/sims/29-life.js"></script>
+    <script src="js/sims/30-bayes.js"></script>
+    <script src="js/sims/31-convection.js"></script>
+    <script src="js/sims/32-blackbody.js"></script>
+    <script src="js/sims/33-predprey.js"></script>
+    <script src="js/sims/34-doppler.js"></script>
+    <script src="js/sims/35-huygens.js"></script>
+    <script src="js/sims/36-excitable.js"></script>
+    <script src="js/sims/37-genetic.js"></script>
+    <script src="js/sims/38-kepler.js"></script>
+    <script src="js/sims/39-fermat.js"></script>
+    <script src="js/sims/40-noether.js"></script>
+    <script src="js/sims/41-massenergy.js"></script>
+    <script src="js/sims/42-dla.js"></script>
+    <script src="js/sims/43-hydrogen.js"></script>
+    <script src="js/sims/44-uncertainty.js"></script>
+    <script src="js/sims/45-smallworld.js"></script>
+    <script src="js/sims/46-teleportation.js"></script>
+    <script src="js/sims/47-standardmodel.js"></script>
+    <script src="js/sims/48-darkmatter.js"></script>
+    <script src="js/sims/49-eye.js"></script>
+    <script src="js/sims/50-einsteinrings.js"></script>
+    <script src="js/sims/51-cmb.js"></script>
+    <script src="js/sims/52-protein.js"></script>
+    <script src="js/sims/53-qec.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
