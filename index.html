@@ -1147,6 +1147,38 @@
             </div>
           </article>
 
+          <!-- All About Tennis iOS app -->
+          <article class="project-card" data-tags="tech sport finance">
+            <a href="https://apps.apple.com/us/app/id6801365777" target="_blank" rel="noopener noreferrer" class="project-thumb">
+              <img src="assets/img/aat-mobile.jpg"
+                   alt="All About Tennis iOS app: the shop home screen, racquet stringing with string choices, and the Court Finder list of Scottsdale courts"
+                   loading="lazy" decoding="async">
+            </a>
+            <div class="p-4 space-y-2 text-sm">
+              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                Mobile App · App Store
+              </div>
+              <h3 class="font-semibold">All About Tennis — iOS App</h3>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                Designed, built and shipped the shop's native app solo. A live Shopify storefront with one-tap
+                Apple Pay checkout, racquet stringing orders with a push when the racquet's ready, back-in-stock
+                and price-drop alerts, a map of every tennis and pickleball court in the US, and a shot tracker
+                that counts your session from the microphone. Supabase handles analytics and notifications.
+                Source is private.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[0.72rem]">
+                <span class="chip">React Native</span>
+                <span class="chip">Expo</span>
+                <span class="chip">TypeScript</span>
+                <span class="chip">Shopify Storefront API</span>
+                <span class="chip">Supabase</span>
+              </div>
+              <a href="https://apps.apple.com/us/app/id6801365777" target="_blank" rel="noopener noreferrer" class="inline-block text-xs font-medium text-cyan-600 hover:underline dark:text-cyan-400">
+                Get it on the App Store →
+              </a>
+            </div>
+          </article>
+
           <!-- Phantom Barons NFT -->
           <article class="project-card" data-tags="tech finance">
             <div
@@ -1457,7 +1489,7 @@
         if (c.startsWith('sudo')) { termPrint('permission denied: this incident will be reported.'); return; }
         switch (c) {
           case 'help':
-            termPrint('commands: work · about · contact · resume · courts · earth · dome · f1 · rocket · light · dark · balls · whoami · clear'); break;
+            termPrint('commands: work · about · contact · resume · courts · earth · dome · f1 · rocket · app · light · dark · balls · whoami · clear'); break;
           case 'resume':
             window.open('assets/Resume/Resume_James_Ponwith.pdf', '_blank'); termPrint('opening resume.pdf…'); break;
           case 'courts': case 'court-finder':
@@ -1468,6 +1500,8 @@
             window.open('https://jamesponwith.github.io/drone-dome/', '_blank'); termPrint('opening aegis… deploying the drone dome.'); break;
           case 'rocket': case 'rocketlab': case 'launch':
             window.open('https://jamesponwith.github.io/rocketlab/', '_blank'); termPrint('opening rocketlab… T-minus 3, 2, 1, ignition.'); break;
+          case 'app': case 'aat': case 'ios':
+            window.open('https://apps.apple.com/us/app/id6801365777', '_blank'); termPrint('opening the all about tennis app… see you on court.'); break;
           case 'f1': case 'forge': case 'engine': case 'f1-sim':
             window.open('https://jamesponwith.github.io/f1-sim/', '_blank'); termPrint('opening power unit forge… spinning up the hologram.'); break;
           case 'work': case 'about': case 'contact': case 'home':
