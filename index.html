@@ -806,6 +806,38 @@
             </div>
           </article>
 
+          <!-- ramp-graph -->
+          <article class="project-card" data-tags="tech">
+            <a href="https://github.com/jamesponwith/ramp-graph" target="_blank" rel="noopener noreferrer" class="project-thumb">
+              <img src="assets/img/ramp-graph.jpg"
+                   alt="ramp-graph benchmark table against upstream LemonGraph: 5.2x faster node inserts, 7.7x faster batched edge inserts, and 14 to 17x faster lookups and multi-hop queries on a 1M-node graph"
+                   loading="lazy" decoding="async">
+            </a>
+            <div class="p-4 space-y-2 text-sm">
+              <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                Database · Systems
+              </div>
+              <h3 class="font-semibold">ramp-graph — Graph Database in Rust</h3>
+              <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                A Rust rewrite of the NSA's LemonGraph: a log-structured, transactional graph database on LMDB
+                with point-in-time history, its LGQL query language and a REST service. 3.6–7.7× faster inserts
+                and 6–17× faster queries than upstream on a 1M-node graph, and ahead of LadybugDB (Kùzu) on every
+                query benchmarked. Steered expansion explores graphs too big to copy, using 5.4× fewer edges than
+                BFS on the ICIJ Offshore Leaks graph.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[0.72rem]">
+                <span class="chip">Rust</span>
+                <span class="chip">LMDB</span>
+                <span class="chip">Query engine</span>
+                <span class="chip">REST</span>
+                <span class="chip">Benchmarking</span>
+              </div>
+              <a href="https://github.com/jamesponwith/ramp-graph" target="_blank" rel="noopener noreferrer" class="inline-block text-xs font-medium text-cyan-600 hover:underline dark:text-cyan-400">
+                Read the code →
+              </a>
+            </div>
+          </article>
+
           <!-- Power Unit Forge -->
           <article class="project-card" data-tags="tech sport">
             <a href="https://jamesponwith.github.io/f1-sim/" target="_blank" rel="noopener noreferrer" class="project-thumb">
@@ -1489,7 +1521,7 @@
         if (c.startsWith('sudo')) { termPrint('permission denied: this incident will be reported.'); return; }
         switch (c) {
           case 'help':
-            termPrint('commands: work · about · contact · resume · courts · earth · dome · f1 · rocket · app · light · dark · balls · whoami · clear'); break;
+            termPrint('commands: work · about · contact · resume · courts · earth · dome · f1 · rocket · app · graph · light · dark · balls · whoami · clear'); break;
           case 'resume':
             window.open('assets/Resume/Resume_James_Ponwith.pdf', '_blank'); termPrint('opening resume.pdf…'); break;
           case 'courts': case 'court-finder':
@@ -1500,6 +1532,8 @@
             window.open('https://jamesponwith.github.io/drone-dome/', '_blank'); termPrint('opening aegis… deploying the drone dome.'); break;
           case 'rocket': case 'rocketlab': case 'launch':
             window.open('https://jamesponwith.github.io/rocketlab/', '_blank'); termPrint('opening rocketlab… T-minus 3, 2, 1, ignition.'); break;
+          case 'graph': case 'ramp': case 'ramp-graph':
+            window.open('https://github.com/jamesponwith/ramp-graph', '_blank'); termPrint('opening ramp-graph… walking the edges.'); break;
           case 'app': case 'aat': case 'ios':
             window.open('https://apps.apple.com/us/app/id6801365777', '_blank'); termPrint('opening the all about tennis app… see you on court.'); break;
           case 'f1': case 'forge': case 'engine': case 'f1-sim':
