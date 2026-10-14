@@ -1,0 +1,35 @@
+"""Fail if any page links a local file that doesn't exist, or the home page pulls in a heavy asset.
+
+Run: python3 scripts/check_site.py
+"""
+
+import pathlib
+import re
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+MAX_HOME_ASSET = 5_000_000  # bytes; convert GIFs to MP4 and resize photos past this
+REF = re.compile(r'(?:src|href|poster|content)="([^"#?]+)')
+
+
+def local_refs(html):
+    for ref in REF.findall(html):
+        ref = ref.removeprefix("https://jamesponwith.github.io/")
+        if not re.search(r"^(?:[a-z]+:|//)|\s", ref) and "." in ref.rsplit("/", 1)[-1]:
+            yield ref.lstrip("/")
+
+
+def problems():
+    for page in sorted(ROOT.glob("*.html")):
+        for ref in sorted(set(local_refs(page.read_text(encoding="utf-8")))):
+            path = ROOT / ref
+            if not path.is_file():
+                yield f"{page.name}: missing {ref}"
+            elif page.name == "index.html" and path.stat().st_size > MAX_HOME_ASSET:
+                yield f"{page.name}: {ref} is {path.stat().st_size / 1e6:.1f} MB"
+
+
+if __name__ == "__main__":
+    found = list(problems())
+    print("\n".join(found) or "ok")
+    sys.exit(1 if found else 0)

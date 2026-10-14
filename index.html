@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="canonical" href="https://jamesponwith.github.io/" />
   <title>James Ponwith — Principal Software Engineer</title>
   <meta name="description" content="James Ponwith — Principal Software Engineer specializing in resiliency engines, real-time systems, AWS, and Golang." />
   <link rel="icon" href="assets/img/teddy_bear.PNG" />
@@ -10,21 +13,22 @@
   <!-- Fonts & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Built locally (covers all *.html pages): npx tailwindcss@3 -c tailwind.config.js -i assets/css/tailwind.src.css -o assets/css/tailwind.css --minify -->
   <link rel="stylesheet" href="assets/css/tailwind.css">
 
   <!-- tsParticles -->
-  <script src="https://cdn.jsdelivr.net/npm/tsparticles@3/tsparticles.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/tsparticles@3.9.1/tsparticles.bundle.min.js" integrity="sha384-k5y1MdALoG8qJ5FfC4SfwHtiC9/IZ8rQXlTxDRDIFriSZwBqIdOa2M8mcmQLs2pS" crossorigin="anonymous"></script>
 
   <!-- Matter.js (tennis-ball physics in hero) -->
-  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js" integrity="sha384-ZRKYEXtLBVeqs9z1WxyeKutCqnkqolS/r1EUWuoUpG4ZKbnRAIXnHhHdnNuiB6CL" crossorigin="anonymous"></script>
 
   <!-- Open Graph -->
   <meta property="og:title" content="James Ponwith — Principal Software Engineer" />
   <meta property="og:description" content="Resiliency & real-time systems. AWS • Go • New Relic • ECS/Fargate • Route53 • DynamoDB." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="assets/img/JandE.JPEG" />
+  <meta property="og:image" content="https://jamesponwith.github.io/assets/img/JandE.JPEG" />
+  <meta property="og:url" content="https://jamesponwith.github.io/" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <style>
@@ -184,13 +188,16 @@
       display: block;
       overflow: hidden;
     }
-    .project-thumb img {
+    .project-thumb img,
+    .project-thumb video {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 250ms ease;
     }
-    .project-card:hover .project-thumb img {
+    .project-card:hover .project-thumb img,
+    .project-card:hover .project-thumb video {
       transform: scale(1.03);
     }
 
@@ -348,7 +355,7 @@
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "James Ponwith",
-    "image": "assets/img/JandE.JPEG",
+    "image": "https://jamesponwith.github.io/assets/img/JandE.JPEG",
     "jobTitle": "Principal Software Engineer",
     "worksFor": { "@type": "Organization", "name": "Capital One" },
     "url": "https://jamesponwith.github.io",
@@ -688,9 +695,7 @@
           <!-- Theory Simulations -->
           <article class="project-card" data-tags="tech">
             <a href="theory-simulations/" class="project-thumb">
-              <img src="assets/demos/theory-simulations-demo.gif"
-                   alt="Simulation montage: figure-eight three-body orbit, merging black holes, Fourier epicycles, Galton board, Mandelbrot set, Turing patterns"
-                   loading="lazy" decoding="async">
+              <video src="assets/demos/theory-simulations-demo.mp4" poster="assets/demos/theory-simulations-demo-poster.jpg" width="640" height="307" muted loop playsinline preload="none" role="img" aria-label="Simulation montage: figure-eight three-body orbit, merging black holes, Fourier epicycles, Galton board, Mandelbrot set, Turing patterns"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -748,9 +753,7 @@
           <!-- Brax Tennis RL -->
           <article class="project-card" data-tags="tech sport">
             <a href="tennis-part1.html" class="project-thumb">
-              <img src="assets/demos/brax-tennis-demo.gif"
-                   alt="RL tennis demo: a paddle agent slides, swings, and returns serves over the net"
-                   loading="lazy" decoding="async">
+              <video src="assets/demos/brax-tennis-demo.mp4" poster="assets/demos/brax-tennis-demo-poster.jpg" width="560" height="360" muted loop playsinline preload="none" role="img" aria-label="RL tennis demo: a paddle agent slides, swings, and returns serves over the net"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -841,9 +844,7 @@
           <!-- Power Unit Forge -->
           <article class="project-card" data-tags="tech sport">
             <a href="https://jamesponwith.github.io/f1-sim/" target="_blank" rel="noopener noreferrer" class="project-thumb">
-              <img src="assets/demos/f1-sim-demo.gif"
-                   alt="Power Unit Forge: a holographic F1 V6 hybrid engine runs a dyno sweep while the power and torque curves draw, then the assembly explodes into its components"
-                   loading="lazy" decoding="async">
+              <video src="assets/demos/f1-sim-demo.mp4" poster="assets/demos/f1-sim-demo-poster.jpg" width="640" height="380" muted loop playsinline preload="none" role="img" aria-label="Power Unit Forge: a holographic F1 V6 hybrid engine runs a dyno sweep while the power and torque curves draw, then the assembly explodes into its components"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -872,9 +873,7 @@
           <!-- AEGIS Drone Dome -->
           <article class="project-card" data-tags="tech">
             <a href="https://jamesponwith.github.io/drone-dome/" target="_blank" rel="noopener noreferrer" class="project-thumb">
-              <img src="assets/demos/drone-dome-demo.gif"
-                   alt="AEGIS drone dome replay: twelve hostiles close in from every direction, interceptor drones leave the shell to capture all twelve, and the remaining drones re-space the shell"
-                   loading="lazy" decoding="async">
+              <video src="assets/demos/drone-dome-demo.mp4" poster="assets/demos/drone-dome-demo-poster.jpg" width="560" height="350" muted loop playsinline preload="none" role="img" aria-label="AEGIS drone dome replay: twelve hostiles close in from every direction, interceptor drones leave the shell to capture all twelve, and the remaining drones re-space the shell"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -903,9 +902,7 @@
           <!-- Strata: Earth, layer by layer -->
           <article class="project-card" data-tags="tech">
             <a href="https://jamesponwith.github.io/world-layers/" target="_blank" rel="noopener noreferrer" class="project-thumb">
-              <img src="assets/demos/strata-demo.gif"
-                   alt="Strata demo: a cutaway Earth opens to show its layers, an earthquake sends seismic waves through the interior, the view switches to temperature, and the outer layers peel away to the core"
-                   loading="lazy" decoding="async">
+              <video src="assets/demos/strata-demo.mp4" poster="assets/demos/strata-demo-poster.jpg" width="560" height="350" muted loop playsinline preload="none" role="img" aria-label="Strata demo: a cutaway Earth opens to show its layers, an earthquake sends seismic waves through the interior, the view switches to temperature, and the outer layers peel away to the core"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -970,9 +967,7 @@
           <!-- Court Finder -->
           <article class="project-card" data-tags="tech sport">
             <a href="https://jamesponwith.github.io/court-finder/" target="_blank" rel="noopener noreferrer" class="project-thumb">
-              <img src="assets/demos/court-finder-demo.gif"
-                   alt="Court Finder demo: locating nearby public tennis courts in NYC, searching Central Park, and opening a facility's details"
-                   loading="lazy" decoding="async">
+              <video src="assets/demos/court-finder-demo.mp4" poster="assets/demos/court-finder-demo-poster.jpg" width="560" height="350" muted loop playsinline preload="none" role="img" aria-label="Court Finder demo: locating nearby public tennis courts in NYC, searching Central Park, and opening a facility's details"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -1160,7 +1155,7 @@
 
           <!-- All About Tennis -->
           <article class="project-card" data-tags="sport finance">
-            <a href="https://allabouttennis.com/" target="_blank" class="project-thumb">
+            <a href="https://allabouttennis.com/" target="_blank" rel="noopener noreferrer" class="project-thumb">
               <img src="assets/img/Allabouttennis.PNG" alt="All About Tennis website" loading="lazy" decoding="async">
             </a>
             <div class="p-4 space-y-2 text-sm">
@@ -1249,7 +1244,7 @@
           <!-- PoseNet -->
           <article class="project-card" data-tags="tech sport">
             <a href="posenetdemo.html" class="project-thumb">
-              <img src="assets/img/posenetgif.gif" alt="PoseNet demo" loading="lazy" decoding="async">
+              <video src="assets/img/posenetgif.mp4" poster="assets/img/posenetgif-poster.jpg" width="800" height="410" muted loop playsinline preload="none" role="img" aria-label="PoseNet demo"></video>
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -1288,8 +1283,8 @@
 
           <!-- Knapp Scholars -->
           <article class="project-card" data-tags="tech sport finance">
-            <a href="https://sandiego.edu/~jponwith/" target="_blank" class="project-thumb">
-              <img src="assets/img/KnappScholarsWebpage.png" alt="Knapp Scholars webpage" loading="lazy" decoding="async">
+            <a href="https://sandiego.edu/~jponwith/" target="_blank" rel="noopener noreferrer" class="project-thumb">
+              <img src="assets/img/KnappScholarsWebpage.jpg" alt="Knapp Scholars webpage" loading="lazy" decoding="async">
             </a>
             <div class="p-4 space-y-2 text-sm">
               <div class="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
@@ -1677,6 +1672,7 @@
         }
       };
 
+      if (!window.tsParticles) return;
       const existing = tsParticles.domItem(0);
       if (existing) {
         await existing.loadOptions(options);
