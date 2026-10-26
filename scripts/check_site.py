@@ -15,7 +15,7 @@ REF = re.compile(r'(?:src|href|poster|content)="([^"#?]+)')
 def local_refs(html):
     for ref in REF.findall(html):
         ref = ref.removeprefix("https://jamesponwith.github.io/")
-        if not re.search(r"^(?:[a-z]+:|//)|\s", ref) and "." in ref.rsplit("/", 1)[-1]:
+        if not re.search(r"^(?:[a-z]+:|//)|\s|\$\{", ref) and "." in ref.rsplit("/", 1)[-1]:
             yield ref.lstrip("/")
 
 

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site Variations</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#05070d; --fg:#e6edf3; --dim:#7d8590; --line:#1f2937; --accent:#22d3ee; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--fg); font:15px/1.6 'JetBrains Mono', ui-monospace, monospace; padding:48px 16px; }
+    main { max-width:760px; margin:0 auto; }
+    h1 { font-size:1.4rem; margin:0 0 4px; }
+    p { color:var(--dim); margin:0 0 32px; }
+    a.v { display:block; padding:20px; border:1px solid var(--line); border-radius:10px; margin-bottom:12px; color:inherit; text-decoration:none; transition:border-color .15s, transform .15s; }
+    a.v:hover, a.v:focus-visible { border-color:var(--accent); transform:translateX(4px); outline:none; }
+    a.v b { color:var(--accent); }
+    a.v span { display:block; color:var(--dim); font-size:.85rem; margin-top:4px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>~/variations</h1>
+  <p>Experimental takes on jamesponwith.github.io. <a href="/" style="color:var(--accent)">Home (Editorial) →</a></p>
+  <a class="v" href="control-plane/"><b>01 Control Plane</b><span>The site is a live resiliency console: watch a cell fail and traffic reroute. ⌘K palette.</span></a>
+  <a class="v" href="constellation/"><b>02 Constellation</b><span>Three.js: projects as stars in 3D space. Fly to each one.</span></a>
+  <a class="v" href="/"><b>03 Editorial · live home page</b><span>Big type, scroll-choreographed, horizontal work rail, view-transition case studies.</span></a>
+  <a class="v" href="os/"><b>04 Ponwith OS</b><span>A tiny desktop OS: windows, dock, a real terminal, and a live monitor.</span></a>
+  <a class="v" href="/classic.html"><b>00 Classic</b><span>The previous home page: terminal hero, dashboard grid, tennis-ball physics.</span></a>
+</main>
+</body>
+</html>

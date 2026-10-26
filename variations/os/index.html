@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ponwith OS · James Ponwith</title>
+<meta name="description" content="James Ponwith, Principal Software Engineer. A portfolio that boots like a tiny operating system.">
+<meta name="theme-color" content="#06070b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06070b;--glass:rgba(20,22,30,.8);--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);
+  --tx:#e9ebf1;--dim:#9aa1b2;--mute:#666d80;--ac:#7aa2ff;--gr:#5ee6a0;--am:#ffc46b;--rd:#ff6b6b;--vi:#c792ea;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font:13px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:default}
+a{color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- wallpaper ---------- */
+#wall{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 50% 110%,#0d1222 0%,#06070b 60%)}
+#wall i{position:absolute;width:75vmax;height:75vmax;border-radius:50%;will-change:transform;animation:drift 46s ease-in-out infinite alternate}
+#wall i:nth-child(1){left:-20vmax;top:-30vmax;background:radial-gradient(closest-side,rgba(64,92,255,.42),transparent)}
+#wall i:nth-child(2){right:-25vmax;top:-10vmax;background:radial-gradient(closest-side,rgba(150,70,255,.30),transparent);animation-duration:58s;animation-delay:-20s}
+#wall i:nth-child(3){left:10vmax;bottom:-45vmax;background:radial-gradient(closest-side,rgba(0,200,170,.24),transparent);animation-duration:52s;animation-delay:-8s}
+#wall i:nth-child(4){right:0;bottom:-30vmax;width:50vmax;height:50vmax;background:radial-gradient(closest-side,rgba(255,140,70,.14),transparent);animation-duration:40s;animation-delay:-30s}
+@keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(8vmax,5vmax,0) scale(1.12)}100%{transform:translate3d(-6vmax,9vmax,0) scale(.94)}}
+#wall::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent);mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent)}
+
+#hello{position:fixed;right:44px;bottom:112px;z-index:1;max-width:520px;text-align:right;pointer-events:none}
+#hello .k{font:12px var(--mono);color:var(--gr);letter-spacing:.04em}
+#hello h1{margin:6px 0 4px;font-size:46px;line-height:1.05;letter-spacing:-.035em;font-weight:700}
+#hello h1 span{color:var(--dim);font-weight:500}
+#hello p{margin:0;color:var(--dim);font-size:14px}
+
+/* ---------- menu bar ---------- */
+#mb{position:fixed;top:0;left:0;right:0;height:28px;z-index:50;display:flex;align-items:center;gap:2px;padding:0 8px;background:rgba(10,11,16,.5);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid var(--line);user-select:none}
+.mi{display:flex;align-items:center;gap:6px;height:22px;padding:0 9px;border:0;border-radius:5px;background:none;color:var(--tx);text-decoration:none;font-size:13px;white-space:nowrap}
+.mi:hover,.mi[aria-expanded=true]{background:rgba(255,255,255,.13)}
+.mb-app{font-weight:600}
+.mb-r{margin-left:auto;display:flex;align-items:center;gap:2px;color:var(--tx)}
+.mb-r svg{display:block}
+#clock{font-variant-numeric:tabular-nums}
+.logo{width:14px;height:14px;border-radius:4px;background:conic-gradient(from 200deg,#7aa2ff,#c792ea,#5ee6a0,#7aa2ff);box-shadow:inset 0 0 0 3px rgba(10,11,16,.55)}
+.menu{position:fixed;top:30px;left:6px;min-width:240px;padding:5px;z-index:60;background:rgba(30,32,42,.82);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--line2);border-radius:10px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.menu :is(button,a){display:flex;justify-content:space-between;gap:20px;width:100%;padding:4px 10px;border:0;border-radius:6px;background:none;color:var(--tx);text-align:left;text-decoration:none;font-size:13px}
+.menu :is(button,a):is(:hover,:focus-visible){background:var(--ac);color:#fff;outline:none}
+.menu kbd{font:inherit;color:var(--mute)}
+.menu :is(button,a):hover kbd{color:#dfe6ff}
+.menu hr{border:0;border-top:1px solid var(--line2);margin:5px 8px}
+
+/* ---------- icons ---------- */
+.ico{container-type:inline-size;display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:23%;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 0 0 .5px rgba(255,255,255,.12),0 6px 16px rgba(0,0,0,.35)}
+.ico svg{display:block}
+.ico b{font:600 1em/1 var(--mono)}
+.i-finder{background:linear-gradient(160deg,#6cc0ff,#2a66e0)}
+.i-terminal{background:linear-gradient(160deg,#2d313c,#0e1015)}
+.i-terminal b{color:var(--gr);font-size:30cqi}
+.i-about{background:#222 center/cover no-repeat}
+.i-mail{background:linear-gradient(160deg,#78d6ff,#2a7cf6)}
+.i-monitor{background:linear-gradient(160deg,#173326,#08120d)}
+.i-resume{background:linear-gradient(160deg,#ff8a70,#d93f37)}
+.i-github{background:linear-gradient(160deg,#3a3f47,#15181d)}
+.i-linkedin{background:linear-gradient(160deg,#1f84e6,#0a58b0)}
+.i-linkedin b{font:700 44cqi/1 var(--sans);color:#fff;letter-spacing:-.04em}
+.i-variations{background:linear-gradient(160deg,#a58bff,#5b3fd6)}
+
+/* ---------- dock ---------- */
+#dock{position:fixed;left:50%;bottom:8px;translate:-50% 0;z-index:40;height:68px;display:flex;align-items:flex-end;gap:6px;padding:0 8px 7px;background:rgba(32,34,44,.42);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);border:1px solid var(--line2);border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.di{--sz:52px;position:relative;flex:none;width:calc(var(--sz)*var(--s,1));height:calc(var(--sz)*var(--s,1));padding:0;border:0;background:none;transition:width .14s ease-out,height .14s ease-out;text-decoration:none;display:block}
+.di::after{content:"";position:absolute;left:50%;bottom:-6px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--tx);opacity:0;transition:opacity .2s}
+.di.on::after{opacity:.75}
+.di.bounce .ico{animation:bounce .7s cubic-bezier(.3,0,.3,1) 2}
+@keyframes bounce{40%{transform:translateY(-16px)}}
+.tip{position:absolute;bottom:calc(100% + 12px);left:50%;translate:-50% 4px;padding:3px 10px;border-radius:6px;background:rgba(30,32,42,.9);border:1px solid var(--line2);color:var(--tx);font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s,translate .12s}
+.di:is(:hover,:focus-visible) .tip{opacity:1;translate:-50% 0}
+.dsep{flex:none;width:1px;height:46px;margin:0 3px 3px;background:var(--line2)}
+#dmin{display:contents}
+.di.mini .ico{border-radius:10px;font-size:11px}
+.di.mini .ico::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.45))}
+
+/* ---------- desktop icons ---------- */
+#dicons{position:fixed;top:44px;right:14px;z-index:1;display:flex;flex-direction:column;gap:10px}
+.dicon{width:88px;padding:6px 4px;border:1px solid transparent;border-radius:8px;background:none;text-align:center;font-size:12px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.dicon .ico{width:50px;margin:0 auto 6px}
+.dicon.sel{background:rgba(255,255,255,.1);border-color:var(--line2)}
+.dicon.sel span{background:var(--ac);border-radius:4px;padding:0 4px}
+
+/* ---------- windows ---------- */
+#wins{position:fixed;inset:0;z-index:5;pointer-events:none}
+.win{position:absolute;left:0;top:0;display:flex;flex-direction:column;min-width:300px;min-height:200px;pointer-events:auto;background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(170%);backdrop-filter:blur(28px) saturate(170%);border:1px solid var(--line2);border-radius:12px;overflow:hidden;box-shadow:0 0 0 .5px rgba(0,0,0,.7),0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);animation:winIn .24s cubic-bezier(.2,.9,.3,1.15);outline:none}
+.win.focused{box-shadow:0 0 0 .5px rgba(0,0,0,.7),0 28px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+@keyframes winIn{from{opacity:0;scale:.93}}
+.win.closing{animation:winOut .16s ease-in forwards;pointer-events:none}
+@keyframes winOut{to{opacity:0;scale:.95}}
+.win.anim{transition:translate .42s cubic-bezier(.3,.9,.25,1),scale .42s cubic-bezier(.3,.9,.25,1),opacity .36s,width .3s cubic-bezier(.3,.9,.25,1),height .3s cubic-bezier(.3,.9,.25,1)}
+.win.mind{visibility:hidden}
+.win.max{border-radius:0}
+.tb{position:relative;flex:none;height:38px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none}
+.ttl{position:absolute;left:84px;right:84px;text-align:center;font-weight:600;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.win.focused .ttl{color:var(--tx)}
+.lights{position:relative;z-index:1;display:flex;gap:8px}
+.l{width:12px;height:12px;padding:0;border:0;border-radius:50%;background:#4a4d57;display:grid;place-items:center;color:rgba(0,0,0,.65)}
+.l svg{opacity:0}
+.win.focused .l.c,.lights:hover .l.c{background:#ff5f57}
+.win.focused .l.m,.lights:hover .l.m{background:#febc2e}
+.win.focused .l.x,.lights:hover .l.x{background:#28c840}
+.lights:hover .l svg,.l:focus-visible svg{opacity:1}
+.back{display:none;position:relative;z-index:1;align-items:center;gap:2px;padding:4px 6px 4px 0;border:0;background:none;color:var(--ac);font-size:15px}
+.wb{position:relative;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.grip{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;touch-action:none;z-index:2}
+.grip::after{content:"";position:absolute;right:4px;bottom:4px;width:7px;height:7px;border-right:1.5px solid var(--mute);border-bottom:1.5px solid var(--mute);opacity:.6}
+body.dragging{user-select:none;-webkit-user-select:none}
+body.dragging iframe{pointer-events:none}
+
+.btn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--line2);background:rgba(255,255,255,.07);color:var(--tx);text-decoration:none;font-size:12.5px;font-weight:500}
+.btn:hover{background:rgba(255,255,255,.13)}
+.btn.pri{background:var(--ac);border-color:transparent;color:#0a1022}
+.btn.pri:hover{filter:brightness(1.1)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font:11.5px/1.6 var(--mono);color:#cdd3e0}
+
+/* ---------- terminal ---------- */
+.term{background:rgba(7,8,12,.74);padding:10px 14px 14px;font:12.5px/1.6 var(--mono);cursor:text}
+.term .o{white-space:pre-wrap;word-break:break-word}
+.tline{display:flex;gap:8px}
+.ps{color:var(--gr);flex:none}
+.ps i{font-style:normal;color:var(--ac)}
+.tin{flex:1;min-width:0;padding:0;border:0;outline:none;background:none;color:var(--tx);font:inherit;caret-color:var(--gr)}
+.c-dir{color:var(--ac);font-weight:600}.c-dim{color:var(--mute)}.c-err{color:var(--rd)}.c-am{color:var(--am)}.c-gr{color:var(--gr)}.c-vi{color:var(--vi)}
+.lsg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));column-gap:12px}
+.nf{display:flex;flex-wrap:wrap;gap:6px 26px;margin:4px 0 8px}
+.nf pre{margin:0;font:inherit;line-height:1.25;background:linear-gradient(180deg,#7aa2ff,#c792ea 60%,#5ee6a0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nf .k{color:var(--ac);font-weight:600}
+.sw{display:inline-block;width:18px;height:10px;margin-right:2px;vertical-align:middle}
+.term a{color:var(--ac)}
+
+/* ---------- finder ---------- */
+.finder{display:flex;height:100%}
+.side{flex:none;width:176px;padding:8px;overflow:auto;background:rgba(255,255,255,.025);border-right:1px solid var(--line)}
+.sl{padding:10px 8px 4px;font-size:11px;font-weight:600;color:var(--mute)}
+.sf{display:flex;align-items:center;gap:9px;width:100%;padding:5px 8px;border:0;border-radius:6px;background:none;text-align:left}
+.sf:hover{background:rgba(255,255,255,.05)}
+.sf[aria-pressed=true]{background:rgba(255,255,255,.11)}
+.sf em{margin-left:auto;font-style:normal;font-size:11px;color:var(--mute)}
+.dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--c,var(--dim))}
+.fmain{flex:1;min-width:0;display:flex;flex-direction:column}
+.ftool{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}
+.fttl{font-size:14px;font-weight:600}
+.ftool input{margin-left:auto;width:180px;height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--line2);background:rgba(0,0,0,.25);color:var(--tx);font:inherit;outline:none}
+.ftool input:focus{border-color:var(--ac)}
+.fgrid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));align-content:start;min-width:0;gap:4px;padding:12px}
+.fi{min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px 10px;border:0;border-radius:10px;background:none;text-align:center}
+.fi[hidden]{display:none}
+.fi:hover{background:rgba(255,255,255,.04)}
+.fi.sel{background:rgba(122,162,255,.16)}
+.th{position:relative;width:100%;aspect-ratio:16/10;margin-bottom:4px;border-radius:7px;overflow:hidden;background:#0b0d13;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.fi.sel .th{outline:2px solid var(--ac);outline-offset:1px}
+.th img{display:block;width:100%;height:100%;object-fit:cover}
+.mt{padding:7px 8px;font:8.5px/1.45 var(--mono);color:#b8c0d2;text-align:left;white-space:pre;overflow:hidden}
+.mt::first-line{color:var(--gr)}
+.fi b{font-weight:500;font-size:12px;line-height:1.3}
+.fi small{font-size:11px;color:var(--mute)}
+.star{position:absolute;top:5px;right:5px;padding:1px 6px;border-radius:999px;background:rgba(94,230,160,.9);color:#062015;font:600 9px/1.5 var(--mono)}
+.fstat{padding:5px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--mute)}
+
+/* ---------- project ---------- */
+.pm{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#000;border-bottom:1px solid var(--line)}
+.pterm{margin:0;padding:16px 18px;background:#07080c;border-bottom:1px solid var(--line);font:12px/1.7 var(--mono);color:#c3cbdc;white-space:pre-wrap}
+.pterm span:first-child{color:var(--gr)}
+.pb{padding:18px 22px 26px}
+.pk{font:11px var(--mono);color:var(--ac);letter-spacing:.06em;text-transform:uppercase}
+.pb h2{margin:4px 0 0;font-size:24px;letter-spacing:-.025em;line-height:1.2}
+.psub{margin:2px 0 12px;color:var(--dim)}
+.pb p,.pb li{color:#cfd4de;font-size:13.5px;line-height:1.6}
+.pb ul{padding-left:18px;margin:10px 0}
+.pb li::marker{color:var(--ac)}
+.pb .chips{margin:16px 0}
+.plinks{display:flex;flex-wrap:wrap;gap:8px}
+
+/* ---------- about ---------- */
+.about{padding:26px 26px 30px;text-align:center}
+.av{width:116px;height:116px;border-radius:50%;object-fit:cover;border:1px solid var(--line2);box-shadow:0 10px 40px rgba(122,162,255,.25)}
+.about h2{margin:14px 0 0;font-size:26px;letter-spacing:-.03em}
+.about .sub{margin:0;color:var(--dim)}
+.spec{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;max-width:380px;margin:18px auto;text-align:left;font-size:12.5px}
+.spec dt{color:var(--mute);text-align:right}.spec dd{margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:18px 0}
+.stat{padding:12px 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.stat b{display:block;font-size:20px;letter-spacing:-.02em;color:var(--gr)}
+.stat span{font-size:11px;color:var(--dim)}
+.about p{text-align:left;color:#cfd4de;font-size:13.5px;line-height:1.65}
+.about .chips{justify-content:center;margin:12px 0 18px}
+.about h3{margin:18px 0 8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.alinks{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+
+/* ---------- mail ---------- */
+.mail{display:flex;flex-direction:column;height:100%}
+.mbar{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.mf{display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line);color:var(--mute)}
+.mf span{width:60px}
+.mf input{flex:1;height:36px;border:0;outline:none;background:none;color:var(--tx);font:inherit;font-size:13.5px}
+.mail textarea{flex:1;min-height:120px;padding:14px;border:0;outline:none;resize:none;background:none;color:var(--tx);font:13.5px/1.6 var(--sans)}
+
+/* ---------- monitor ---------- */
+.mon{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px;min-height:100%}
+.mtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sim{padding:1px 8px;border-radius:999px;border:1px solid rgba(255,196,107,.5);color:var(--am);font:600 10.5px/1.6 var(--mono);letter-spacing:.06em}
+.mtop .btn{margin-left:auto}
+.mstat{font:11.5px var(--mono);color:var(--dim)}
+.cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.cell{padding:10px 12px 8px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid var(--line);transition:border-color .3s,background .3s}
+.cell.bad{border-color:rgba(255,107,107,.55);background:rgba(255,107,107,.07)}
+.cell.warn{border-color:rgba(255,196,107,.5)}
+.ch{display:flex;align-items:center;gap:7px;font:600 12px var(--mono)}
+.pill{margin-left:auto;padding:0 7px;border-radius:999px;font:600 10px/1.7 var(--mono);background:rgba(94,230,160,.14);color:var(--gr)}
+.cell.bad .pill{background:rgba(255,107,107,.18);color:var(--rd)}
+.cell.warn .pill{background:rgba(255,196,107,.16);color:var(--am)}
+.cv{margin-top:4px;font-size:12px;color:var(--dim)}
+.cv b{font-size:20px;color:var(--tx);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cp{font:11px var(--mono);color:var(--mute)}
+.cp b{color:var(--dim);font-weight:400}
+.cell canvas{display:block;width:100%;height:38px;margin-top:6px}
+.chart{padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.22);border:1px solid var(--line)}
+.chl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--dim)}
+.chart canvas{display:block;width:100%;height:150px;margin-top:6px}
+.mlog{margin:0;padding:10px 12px;min-height:118px;border-radius:10px;background:#07080c;border:1px solid var(--line);font:11.5px/1.6 var(--mono);color:#b9c1d3;white-space:pre-wrap}
+.mfoot{font-size:11px;color:var(--mute)}
+
+/* ---------- resume ---------- */
+.res{display:flex;flex-direction:column;height:100%}
+.res .mbar{align-items:center}
+.res iframe{flex:1;width:100%;border:0;background:#fff}
+
+/* ---------- boot ---------- */
+#boot{position:fixed;inset:0;z-index:100;background:#030305;color:#c6ccd9;font:12.5px/1.65 var(--mono);padding:28px 32px;overflow:hidden;transition:opacity .45s}
+#boot.out{opacity:0}
+#boot pre{margin:0;font:inherit;white-space:pre-wrap}
+#boot .ok{color:var(--gr)}#boot .dim{color:var(--mute)}
+#boot .skip{position:absolute;right:24px;bottom:20px;color:var(--mute);font-size:11px}
+.cur{display:inline-block;width:.6em;height:1.1em;vertical-align:text-bottom;background:var(--gr);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+#toast{position:fixed;top:40px;left:50%;translate:-50% -8px;z-index:70;padding:7px 14px;border-radius:9px;background:rgba(30,32,42,.92);border:1px solid var(--line2);font-size:12.5px;opacity:0;pointer-events:none;transition:opacity .2s,translate .2s}
+#toast.show{opacity:1;translate:-50% 0}
+
+/* ---------- mobile home screen ---------- */
+#home{display:none}
+@media (max-width:699px){
+  #dock,#dicons,#hello,.mb-d{display:none}
+  #mb{padding-left:12px}
+  #home{display:block;position:fixed;inset:28px 0 0;z-index:2;overflow-y:auto;padding:22px 16px calc(40px + env(safe-area-inset-bottom))}
+  .hw{padding:18px;margin-bottom:26px;border-radius:22px;background:rgba(24,26,36,.55);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);border:1px solid var(--line2)}
+  .hw .k{font:11px var(--mono);color:var(--gr)}
+  .hw h1{margin:4px 0 2px;font-size:28px;letter-spacing:-.03em;line-height:1.1}
+  .hw p{margin:0;color:var(--dim);font-size:13px}
+  .hgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px 8px}
+  .happ{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;color:var(--tx);text-decoration:none;font-size:11px}
+  .happ .ico{width:min(62px,17vw)}
+  .happ:active .ico{filter:brightness(.8)}
+  .win{translate:none!important;scale:1!important;width:100%!important;height:auto!important;top:28px;bottom:0;min-width:0;border:0;border-radius:0;animation:mIn .3s cubic-bezier(.2,.9,.3,1);background:rgba(16,18,25,.92)}
+  .win.closing{animation:mOut .22s ease-in forwards}
+  .lights,.grip{display:none}
+  .back{display:flex}
+  .ttl{left:70px;right:70px}
+  .finder{flex-direction:column}
+  .side{width:auto;display:flex;gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .side .sl{display:none}
+  .sf{flex:none;width:auto}
+  .ftool input{width:130px}
+  .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tin,.mf input,.mail textarea,.ftool input{font-size:16px}
+  .menu{left:6px;right:6px;min-width:0}
+}
+@keyframes mIn{from{transform:translateX(35%);opacity:0}}
+@keyframes mOut{to{transform:translateX(35%);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<h1 class="sr">James Ponwith, Principal Software Engineer</h1>
+<div id="wall" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<div id="hello" aria-hidden="true"></div>
+
+<header id="mb">
+  <button class="mi" id="osbtn" aria-haspopup="true" aria-expanded="false" aria-controls="osmenu"><span class="logo" aria-hidden="true"></span><b>Ponwith OS</b></button>
+  <span class="mi mb-app mb-d" id="appname">Finder</span>
+  <button class="mi mb-d" data-app="finder">Projects</button>
+  <button class="mi mb-d" data-app="monitor">Monitor</button>
+  <a class="mi" href="../">Variations</a>
+  <div class="mb-r">
+    <span class="mi" aria-hidden="true"><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0zM3.6 6.5a6.3 6.3 0 0 1 8.8 0l-1.3 1.3a4.5 4.5 0 0 0-6.2 0zM1.3 4.2a9.6 9.6 0 0 1 13.4 0l-1.3 1.3a7.8 7.8 0 0 0-10.8 0z" fill="currentColor"/></svg></span>
+    <span class="mi" aria-hidden="true"><svg width="24" height="12" viewBox="0 0 24 12"><rect x=".5" y=".5" width="20" height="11" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/><rect x="2" y="2" width="17" height="8" rx="1.6" fill="currentColor"/><path d="M22 4v4a1.6 1.6 0 0 0 0-4z" fill="currentColor" fill-opacity=".5"/></svg></span>
+    <span class="mi" id="clock"></span>
+  </div>
+</header>
+<div class="menu" id="osmenu" role="menu" hidden>
+  <button role="menuitem" data-app="about">About James</button>
+  <button role="menuitem" data-app="finder">Projects</button>
+  <button role="menuitem" data-app="terminal">Terminal</button>
+  <button role="menuitem" data-app="monitor">Monitor</button>
+  <button role="menuitem" data-app="mail">Mail</button>
+  <button role="menuitem" data-app="resume">Resume</button>
+  <hr>
+  <a role="menuitem" href="../">Other variations <kbd>↗</kbd></a>
+  <a role="menuitem" id="ghlink" target="_blank" rel="noopener">GitHub <kbd>↗</kbd></a>
+  <hr>
+  <button role="menuitem" data-act="closeall">Close all windows</button>
+  <button role="menuitem" data-act="restart">Restart…</button>
+</div>
+
+<nav id="dicons" aria-label="Desktop"></nav>
+<main id="wins" aria-label="Windows"></main>
+<nav id="home" aria-label="Home screen"></nav>
+<nav id="dock" aria-label="Dock"></nav>
+<div id="toast" role="status"></div>
+<div id="boot" hidden aria-hidden="true"><pre id="bootlog"></pre><span class="skip">press any key to skip</span></div>
+
+<script src="../data.js"></script>
+<script>
+(() => {
+'use strict';
+const S = window.SITE;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+const MOB = matchMedia('(max-width: 699px)');
+const MB = 28, DOCK = 86;
+const BOOT_AT = Date.now();
+
+/* ---------- icons ---------- */
+const GH = 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z';
+const GLYPH = {
+  finder: '<svg viewBox="0 0 24 24" width="60%"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h4.6l1.8 2h8.6A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" fill="#fff" fill-opacity=".95"/><path d="M3 9.5h18" stroke="#2a66e0" stroke-opacity=".35"/></svg>',
+  terminal: '<b>&gt;_</b>',
+  about: '',
+  mail: '<svg viewBox="0 0 24 24" width="62%"><rect x="3" y="6" width="18" height="13" rx="2" fill="#fff"/><path d="M3.6 7.2 12 13.5l8.4-6.3" fill="none" stroke="#2a7cf6" stroke-width="1.6"/></svg>',
+  monitor: '<svg viewBox="0 0 24 24" width="68%"><polyline points="3,15 7,15 9,9 12,18 14,6 16,13 21,13" fill="none" stroke="#5ee6a0" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  resume: '<svg viewBox="0 0 24 24" width="58%"><path d="M6 3h8l4 4v14H6z" fill="#fff"/><path d="M14 3v4h4" fill="#f3c9c4"/><path d="M8.5 11h7M8.5 13.5h7M8.5 16h4.5" stroke="#d93f37" stroke-opacity=".6" stroke-width="1.1"/></svg>',
+  github: `<svg viewBox="0 0 16 16" width="58%"><path d="${GH}" fill="#fff"/></svg>`,
+  linkedin: '<b>in</b>',
+  variations: '<svg viewBox="0 0 24 24" width="56%"><rect x="4" y="4" width="7" height="7" rx="2" fill="#fff"/><rect x="13" y="4" width="7" height="7" rx="2" fill="#fff" fill-opacity=".7"/><rect x="4" y="13" width="7" height="7" rx="2" fill="#fff" fill-opacity=".7"/><rect x="13" y="13" width="7" height="7" rx="2" fill="#fff" fill-opacity=".45"/></svg>'
+};
+const ico = k => `<span class="ico i-${k}" aria-hidden="true"${k === 'about' ? ` style="background-image:url('${esc(S.portrait)}')"` : ''}>${GLYPH[k] || ''}</span>`;
+
+/* ---------- apps ---------- */
+const APPS = {
+  finder:   { name: 'Projects', w: 800, h: 520, build: buildFinder },
+  terminal: { name: 'Terminal', w: 660, h: 470, build: buildTerminal },
+  about:    { name: 'About',    w: 520, h: 640, build: buildAbout },
+  mail:     { name: 'Mail',     w: 540, h: 440, build: buildMail },
+  monitor:  { name: 'Monitor',  w: 760, h: 620, build: buildMonitor },
+  resume:   { name: 'Resume',   w: 760, h: 860, build: buildResume }
+};
+const LINKS = [
+  { k: 'github', name: 'GitHub', href: S.github },
+  { k: 'linkedin', name: 'LinkedIn', href: S.linkedin }
+];
+const openApp = (k, o = {}) => openWin({ id: k, app: k, title: APPS[k].name, w: APPS[k].w, h: APPS[k].h, build: APPS[k].build, ...o });
+const project = id => S.projects.find(p => p.id === id);
+const openProject = id => {
+  const p = project(id); if (!p) return;
+  openWin({ id: 'p:' + id, app: 'finder', title: p.title, w: 640, h: 640, build: b => buildProject(b, p) });
+};
+
+/* ---------- chrome: desktop, dock, home ---------- */
+$('#hello').innerHTML = `<div class="k">~/james $ whoami</div><h1>${esc(S.name)}<br><span>${esc(S.title)}</span></h1><p>${esc(S.tagline)}</p>`;
+$('#ghlink').href = S.github;
+
+const dockApps = ['finder', 'terminal', 'about', 'mail', 'monitor', 'resume'];
+$('#dock').innerHTML =
+  dockApps.map(k => `<button class="di" data-app="${k}" aria-label="${APPS[k].name}">${ico(k)}<span class="tip">${APPS[k].name}</span></button>`).join('') +
+  '<span class="dsep" aria-hidden="true"></span>' +
+  LINKS.map(l => `<a class="di" href="${esc(l.href)}" target="_blank" rel="noopener" aria-label="${l.name}">${ico(l.k)}<span class="tip">${l.name}</span></a>`).join('') +
+  `<a class="di" href="../" aria-label="Other variations">${ico('variations')}<span class="tip">Other variations</span></a><span id="dmin"></span>`;
+
+$('#dicons').innerHTML = [
+  ['finder', 'Projects'], ['about', 'about.txt'], ['resume', 'Resume.pdf'], ['monitor', 'Monitor']
+].map(([k, n]) => `<button class="dicon" data-dbl="${k}">${ico(k)}<span>${n}</span></button>`).join('');
+
+$('#home').innerHTML = `<section class="hw"><div class="k">${esc(S.location)}</div><h1>${esc(S.name)}</h1><p>${esc(S.title)}</p></section><div class="hgrid">` +
+  dockApps.map(k => `<button class="happ" data-app="${k}">${ico(k)}${APPS[k].name}</button>`).join('') +
+  LINKS.map(l => `<a class="happ" href="${esc(l.href)}" target="_blank" rel="noopener">${ico(l.k)}${l.name}</a>`).join('') +
+  `<a class="happ" href="../">${ico('variations')}Variations</a></div>`;
+
+// dock magnification
+(() => {
+  const dock = $('#dock'); let centers = null;
+  dock.addEventListener('pointerenter', e => {
+    if (e.pointerType !== 'mouse' || RM.matches) return;
+    centers = $$('.di', dock).map(b => { const r = b.getBoundingClientRect(); return [b, r.left + r.width / 2]; });
+  });
+  dock.addEventListener('pointermove', e => {
+    if (!centers) return;
+    for (const [b, cx] of centers) {
+      const d = Math.min(Math.abs(e.clientX - cx) / 150, 1);
+      b.style.setProperty('--s', (1 + 0.55 * Math.cos(d * Math.PI / 2)).toFixed(3));
+    }
+  });
+  dock.addEventListener('pointerleave', () => { centers = null; $$('.di', dock).forEach(b => b.style.removeProperty('--s')); });
+})();
+
+// clock
+const clock = $('#clock');
+const tick = () => {
+  const d = new Date();
+  clock.textContent = MOB.matches
+    ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    : d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric' }).replace(',', '') + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+};
+tick(); setInterval(tick, 10000); MOB.addEventListener('change', tick);
+
+// toast
+let toastT;
+const toast = msg => { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); };
+
+// copy helper
+const copy = async text => {
+  try { await navigator.clipboard.writeText(text); }
+  catch { const ta = document.createElement('textarea'); ta.value = text; document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast('Copied ' + text);
+};
+
+/* ---------- window manager ---------- */
+const wins = new Map();
+let z = 10, cascade = 0;
+const layer = $('#wins');
+const place = st => { const s = st.el.style; s.translate = `${st.x}px ${st.y}px`; s.width = st.w + 'px'; s.height = st.h + 'px'; };
+const topWin = () => [...wins.values()].filter(s => !s.min).sort((a, b) => b.z - a.z)[0];
+const X = '<svg width="6" height="6" viewBox="0 0 6 6"><path d="M.5.5l5 5m0-5-5 5" stroke="currentColor" stroke-width="1.2"/></svg>';
+const M = '<svg width="6" height="6" viewBox="0 0 6 6"><path d="M0 3h6" stroke="currentColor" stroke-width="1.2"/></svg>';
+const Z = '<svg width="6" height="6" viewBox="0 0 6 6"><path d="M0 0h4L0 4zM6 6H2l4-4z" fill="currentColor"/></svg>';
+
+function openWin(o) {
+  if (wins.has(o.id)) { const st = wins.get(o.id); if (st.min) restore(st); focus(st, true); return st; }
+  const vw = innerWidth, vh = innerHeight;
+  const w = Math.min(o.w, vw - 24), h = Math.min(o.h, vh - MB - DOCK - 12);
+  let { x, y } = o;
+  if (x == null) { x = (vw - w) / 2 + (cascade % 6) * 26 - 60; y = 56 + (cascade % 6) * 26; cascade++; }
+  const st = { id: o.id, app: o.app, title: o.title, w, h, x: Math.round(clamp(x, 8, vw - w - 8)), y: Math.round(clamp(y, MB + 8, Math.max(MB + 8, vh - h - DOCK))), z: 0, min: false, max: false };
+  const el = st.el = document.createElement('section');
+  el.className = 'win'; el.tabIndex = -1;
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', o.title);
+  el.innerHTML = `<header class="tb"><div class="lights"><button class="l c" aria-label="Close">${X}</button><button class="l m" aria-label="Minimize">${M}</button><button class="l x" aria-label="Zoom">${Z}</button></div><button class="back" aria-label="Back to home screen"><svg width="10" height="16" viewBox="0 0 10 16"><path d="M8 1 2 8l6 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</button><div class="ttl">${esc(o.title)}</div></header><div class="wb"></div><div class="grip" aria-hidden="true"></div>`;
+  place(st);
+  const tb = $('.tb', el), body = $('.wb', el);
+  $('.c', el).onclick = () => closeWin(st);
+  $('.m', el).onclick = () => minimize(st);
+  $('.x', el).onclick = () => toggleMax(st);
+  $('.back', el).onclick = () => (history.state && history.state.pw) ? history.back() : closeWin(st);
+  tb.addEventListener('dblclick', e => { if (!e.target.closest('button')) toggleMax(st); });
+  el.addEventListener('pointerdown', () => focus(st), true);
+  el.addEventListener('focusin', () => focus(st));
+  drag(tb, st, (st0, dx, dy) => { st.x = clamp(st0.x + dx, 80 - st.w, innerWidth - 80); st.y = clamp(st0.y + dy, MB, innerHeight - 40); });
+  drag($('.grip', el), st, (st0, dx, dy) => { st.w = Math.max(320, st0.w + dx); st.h = Math.max(220, st0.h + dy); });
+  wins.set(o.id, st);
+  layer.append(el);
+  st.cleanup = o.build(body, st);
+  if (MOB.matches) history.pushState({ pw: 1 }, '');
+  focus(st, true);
+  syncDock();
+  bounce(o.app);
+  return st;
+}
+
+function drag(handle, st, apply) {
+  handle.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || e.target.closest('button') || MOB.matches || st.max) return;
+    e.preventDefault();
+    const sx = e.clientX, sy = e.clientY, st0 = { x: st.x, y: st.y, w: st.w, h: st.h };
+    handle.setPointerCapture(e.pointerId);
+    document.body.classList.add('dragging');
+    const mv = e => { apply(st0, e.clientX - sx, e.clientY - sy); place(st); };
+    const up = () => { handle.removeEventListener('pointermove', mv); handle.removeEventListener('pointerup', up); handle.removeEventListener('pointercancel', up); document.body.classList.remove('dragging'); };
+    handle.addEventListener('pointermove', mv); handle.addEventListener('pointerup', up); handle.addEventListener('pointercancel', up);
+  });
+}
+
+function focus(st, moveFocus) {
+  if (st.z !== z) { st.z = ++z; st.el.style.zIndex = z; }
+  for (const s of wins.values()) s.el.classList.toggle('focused', s === st);
+  $('#appname').textContent = APPS[st.app] ? (st.id.startsWith('p:') ? 'Projects' : APPS[st.app].name) : st.title;
+  if (moveFocus && !st.el.contains(document.activeElement)) ($('[autofocus]', st.el) || st.el).focus({ preventScroll: true });
+}
+
+function closeWin(st) {
+  if (!wins.has(st.id)) return;
+  wins.delete(st.id);
+  if (typeof st.cleanup === 'function') st.cleanup();
+  st.mini && st.mini.remove();
+  const el = st.el; el.classList.add('closing');
+  const done = () => el.remove();
+  if (RM.matches) done(); else { el.addEventListener('animationend', done, { once: true }); setTimeout(done, 400); }
+  const t = topWin(); if (t) focus(t, true); else $('#appname').textContent = 'Finder';
+  syncDock();
+}
+
+function animate(st, after) {
+  st.el.classList.add('anim');
+  clearTimeout(st.animT);
+  st.animT = setTimeout(() => { st.el.classList.remove('anim'); after && after(); }, RM.matches ? 0 : 440);
+}
+
+function minimize(st) {
+  if (MOB.matches || st.min) return;
+  st.min = true;
+  const b = document.createElement('button');
+  b.className = 'di mini'; b.setAttribute('aria-label', 'Restore ' + st.title);
+  b.innerHTML = `${ico(st.app)}<span class="tip">${esc(st.title)}</span>`;
+  b.onclick = () => restore(st);
+  $('#dmin').append(b); st.mini = b;
+  const r = b.getBoundingClientRect();
+  $$('video', st.el).forEach(v => v.pause());
+  void st.el.offsetWidth;
+  animate(st, () => st.min && st.el.classList.add('mind'));
+  st.el.style.translate = `${r.left + r.width / 2 - st.w / 2}px ${r.top + r.height / 2 - st.h / 2}px`;
+  st.el.style.scale = '0.06'; st.el.style.opacity = '0';
+  const t = topWin(); if (t) focus(t, true);
+  syncDock();
+}
+
+function restore(st) {
+  st.min = false; st.mini && st.mini.remove(); st.mini = null;
+  st.el.classList.remove('mind');
+  void st.el.offsetWidth;
+  animate(st);
+  place(st); st.el.style.scale = ''; st.el.style.opacity = '';
+  if (!RM.matches) $$('video', st.el).forEach(v => v.play().catch(() => {}));
+  focus(st, true); syncDock();
+}
+
+function toggleMax(st) {
+  if (MOB.matches) return;
+  if (!st.max) { st.prev = { x: st.x, y: st.y, w: st.w, h: st.h }; Object.assign(st, { x: 0, y: MB, w: innerWidth, h: innerHeight - MB - DOCK }); }
+  else Object.assign(st, st.prev);
+  st.max = !st.max; st.el.classList.toggle('max', st.max);
+  animate(st); place(st);
+}
+
+function syncDock() {
+  const open = new Set([...wins.values()].map(s => s.app));
+  $$('#dock [data-app]').forEach(b => b.classList.toggle('on', open.has(b.dataset.app)));
+}
+function bounce(app) {
+  const b = $(`#dock [data-app="${app}"]`); if (!b || RM.matches || MOB.matches) return;
+  b.classList.remove('bounce'); void b.offsetWidth; b.classList.add('bounce');
+  setTimeout(() => b.classList.remove('bounce'), 1400);
+}
+
+addEventListener('resize', () => {
+  for (const st of wins.values()) {
+    if (st.max) Object.assign(st, { w: innerWidth, h: innerHeight - MB - DOCK });
+    else { st.x = clamp(st.x, 80 - st.w, innerWidth - 80); st.y = clamp(st.y, MB, Math.max(MB, innerHeight - 40)); }
+    if (!st.min) place(st);
+  }
+});
+addEventListener('popstate', () => { if (MOB.matches) { const t = topWin(); t && closeWin(t); } });
+
+/* ---------- global clicks / menus ---------- */
+const osbtn = $('#osbtn'), osmenu = $('#osmenu');
+const menu = open => { osmenu.hidden = !open; osbtn.setAttribute('aria-expanded', open); if (open) $('button,a', osmenu).focus(); };
+osbtn.onclick = e => { e.stopPropagation(); menu(osmenu.hidden); };
+
+document.addEventListener('click', e => {
+  if (!osmenu.hidden && !e.target.closest('#osmenu')) menu(false);
+  const a = e.target.closest('[data-app]');
+  if (a) { menu(false); openApp(a.dataset.app); return; }
+  const act = e.target.closest('[data-act]');
+  if (act) { menu(false); act.dataset.act === 'restart' ? restart() : [...wins.values()].forEach(closeWin); return; }
+  const d = e.target.closest('[data-dbl]');
+  $$('.dicon').forEach(x => x.classList.toggle('sel', x === d));
+  if (d && e.detail === 0) openApp(d.dataset.dbl); // keyboard activation
+});
+document.addEventListener('dblclick', e => { const d = e.target.closest('[data-dbl]'); if (d) openApp(d.dataset.dbl); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !osmenu.hidden) { menu(false); osbtn.focus(); }
+  if (!osmenu.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+    e.preventDefault();
+    const items = $$('button,a', osmenu), i = items.indexOf(document.activeElement);
+    items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus();
+  }
+});
+
+/* ---------- Terminal ---------- */
+const CMDS = ['help', 'ls', 'cd', 'open', 'cat', 'whoami', 'neofetch', 'resume', 'contact', 'clear', 'history', 'pwd', 'echo', 'date', 'top', 'mail', 'sudo', 'exit'];
+const ART = [
+  '     ██╗██████╗ ',
+  '     ██║██╔══██╗',
+  '     ██║██████╔╝',
+  '██   ██║██╔═══╝ ',
+  '╚█████╔╝██║     ',
+  ' ╚════╝ ╚═╝     '
+].join('\n');
+const projFiles = p => ['README.md', 'stack.txt', ...(p.term ? ['log.txt'] : []), ...(p.links.length ? ['links.txt'] : [])];
+const linkHTML = l => `<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`;
+
+function buildTerminal(body, st) {
+  body.classList.add('term');
+  body.innerHTML = '<div class="tout"></div><div class="tline"><span class="ps"></span><input class="tin" autofocus autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal command"></div>';
+  const out = $('.tout', body), ps = $('.ps', body), inp = $('.tin', body);
+  let cwd = null, hist = [], hi = 0, typing = null;
+  const promptHTML = () => `james@ponwith <i>${cwd ? '~/' + esc(cwd) : '~'}</i> %`;
+  const setPrompt = () => { ps.innerHTML = promptHTML(); };
+  const print = (html, cls = '') => { const d = document.createElement('div'); d.className = 'o ' + cls; d.innerHTML = html; out.append(d); body.scrollTop = body.scrollHeight; };
+  setPrompt();
+  body.addEventListener('click', () => { if (!getSelection().toString()) inp.focus({ preventScroll: true }); });
+
+  const resolve = a => (a === '.' || !a) ? cwd : a.replace(/^~\//, '').replace(/\/$/, '');
+  const run = raw => {
+    const line = raw.trim();
+    print(`<span class="ps">${promptHTML()}</span> ${esc(line)}`);
+    if (!line) return;
+    hist.push(line); hi = hist.length;
+    const [cmd, ...args] = line.split(/\s+/); const arg = args.join(' ');
+    const p = cwd && project(cwd);
+    switch (cmd) {
+      case 'help':
+        print([
+          ['ls', 'list projects (they are directories)'], ['cd <project>', 'enter a project · cd .. to go back'],
+          ['open <project|app>', 'open a window · try open f1, open monitor'], ['cat <file>', 'about.txt, README.md, log.txt …'],
+          ['whoami', 'the short version'], ['neofetch', 'system info'], ['resume', 'open the resume'], ['contact', 'how to reach me'],
+          ['top', 'resiliency monitor (simulation)'], ['history · clear · exit', '']
+        ].map(([c, d]) => `  <span class="c-gr">${esc(c.padEnd(22))}</span><span class="c-dim">${d}</span>`).join('\n') + '\n\n<span class="c-dim">Tab completes project ids · ↑/↓ for history</span>');
+        break;
+      case 'ls':
+        if (p) print(projFiles(p).join('   '));
+        else print('<div class="lsg">' + S.projects.map(q => `<span class="c-dir">${esc(q.id)}/</span>`).join('') + '<span>about.txt</span><span class="c-am">resume.pdf</span></div>');
+        break;
+      case 'cd': {
+        const t = resolve(arg);
+        if (!arg || arg === '~' || arg === '..' || arg === '/') cwd = null;
+        else if (project(t)) { cwd = t; print(`<span class="c-dim">${esc(project(t).title)} — ${esc(project(t).subtitle)} · try</span> ls<span class="c-dim">,</span> cat README.md<span class="c-dim">, or</span> open .`); }
+        else print(`<span class="c-err">cd: no such file or directory: ${esc(arg)}</span>`);
+        setPrompt(); break;
+      }
+      case 'open': {
+        const t = resolve(arg);
+        if (project(t)) { openProject(t); print(`<span class="c-dim">opening ${esc(t)}…</span>`); }
+        else if (/^resume(\.pdf)?$/.test(t)) openApp('resume');
+        else if (t === 'about.txt' || t === 'about') openApp('about');
+        else if (APPS[t]) openApp(t);
+        else if (t === 'projects') openApp('finder');
+        else print(arg ? `<span class="c-err">open: ${esc(arg)}: not found</span>` : 'usage: open &lt;project|app&gt;   e.g. open resiliency');
+        break;
+      }
+      case 'cat': {
+        const f = arg.replace(/^.*\//, ''), q = arg.includes('/') ? project(arg.split('/')[0]) : p;
+        if (!arg) print('usage: cat &lt;file&gt;');
+        else if (!q && f === 'about.txt') print(S.about.map(esc).join('\n\n'));
+        else if (!q && f === 'resume.pdf') print('<span class="c-dim">binary file — try</span> open resume.pdf');
+        else if (q && f === 'README.md') print(`<span class="c-gr"># ${esc(q.title)}</span>\n<span class="c-dim">${esc(q.kind)} · ${q.year}</span>\n\n${esc(q.blurb)}` + (q.bullets ? '\n\n' + q.bullets.map(b => '  • ' + esc(b)).join('\n') : ''));
+        else if (q && f === 'stack.txt') print(q.stack.map(esc).join('\n'));
+        else if (q && f === 'log.txt' && q.term) print(q.term.map(esc).join('\n'));
+        else if (q && f === 'links.txt' && q.links.length) print(q.links.map(linkHTML).join('\n'));
+        else print(`<span class="c-err">cat: ${esc(arg)}: No such file or directory</span>`);
+        break;
+      }
+      case 'whoami': print(`<b>${esc(S.name)}</b> — ${esc(S.title)} · ${esc(S.location)}\n<span class="c-dim">${esc(S.tagline)}</span>`); break;
+      case 'neofetch': {
+        const up = Math.max(1, Math.round((Date.now() - BOOT_AT) / 60000));
+        const rows = [
+          `<span class="k">james</span>@<span class="k">ponwith</span>`, '<span class="c-dim">──────────────</span>',
+          ['OS', 'Ponwith OS (browser)'], ['Host', S.name], ['Role', S.title], ['Location', S.location], ['Uptime', up + ' min'],
+          ['Projects', S.projects.length + ' directories'], ['Stack', S.stack.slice(0, 5).join(', ')], ['', S.stack.slice(5).join(', ')],
+          ...S.stats.map(s => [s.value, s.label]),
+          '', ['#ff6b6b', '#ffc46b', '#5ee6a0', '#7aa2ff', '#c792ea', '#e9ebf1'].map(c => `<span class="sw" style="background:${c}"></span>`).join('')
+        ].map(r => Array.isArray(r) ? (r[0] ? `<span class="k">${esc(r[0])}</span>: ${esc(r[1])}` : `          ${esc(r[1])}`) : r);
+        print(`<div class="nf"><pre aria-hidden="true">${ART}</pre><div>${rows.join('<br>')}</div></div>`);
+        break;
+      }
+      case 'resume': print('<span class="c-dim">opening resume.pdf…</span>'); openApp('resume'); break;
+      case 'contact':
+        print(`email     <a href="mailto:${esc(S.email)}">${esc(S.email)}</a>\ngithub    <a href="${esc(S.github)}" target="_blank" rel="noopener">${esc(S.github.replace('https://', ''))}</a>\nlinkedin  <a href="${esc(S.linkedin)}" target="_blank" rel="noopener">${esc(S.linkedin.replace('https://www.', ''))}</a>\n<span class="c-dim">or run</span> mail <span class="c-dim">to compose one here.</span>`);
+        break;
+      case 'mail': openApp('mail'); break;
+      case 'top': case 'monitor': print('<span class="c-dim">launching monitor (simulation)…</span>'); openApp('monitor'); break;
+      case 'clear': out.innerHTML = ''; break;
+      case 'history': print(hist.map((h, i) => String(i + 1).padStart(4) + '  ' + esc(h)).join('\n')); break;
+      case 'pwd': print('/Users/james' + (cwd ? '/' + esc(cwd) : '')); break;
+      case 'echo': print(esc(arg)); break;
+      case 'date': print(esc(new Date().toString())); break;
+      case 'sudo': print(`<span class="c-err">james is not in the sudoers file. This incident will be reported.</span>\n<span class="c-dim">(the resiliency engine has rerouted your request to a healthy cell: </span>help<span class="c-dim">)</span>`); break;
+      case 'exit': closeWin(st); break;
+      case 'vim': case 'vi': case 'emacs': case 'nano': print('<span class="c-dim">no editors here — this OS is read-only. try</span> cat'); break;
+      case 'rm': print('<span class="c-err">rm: operation not permitted: production is protected</span>'); break;
+      default:
+        if (project(cmd)) { openProject(cmd); print(`<span class="c-dim">opening ${esc(cmd)}…</span>`); }
+        else print(`<span class="c-err">zsh: command not found: ${esc(cmd)}</span>  <span class="c-dim">try</span> help`);
+    }
+  };
+
+  const complete = () => {
+    const v = inp.value, parts = v.split(' '), last = parts[parts.length - 1];
+    const pool = parts.length === 1 ? CMDS.concat(S.projects.map(q => q.id))
+      : parts[0] === 'cat' ? (cwd ? projFiles(project(cwd)) : ['about.txt', 'resume.pdf'])
+      : S.projects.map(q => q.id).concat(parts[0] === 'open' ? ['resume.pdf', 'about.txt', ...Object.keys(APPS)] : []);
+    const m = [...new Set(pool)].filter(c => c.startsWith(last));
+    if (!m.length) return;
+    let pre = m[0]; for (const c of m) while (!c.startsWith(pre)) pre = pre.slice(0, -1);
+    parts[parts.length - 1] = m.length === 1 ? m[0] + ' ' : pre;
+    inp.value = parts.join(' ');
+    if (m.length > 1 && pre === last) print(`<span class="ps">${promptHTML()}</span> ${esc(v)}\n<span class="c-dim">${m.map(esc).join('   ')}</span>`);
+  };
+
+  inp.addEventListener('keydown', e => {
+    if (typing) { typing(); }
+    if (e.key === 'Enter') { const v = inp.value; inp.value = ''; run(v); }
+    else if (e.key === 'Tab') { e.preventDefault(); complete(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (hi > 0) inp.value = hist[--hi]; }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); hi = Math.min(hist.length, hi + 1); inp.value = hist[hi] || ''; }
+    else if (e.key === 'l' && e.ctrlKey) { e.preventDefault(); out.innerHTML = ''; }
+    else if (e.key === 'c' && e.ctrlKey && !getSelection().toString()) { print(`<span class="ps">${promptHTML()}</span> ${esc(inp.value)}^C`); inp.value = ''; }
+  });
+
+  // intro: auto-type neofetch
+  print(`<span class="c-dim">Last login: ${esc(new Date().toLocaleString())} on ttys000</span>`);
+  const intro = () => print('Welcome. Type <span class="c-gr">help</span> to look around — try <span class="c-gr">ls</span>, <span class="c-gr">open f1</span>, <span class="c-gr">cat about.txt</span>, or press Tab.\n');
+  if (RM.matches) { run('neofetch'); intro(); return; }
+  const word = 'neofetch'; let i = 0, timer;
+  typing = () => { clearTimeout(timer); typing = null; inp.value = ''; run(word); intro(); };
+  const step = () => { if (!typing) return; inp.value = word.slice(0, ++i); if (i < word.length) timer = setTimeout(step, 55 + Math.random() * 50); else timer = setTimeout(typing, 260); };
+  timer = setTimeout(step, 450);
+  return () => clearTimeout(timer);
+}
+
+/* ---------- Finder ---------- */
+const TAGS = [['all', 'All Projects', '#9aa1b2'], ['tech', 'Tech', '#7aa2ff'], ['finance', 'Finance', '#5ee6a0'], ['sport', 'Sport', '#ffc46b']];
+function thumb(p) {
+  const m = p.media;
+  if (m) return `<img src="${esc(m.type === 'video' ? m.poster : m.src)}" alt="" loading="lazy" decoding="async">`;
+  return `<div class="mt">${(p.term || []).slice(0, 5).map(esc).join('\n')}</div>`;
+}
+function buildFinder(body) {
+  let filter = 'all';
+  const count = t => S.projects.filter(p => t === 'all' || p.tags.includes(t)).length;
+  body.innerHTML = `<div class="finder"><nav class="side" aria-label="Filter projects"><div class="sl">Tags</div>${TAGS.map(([t, n, c]) => `<button class="sf" data-f="${t}" aria-pressed="${t === 'all'}"><span class="dot" style="--c:${c}"></span>${n}<em>${count(t)}</em></button>`).join('')}</nav>
+    <div class="fmain"><div class="ftool"><div class="fttl">All Projects</div><input type="search" placeholder="Search" aria-label="Search projects"></div>
+    <div class="fgrid">${S.projects.map(p => `<button class="fi" data-p="${esc(p.id)}" title="${esc(p.subtitle)}"><span class="th">${thumb(p)}${p.featured ? '<span class="star">FEATURED</span>' : ''}</span><b>${esc(p.title)}</b><small>${esc(p.kind)} · ${p.year}</small></button>`).join('')}</div>
+    <div class="fstat"></div></div></div>`;
+  const items = $$('.fi', body), q = $('input', body), stat = $('.fstat', body), ttl = $('.fttl', body);
+  const render = () => {
+    const s = q.value.trim().toLowerCase(); let n = 0;
+    for (const it of items) {
+      const p = project(it.dataset.p);
+      const hay = [p.title, p.subtitle, p.kind, p.blurb, ...p.stack].join(' ').toLowerCase();
+      it.hidden = !((filter === 'all' || p.tags.includes(filter)) && (!s || hay.includes(s)));
+      n += !it.hidden;
+    }
+    ttl.textContent = TAGS.find(t => t[0] === filter)[1];
+    stat.textContent = `${n} item${n === 1 ? '' : 's'} · ${MOB.matches ? 'tap' : 'double-click or press Enter'} to open`;
+  };
+  render();
+  $$('.sf', body).forEach(b => b.onclick = () => { filter = b.dataset.f; $$('.sf', body).forEach(x => x.setAttribute('aria-pressed', x === b)); render(); });
+  q.addEventListener('input', render);
+  for (const it of items) {
+    it.addEventListener('click', e => {
+      items.forEach(x => x.classList.toggle('sel', x === it));
+      if (MOB.matches || e.detail === 0) openProject(it.dataset.p);
+    });
+    it.addEventListener('dblclick', () => openProject(it.dataset.p));
+  }
+}
+
+/* ---------- Project ---------- */
+function buildProject(body, p) {
+  const m = p.media;
+  let media = '';
+  if (m && m.type === 'video') media = `<video class="pm" src="${esc(m.src)}" poster="${esc(m.poster)}" muted loop playsinline preload="none"${RM.matches ? ' controls' : ''} aria-label="${esc(p.title)} demo"></video>`;
+  else if (m) media = `<img class="pm" src="${esc(m.src)}" alt="${esc(p.title)} demo" decoding="async">`;
+  const term = p.term ? `<pre class="pterm">${p.term.map(l => `<span>${esc(l)}</span>`).join('\n')}</pre>` : '';
+  body.innerHTML = `<article>${media}${term}<div class="pb"><div class="pk">${esc(p.kind)} · ${p.year}</div><h2>${esc(p.title)}</h2><p class="psub">${esc(p.subtitle)}</p><p>${esc(p.blurb)}</p>${p.bullets ? `<ul>${p.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}<div class="chips">${p.stack.map(s => `<span class="chip">${esc(s)}</span>`).join('')}</div><div class="plinks">${p.links.map((l, i) => `<a class="btn${i ? '' : ' pri'}" href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</div></div></article>`;
+  const v = $('video', body);
+  if (v && !RM.matches) v.play().catch(() => {});
+}
+
+/* ---------- About ---------- */
+function buildAbout(body) {
+  body.innerHTML = `<div class="about"><img class="av" src="${esc(S.portrait)}" alt="Portrait of ${esc(S.name)}"><h2>${esc(S.name)}</h2><p class="sub">${esc(S.title)}</p>
+    <dl class="spec"><dt>Location</dt><dd>${esc(S.location)}</dd><dt>Focus</dt><dd>${esc(S.tagline)}</dd><dt>Email</dt><dd><a href="mailto:${esc(S.email)}">${esc(S.email)}</a></dd></dl>
+    <div class="stats">${S.stats.map(s => `<div class="stat"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join('')}</div>
+    ${S.about.map(t => `<p>${esc(t)}</p>`).join('')}
+    <h3>Stack</h3><div class="chips">${S.stack.map(s => `<span class="chip">${esc(s)}</span>`).join('')}</div>
+    <div class="alinks"><button class="btn pri" data-app="finder">Browse projects</button><button class="btn" data-app="resume">Resume</button><a class="btn" href="${esc(S.github)}" target="_blank" rel="noopener">GitHub ↗</a><a class="btn" href="${esc(S.linkedin)}" target="_blank" rel="noopener">LinkedIn ↗</a></div></div>`;
+}
+
+/* ---------- Mail ---------- */
+function buildMail(body) {
+  body.innerHTML = `<form class="mail"><div class="mbar"><button class="btn pri" type="submit">Send ↗</button><button class="btn" type="button" data-copy>Copy address</button></div>
+    <label class="mf"><span>To:</span><input value="${esc(S.email)}" readonly></label>
+    <label class="mf"><span>Subject:</span><input name="s" value="Hello from Ponwith OS" autofocus></label>
+    <textarea name="b" aria-label="Message" placeholder="Hi James, …"></textarea></form>`;
+  const f = $('form', body);
+  f.onsubmit = e => { e.preventDefault(); location.href = `mailto:${S.email}?subject=${encodeURIComponent(f.s.value)}&body=${encodeURIComponent(f.b.value)}`; };
+  $('[data-copy]', body).onclick = () => copy(S.email);
+}
+
+/* ---------- Resume ---------- */
+function buildResume(body) {
+  body.innerHTML = `<div class="res"><div class="mbar"><a class="btn pri" href="${esc(S.resume)}" target="_blank" rel="noopener">Open in new tab ↗</a><a class="btn" href="${esc(S.resume)}" download>Download</a></div><iframe src="${esc(S.resume)}" title="Resume of ${esc(S.name)}" loading="lazy"></iframe></div>`;
+}
+
+/* ---------- Monitor (simulation) ---------- */
+const CELLS = [{ id: 'e1a', c: '#7aa2ff' }, { id: 'e1b', c: '#5ee6a0' }, { id: 'e1c', c: '#c792ea' }];
+function buildMonitor(body, st) {
+  const N = 121, DT = 250;
+  body.innerHTML = `<div class="mon">
+    <div class="mtop"><b>Resiliency Engine</b><span class="sim">SIMULATION</span><span class="mstat"></span><button class="btn" type="button">Inject failure</button></div>
+    <div class="cells">${CELLS.map(c => `<div class="cell"><div class="ch"><span class="dot" style="--c:${c.c}"></span>cell ${c.id}<span class="pill">healthy</span></div><div class="cv"><b>0</b> auths/s</div><div class="cp">p99 <b>0</b> ms</div><canvas aria-hidden="true"></canvas></div>`).join('')}</div>
+    <div class="chart"><div class="chl"><span>Authorizations / sec, stacked by cell</span><span>last 30s</span></div><canvas aria-hidden="true"></canvas></div>
+    <pre class="mlog" aria-label="Engine log"></pre>
+    <div class="mfoot">Simulated traffic, not production data: an illustration of how the engine detects a degraded cell, reaches quorum, and reroutes live traffic to healthy cells.</div></div>`;
+  const cellEls = $$('.cell', body), big = $('.chart canvas', body), logEl = $('.mlog', body), mstat = $('.mstat', body);
+  const cells = CELLS.map((c, i) => ({ ...c, el: cellEls[i], cv: $('canvas', cellEls[i]), w: 1, tw: 1, p99: 40, state: 'healthy', s: new Array(N).fill(0) }));
+  let t = 0, next = Infinity, inc = null, reroutes = 0, served = 0, lastTick = performance.now(), raf = 0;
+  const lines = [];
+  const ts = () => new Date().toLocaleTimeString([], { hour12: false });
+  const log = (msg, cls) => { lines.push(`<span class="c-dim">${ts()}</span> ${cls ? `<span class="${cls}">${msg}</span>` : msg}`); if (lines.length > 7) lines.shift(); logEl.innerHTML = lines.join('\n'); };
+  const setState = (c, s) => { c.state = s; c.el.classList.toggle('bad', s === 'drained' || s === 'degraded'); c.el.classList.toggle('warn', s === 'probing'); $('.pill', c.el).textContent = s; };
+  log('engine up · cells e1a e1b e1c · mode=watch', 'c-gr');
+
+  const incident = idx => {
+    const c = cells[idx], others = cells.filter(x => x !== c).map(x => x.id).join(', ');
+    inc = { c, t0: t, steps: [
+      [0.75, () => { setState(c, 'degraded'); log(`${c.id} p99 breach — degraded`, 'c-err'); }],
+      [1.75, () => log('quorum 3/3 · mode=action', 'c-am')],
+      [2.0, () => { c.tw = 0; setState(c, 'drained'); reroutes++; log(`route53: ${c.id} → ${others}`, 'c-am'); }],
+      [3.0, () => log('0 auths dropped', 'c-gr')],
+      [9.0, () => { setState(c, 'probing'); log(`${c.id} half-open probe ok`); }],
+      [10.5, () => { c.tw = 1; setState(c, 'healthy'); log(`${c.id} healthy — restored`, 'c-gr'); inc = null; next = t + 9 + Math.random() * 8; }]
+    ] };
+  };
+  const btn = $('.mtop .btn', body);
+  btn.onclick = () => { if (!inc) incident(Math.floor(Math.random() * 3)); };
+
+  const step = () => {
+    t += DT / 1000;
+    if (!inc && t >= next) incident(Math.floor(Math.random() * 3));
+    if (inc) { const e = t - inc.t0; while (inc && inc.steps.length && e >= inc.steps[0][0]) inc.steps.shift()[1](); }
+    const total = 9800 + 1400 * Math.sin(t / 7) + 500 * Math.sin(t / 2.3) + (Math.random() - 0.5) * 450;
+    for (const c of cells) {
+      c.w += (c.tw - c.w) * 0.35;
+      const e = inc && inc.c === c ? t - inc.t0 : -1;
+      const target = e < 0 ? 38 + Math.random() * 9 : e < 1.5 ? 40 + 860 * (e / 1.5) ** 2 : e < 9 ? 700 + Math.random() * 220 : 60 + Math.random() * 20;
+      c.p99 += (target - c.p99) * 0.6;
+    }
+    const sum = cells.reduce((a, c) => a + c.w, 0);
+    for (const c of cells) {
+      const v = total * c.w / sum;
+      c.s.push(v); c.s.shift();
+      $('.cv b', c.el).textContent = Math.round(v).toLocaleString();
+      $('.cp b', c.el).textContent = Math.round(c.p99);
+    }
+    served += total * DT / 1000;
+    mstat.textContent = `served ${Math.round(served).toLocaleString()} · reroutes ${reroutes} · dropped 0`;
+    btn.disabled = !!inc;
+    lastTick = performance.now();
+    if (RM.matches) draw(lastTick);
+  };
+
+  const fit = cv => { const r = devicePixelRatio || 1, w = Math.round(cv.clientWidth * r), h = Math.round(cv.clientHeight * r); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } return [cv.getContext('2d'), w, h, r]; };
+  const xs = (i, frac, W) => W * (i - frac) / (N - 2);
+  function draw(now) {
+    const frac = RM.matches ? 1 : Math.min(1, (now - lastTick) / DT);
+    // sparklines
+    for (const c of cells) {
+      const [g, W, H, r] = fit(c.cv); if (!W) continue;
+      g.clearRect(0, 0, W, H);
+      const col = c.state === 'healthy' ? c.c : c.state === 'probing' ? '#ffc46b' : '#ff6b6b';
+      g.beginPath();
+      c.s.forEach((v, i) => { const x = xs(i, frac, W), y = H - 2 * r - (v / 7000) * (H - 4 * r); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+      g.strokeStyle = col; g.lineWidth = 1.5 * r; g.lineJoin = 'round'; g.stroke();
+      g.lineTo(W * 2, H); g.lineTo(-W, H); g.closePath();
+      g.globalAlpha = 0.14; g.fillStyle = col; g.fill(); g.globalAlpha = 1;
+    }
+    // stacked area
+    const [g, W, H, r] = fit(big); if (!W) return;
+    g.clearRect(0, 0, W, H);
+    g.strokeStyle = 'rgba(255,255,255,.06)'; g.lineWidth = r;
+    for (let k = 1; k < 4; k++) { const y = Math.round(H * k / 4) + .5; g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+    const MAX = 13500, y = v => H - (v / MAX) * H;
+    const cum = cells.map(() => new Array(N));
+    for (let i = 0; i < N; i++) { let a = 0; cells.forEach((c, k) => { a += c.s[i]; cum[k][i] = a; }); }
+    cells.forEach((c, k) => {
+      g.beginPath();
+      for (let i = 0; i < N; i++) { const x = xs(i, frac, W); i ? g.lineTo(x, y(cum[k][i])) : g.moveTo(x, y(cum[k][i])); }
+      for (let i = N - 1; i >= 0; i--) g.lineTo(xs(i, frac, W), k ? y(cum[k - 1][i]) : H);
+      g.closePath(); g.fillStyle = c.c + '40'; g.fill();
+      g.beginPath();
+      for (let i = 0; i < N; i++) { const x = xs(i, frac, W); i ? g.lineTo(x, y(cum[k][i])) : g.moveTo(x, y(cum[k][i])); }
+      g.strokeStyle = c.c; g.lineWidth = 1.4 * r; g.stroke();
+    });
+  }
+  const loop = now => { raf = requestAnimationFrame(loop); if (!st.min && !document.hidden) draw(now); };
+  for (let i = 0; i < N; i++) step(); // prefill history
+  next = t + 4; served = 0;
+  const iv = setInterval(step, DT);
+  if (!RM.matches) raf = requestAnimationFrame(loop); else draw(performance.now());
+  return () => { clearInterval(iv); cancelAnimationFrame(raf); };
+}
+
+/* ---------- session / boot ---------- */
+function startSession() {
+  if (wins.size) return;
+  if (MOB.matches) return; // home screen is the landing view on phones
+  const vw = innerWidth, wide = vw >= 1180;
+  openApp('about', { x: wide ? vw / 2 - 600 : 24, y: 48 });
+  openApp('terminal', { x: wide ? vw / 2 - 60 : vw - 680, y: wide ? 120 : 160 });
+}
+
+function restart() { [...wins.values()].forEach(closeWin); boot(); }
+
+function boot() {
+  const box = $('#boot'), out = $('#bootlog');
+  box.hidden = false; box.classList.remove('out'); out.innerHTML = '';
+  const timers = []; let done = false;
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const add = html => out.insertAdjacentHTML('beforeend', html);
+  const finish = () => {
+    if (done) return; done = true;
+    timers.forEach(clearTimeout);
+    removeEventListener('keydown', finish, true); removeEventListener('pointerdown', finish, true);
+    try { sessionStorage.setItem('pw-booted', '1'); } catch {}
+    box.classList.add('out'); setTimeout(() => { if (done) box.hidden = true; }, 460);
+    startSession();
+  };
+  addEventListener('keydown', finish, true); addEventListener('pointerdown', finish, true);
+  const OK = '[<span class="ok">  OK  </span>]';
+  const L = [
+    '<span class="dim">[    0.000000]</span> Ponwith OS kernel — booting on ' + esc(S.name),
+    '<span class="dim">[    0.004113]</span> cpu: ' + esc(S.title),
+    '<span class="dim">[    0.009871]</span> tz: ' + esc(S.location),
+    `${OK} Mounted /home/james`,
+    `${OK} Mounted /projects <span class="dim">(${S.projects.length} entries)</span>`,
+    `${OK} Loaded toolchain <span class="dim">${esc(S.stack.slice(0, 4).join(' · '))} …</span>`,
+    `${OK} Started resiliency-engine.service <span class="dim">— cells e1a e1b e1c healthy</span>`,
+    `${OK} Started quorum-lease.service`,
+    `${OK} Reached target <b>Graphical Interface</b>`
+  ];
+  let t = 100;
+  for (const l of L) { at(t, () => add(l + '\n')); t += 85; }
+  t += 150;
+  at(t, () => add('\n<span class="dim">Ponwith OS (tty1)</span>\n\nponwith login: <span id="lu"></span><span class="cur"></span>'));
+  [...'james'].forEach((ch, i) => at(t + 240 + i * 70, () => { $('#lu').textContent += ch; }));
+  t += 240 + 5 * 70 + 140;
+  at(t, () => { $('.cur', out)?.remove(); add('\nPassword: <span id="lp"></span>'); });
+  for (let i = 0; i < 8; i++) at(t + 50 + i * 26, () => { $('#lp').textContent += '•'; });
+  t += 50 + 8 * 26 + 160;
+  at(t, () => add('\n\n<span class="ok">Welcome, james.</span>'));
+  at(t + 240, finish);
+}
+
+let booted = false;
+try { booted = !!sessionStorage.getItem('pw-booted'); } catch {}
+if (booted || RM.matches) startSession(); else boot();
+})();
+</script>
+</body>
+</html>
