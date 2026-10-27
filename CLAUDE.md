@@ -53,18 +53,38 @@ bd close <id>         # Complete work
 
 ## Build & Test
 
-_Add your build and test commands here_
+No build step: static HTML on GitHub Pages, deployed from `master`.
 
 ```bash
-# Example:
-# npm install
-# npm test
+python3 -m http.server 8000      # from the repo root; open http://127.0.0.1:8000/ (not localhost)
+python3 scripts/check_site.py    # run before pushing; CI runs it too (.github/workflows/check.yml)
+node --check variations/data.js  # after editing the content file
+```
+
+Opening pages from disk doesn't work: `variations/data.js` and the writeups use root-absolute paths.
+
+Tailwind is only used by `classic.html`. After changing its classes:
+
+```bash
+npx tailwindcss@3 -c tailwind.config.js -i assets/css/tailwind.src.css -o assets/css/tailwind.css --minify
 ```
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+- `index.html`: the home page. Renders bio, stats and every project card from `variations/data.js`.
+- `variations/data.js`: the single source of content (`window.SITE`). `variations/sim.js` is the live resiliency-engine simulation shared by the home page and `variations/control-plane/`.
+- `variations/`: alternate home designs (`control-plane/`, `constellation/`, `os/`) plus a chooser at `variations/index.html`.
+- `classic.html`: the previous home page, frozen, with its own copy of the content.
+- Writeups and project pages (`tennis-part{1,2,3}.html`, `llm-router-lessons.html`, `flywheel-writeup.html`, `card-auth-saga.html`, `aegis.html`, `rocketlab.html`, `SeniorProject.html`, `posenetdemo.html`) share `assets/css/article.css`. `dora.html` reads each repo's `docs/dora.json`.
+- `theory-simulations/`: a self-contained atlas of 53 simulations (plain scripts, no dependencies); see its README.
+- `scripts/check_site.py`: stdlib link/asset checker.
 
 ## Conventions & Patterns
 
-_Add your project-specific conventions here_
+- Edit content in `variations/data.js`, not in HTML. Paths there are root-absolute (`/assets/...`).
+- Don't edit `classic.html` except to remove dead content.
+- New writeups: the two `<head>` lines from the top of `assets/css/article.css`, then `<link rel="stylesheet" href="/assets/css/article.css">`, and `<a class="back" href="/">← James Ponwith</a>` as the first thing in `<body>`. Plain semantic HTML with its classes (`.meta`, `.tldr`, `.series`, `.next`, `.foot`); no Tailwind.
+- Keep each page's canonical, description and og/twitter metadata.
+- Prefer MP4 with a poster over GIF; home-page assets stay under 5 MB (the check enforces it).
+- Pin CDN scripts to exact versions with SRI `integrity` hashes.
+- No invented numbers: every figure on the site comes from the project's own repo.

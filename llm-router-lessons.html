@@ -15,37 +15,19 @@
 <meta property="article:published_time" content="2026-08-15">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "What a $780B payment system taught me about serving LLMs", "description": "Five resiliency-engine ideas applied to LLM serving: health cells, canaries, learn/action, hedging, chaos.", "datePublished": "2026-08-15", "image": "https://jamesponwith.github.io/assets/img/JandE.JPEG", "url": "https://jamesponwith.github.io/llm-router-lessons.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
 <link rel="icon" href="assets/img/teddy_bear.PNG">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root { color-scheme: light dark; }
-body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
-  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
-h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
-h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
-h2 { font-size: 1.25rem; margin-top: 2.2rem; }
-a { color: #0891b2; text-decoration: none; }
-a:hover { text-decoration: underline; }
-img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
-code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
-  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
-blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
-  color: #6b7280; font-size: 0.95em; }
-hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
-.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
-em { color: inherit; }
-@media (prefers-color-scheme: dark) {
-  body { color: #d1d5db; background: #030712; }
-  code { background: rgba(34,211,238,0.1); }
-  a { color: #22d3ee; }
-  blockquote { border-color: #22d3ee; color: #9ca3af; }
-  hr { border-top-color: #1f2937; }
-}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
 </head>
 <body>
-<a class="back" href="index.html">← jamesponwith.github.io</a>
+<a class="back" href="/">← James Ponwith</a>
 <h1>What a $780B payment system taught me about serving LLMs</h1>
+<p class="meta">Aug 15, 2026 · 3 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>Five ideas from a Capital One payments resiliency engine, rebuilt small as llm-resiliency-router: an OpenAI-compatible Go proxy any SDK adopts by changing <code>base_url</code>.</li>
+<li>Each upstream is a health state machine, and a background canary grades answers, so a provider returning <code>200 OK</code> full of garbage gets ejected: routing on quality, not liveness.</li>
+<li>It ships in learn mode, logging every decision before it acts; opt-in hedging races a stalled request against the next healthy upstream.</li>
+</ul></div>
 <p>At Capital One I worked on a resiliency engine that moved payment traffic
 between cells the moment one misbehaved. $780B a year flowed through
 decisions like "this cell is lying about being healthy." When I started
@@ -55,6 +37,51 @@ up within a week.</p>
 <a href="https://github.com/jamesponwith/llm-resiliency-router">llm-resiliency-router</a>,
 an OpenAI-compatible proxy in ~1,500 lines of mostly-stdlib Go. Point any
 SDK at it by changing <code>base_url</code>. Five ideas carried over from payments.</p>
+<figure>
+<svg class="diagram" viewBox="0 0 680 396" role="img" aria-labelledby="arch-t arch-d" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">
+<title id="arch-t">llm-resiliency-router architecture</title>
+<desc id="arch-d">Any OpenAI SDK points its base_url at the router. Inside the router, a learn or action mode, priority failover and opt-in hedging sit above one health cell per upstream, fed by real traffic and background canary evals; every decision is logged. The router forwards to Anthropic (translated to /v1/messages), OpenAI (passthrough) and Ollama (local last-resort failover).</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.2">
+<rect x="230" y="8" width="220" height="50" rx="3"/>
+<rect x="20" y="96" width="640" height="200" rx="3" stroke="var(--acc)" stroke-width="1.6"/>
+<rect x="36" y="134" width="296" height="42" rx="3" stroke-opacity=".5"/>
+<rect x="348" y="134" width="296" height="42" rx="3" stroke-opacity=".5"/>
+<rect x="36" y="210" width="190" height="34" rx="3"/>
+<rect x="245" y="210" width="190" height="34" rx="3"/>
+<rect x="454" y="210" width="190" height="34" rx="3"/>
+<rect x="36" y="334" width="190" height="50" rx="3"/>
+<rect x="245" y="334" width="190" height="50" rx="3"/>
+<rect x="454" y="334" width="190" height="50" rx="3"/>
+<path d="M340 58V93" marker-end="url(#ah)"/><path d="M131 296V331" marker-end="url(#ah)"/><path d="M340 296V331" marker-end="url(#ah)"/><path d="M549 296V331" marker-end="url(#ah)"/>
+</g>
+<g fill="var(--acc)"><circle cx="52" cy="227" r="4"/><circle cx="261" cy="227" r="4"/><circle cx="470" cy="227" r="4"/></g>
+<g fill="currentColor">
+<text x="340" y="30" text-anchor="middle" font-weight="500">client — any OpenAI SDK</text>
+<text x="340" y="48" text-anchor="middle" opacity=".65" font-size="11">base_url → the router</text>
+<text x="350" y="81" opacity=".65" font-size="11">POST /v1/chat/completions (JSON + SSE)</text>
+<text x="36" y="120" font-weight="500" fill="var(--acc)">ROUTER</text>
+<text x="644" y="120" text-anchor="end" opacity=".65" font-size="11">mode: learn (observe + log) / action (shift traffic)</text>
+<text x="48" y="151" font-weight="500">priority failover</text>
+<text x="48" y="167" opacity=".65" font-size="11">first allowed cell, next on hard failure</text>
+<text x="360" y="151" font-weight="500">hedging (opt-in)</text>
+<text x="360" y="167" opacity=".65" font-size="11">no first token by hedge_after → race next</text>
+<text x="36" y="200" opacity=".65" font-size="11">health cell per upstream: healthy → degraded → ejected → half-open → healthy</text>
+<text x="64" y="231">cell · anthropic</text>
+<text x="273" y="231">cell · openai</text>
+<text x="482" y="231">cell · ollama</text>
+<text x="36" y="264" font-size="11">▲ fed by real traffic AND background canary evals (200-with-garbage gets ejected)</text>
+<text x="36" y="284" opacity=".65" font-size="11">every decision → decisions.jsonl + /status + /metrics</text>
+<text x="131" y="355" text-anchor="middle" font-weight="500">anthropic</text>
+<text x="131" y="372" text-anchor="middle" opacity=".65" font-size="11">translated to /v1/messages</text>
+<text x="340" y="355" text-anchor="middle" font-weight="500">openai</text>
+<text x="340" y="372" text-anchor="middle" opacity=".65" font-size="11">passthrough</text>
+<text x="549" y="355" text-anchor="middle" font-weight="500">ollama</text>
+<text x="549" y="372" text-anchor="middle" opacity=".65" font-size="11">local, last-resort failover</text>
+</g>
+</svg>
+<figcaption>The router between any OpenAI SDK and its providers, after the diagram in the repo README.</figcaption>
+</figure>
 <h2>1. Health is a state machine, not a boolean</h2>
 <p>Each upstream lives in a cell: a ring buffer of outcomes driving
 <code>healthy → degraded → ejected → half-open → healthy</code>, with hysteresis both
@@ -62,6 +89,10 @@ ways. Ejection takes consecutive hard failures; recovery must be <em>earned</em>
 through a probe. Kill a provider mid-traffic and requests shift before any
 client sees an error — the <a href="https://raw.githubusercontent.com/jamesponwith/llm-resiliency-router/main/docs/failover-demo.gif">failover demo</a> is
 eight seconds long and shows the whole thing.</p>
+<figure>
+<img src="https://raw.githubusercontent.com/jamesponwith/llm-resiliency-router/main/docs/failover-demo.gif" alt="Failover demo: the primary is killed mid-traffic, requests shift to the backup with zero client errors, and a half-open probe recovers the primary." loading="lazy">
+<figcaption>Failover demo: primary killed mid-traffic, requests shift to backup with zero client errors, half-open probe recovers primary.</figcaption>
+</figure>
 <h2>2. "Up" is not "working"</h2>
 <p>The failure availability checks cannot see: a provider returning <code>200 OK</code>
 full of garbage. A background canary asks every upstream a fixed prompt set
@@ -89,6 +120,21 @@ one second instead of never. Off by default: hedging spends money.</p>
 <code>flaky</code>, <code>slow</code>, <code>hang</code>, <code>stall</code>, <code>lobotomized</code> — as YAML. The same profiles
 drive the component tests and the recorded demos, so the tests and the
 marketing can't drift apart.</p>
+<h2>By the numbers (v0.1.0)</h2>
+<table>
+<tr><th>What</th><th>Value</th></tr>
+<tr><td>Size</td><td>~1,500 lines of mostly-stdlib Go</td></tr>
+<tr><td>PRs (#1–#11)</td><td>11, every one gated</td></tr>
+<tr><td>Upstream kinds</td><td>3 — anthropic, openai, ollama</td></tr>
+<tr><td>Default mode</td><td><code>learn</code></td></tr>
+<tr><td>Ejection (<code>eject_after</code>)</td><td>3 consecutive hard failures (5xx / 429 / timeout / canary miss)</td></tr>
+<tr><td>Half-open probe (<code>probe_interval</code>)</td><td>15s</td></tr>
+<tr><td>Degraded signal (<code>window</code> / <code>degrade_p95</code>)</td><td>p95 over 60s above 8s</td></tr>
+<tr><td>Upstream header timeout</td><td>30s</td></tr>
+<tr><td>Hedging (<code>hedge_after</code>)</td><td>0 — off by default</td></tr>
+<tr><td>Chaos profiles</td><td>healthy, flaky, slow, down, hang, stall, lobotomized, brilliant</td></tr>
+</table>
+<p class="foot">Defaults from <code>config.yaml</code>, <code>main.go</code> and <code>chaos/profiles.yaml</code> at the v0.1.0 tag.</p>
 <hr />
 <p>The router was built end to end inside a
 <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic development flywheel</a>:
@@ -96,5 +142,6 @@ spec first, an AI pair with hard local hooks, a 30-second PR gate, goreleaser
 releases, weekly public DORA metrics. Eleven PRs, every one gated. That
 story has <a href="flywheel-writeup.html">its own writeup</a>.</p>
 <p><em>Numbers current as of v0.1.0.</em></p>
+<p class="foot">Code: <a href="https://github.com/jamesponwith/llm-resiliency-router">github.com/jamesponwith/llm-resiliency-router</a> · Next: <a href="flywheel-writeup.html">An agentic development flywheel for one</a></p>
 </body>
 </html>

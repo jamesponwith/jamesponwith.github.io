@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AEGIS — Drone-swarm protective dome · James Ponwith</title>
+<meta name="description" content="A simulated drone swarm that holds a hemispherical shell around an asset and intercepts inbound threats: IMM tracking on noisy radar, Hungarian assignment, lead pursuit, and a shell that re-spaces itself.">
+<link rel="canonical" href="https://jamesponwith.github.io/aegis.html">
+<meta property="og:title" content="AEGIS — Drone-swarm protective dome">
+<meta property="og:description" content="A simulated drone swarm that holds a hemispherical shell around an asset and intercepts inbound threats: IMM tracking on noisy radar, Hungarian assignment, lead pursuit, and a shell that re-spaces itself.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jamesponwith.github.io/aegis.html">
+<meta property="og:image" content="https://jamesponwith.github.io/assets/demos/drone-dome-demo-poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-10-27">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "AEGIS — Drone-swarm protective dome", "description": "A simulated drone swarm that holds a hemispherical shell around an asset and intercepts inbound threats: IMM tracking on noisy radar, Hungarian assignment, lead pursuit, and a shell that re-spaces itself.", "datePublished": "2026-10-27", "image": "https://jamesponwith.github.io/assets/demos/drone-dome-demo-poster.jpg", "url": "https://jamesponwith.github.io/aegis.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
+</head>
+<body>
+<a class="back" href="/">← James Ponwith</a>
+<h1>AEGIS: a drone-swarm protective dome</h1>
+<p class="meta">Oct 27, 2026 · 5 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>A simulation of 24 small drones holding slots on a 40 m hemispherical shell around an asset. When a radar track is classified hostile, the best-placed drone leaves the shell to capture it and the rest re-space to close the gap.</li>
+<li>Each 50 ms tick runs sense → track → assess → assign → guide → heal: IMM filters on noisy radar, Hungarian assignment by time to intercept, lead pursuit, and a fresh Fibonacci lattice whenever the shell changes.</li>
+<li>Over 16 seeds of the four standard scenarios: 448/448 hostiles captured, 0 leaks, 0 benign objects touched. Against 36 hostiles and 24 drones, every drone makes exactly one capture before the shell runs out.</li>
+</ul></div>
+
+<p>The problem: keep inbound objects from reaching a protected asset using a fleet of small, single-use
+interceptors and one radar at the asset. The radar is noisy and misses scans. Some inbound traffic is
+benign and must be left alone. Some threats weave, some come in faster than the drones can fly, and
+sometimes there are more threats than drones. The shell has to keep covering every direction while it
+spends drones.</p>
+
+<figure>
+<video src="/assets/demos/drone-dome-demo.mp4" poster="/assets/demos/drone-dome-demo-poster.jpg" muted loop playsinline controls preload="none"></video>
+<figcaption>A 3D replay exported by the simulator. The live site has one per scenario, with a scrubbable timeline.</figcaption>
+</figure>
+
+<h2>The pipeline</h2>
+<figure>
+<svg class="diagram" viewBox="0 0 560 300" role="img" aria-labelledby="ae-t">
+<title id="ae-t">The AEGIS tick: sense (sensor.py), track (tracking.py), assess (threat.py), assign (command.py), guide (guidance.py), heal (command.py and geometry.py), repeating every 50 ms.</title>
+<defs><marker id="ae-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="10" y="40" width="160" height="80" rx="3"/>
+<rect x="200" y="40" width="160" height="80" rx="3"/>
+<rect x="390" y="40" width="160" height="80" rx="3"/>
+<rect x="390" y="180" width="160" height="80" rx="3" stroke="var(--acc)" stroke-width="2"/>
+<rect x="200" y="180" width="160" height="80" rx="3"/>
+<rect x="10" y="180" width="160" height="80" rx="3"/>
+<path d="M10 220 H0 V14 H90 V38" marker-end="url(#ae-a)" stroke-dasharray="4 4"/>
+</g>
+<g stroke="currentColor" stroke-width="1.5" marker-end="url(#ae-a)">
+<line x1="170" y1="80" x2="198" y2="80"/>
+<line x1="360" y1="80" x2="388" y2="80"/>
+<line x1="470" y1="120" x2="470" y2="178"/>
+<line x1="390" y1="220" x2="362" y2="220"/>
+<line x1="200" y1="220" x2="172" y2="220"/>
+</g>
+<g font-size="15" fill="currentColor" text-anchor="middle">
+<text x="104" y="10" font-size="11" fill="var(--acc)" font-family="JetBrains Mono, monospace" text-anchor="start" dy="0.9em">next tick, every 50 ms</text>
+<text x="90" y="68" font-weight="700">Sense</text><text x="90" y="88" font-size="11" font-family="JetBrains Mono, monospace">sensor.py</text><text x="90" y="107" font-size="12">noise, 3% missed scans</text>
+<text x="280" y="68" font-weight="700">Track</text><text x="280" y="88" font-size="11" font-family="JetBrains Mono, monospace">tracking.py</text><text x="280" y="107" font-size="12">IMM + GNN association</text>
+<text x="470" y="68" font-weight="700">Assess</text><text x="470" y="88" font-size="11" font-family="JetBrains Mono, monospace">threat.py</text><text x="470" y="107" font-size="12">closest approach in shell?</text>
+<text x="470" y="208" font-weight="700">Assign</text><text x="470" y="228" font-size="11" font-family="JetBrains Mono, monospace">command.py</text><text x="470" y="247" font-size="12">Hungarian, time to intercept</text>
+<text x="280" y="208" font-weight="700">Guide</text><text x="280" y="228" font-size="11" font-family="JetBrains Mono, monospace">guidance.py</text><text x="280" y="247" font-size="12">lead pursuit, accel-limited</text>
+<text x="90" y="208" font-weight="700">Heal</text><text x="90" y="228" font-size="11" font-family="JetBrains Mono, monospace">geometry.py</text><text x="90" y="247" font-size="12">Fibonacci lattice re-slot</text>
+<text x="280" y="290" font-size="11" fill="var(--mute)">a miss (range opening at close quarters) frees the drone for re-attack</text>
+</g>
+</svg>
+<figcaption>One module per stage. The radar scan period and the simulation step are the same 50 ms.</figcaption>
+</figure>
+<ul>
+<li><strong>Sense.</strong> Radar reports with range-dependent noise (0.3 m floor plus 0.004 m per metre of range) out to 320 m, and 3% missed scans. Friendly drones are filtered upstream (IFF).</li>
+<li><strong>Track.</strong> An IMM filter per track blends a cruise model and a maneuver model by likelihood, so straight flyers get tight estimates and weaving targets stay inside the association gate. Association is global nearest neighbour (Hungarian) with a chi-square gate. Tracks confirm after 3 hits and coast through short dropouts.</li>
+<li><strong>Assess.</strong> Project both the instantaneous and the smoothed mean velocity and take the more dangerous prediction. A track is hostile if its closest approach falls inside the shell. Classification waits until the velocity estimate has settled; once hostile, hysteresis keeps it hostile.</li>
+<li><strong>Assign.</strong> Hungarian assignment of free shell drones to hostile tracks, minimizing time to intercept. An intercept only counts if it lands before the threat reaches the core and within the 180 m engagement range. Threats less than 4 s from breaching get a two-drone salvo. A reserve of 4 stays on the shell unless a threat would otherwise go unanswered.</li>
+<li><strong>Guide.</strong> Lead pursuit to the predicted intercept point under a 30 m/s speed and 45 m/s² acceleration limit. Long-horizon aim uses the smoothed velocity, terminal aim the instantaneous one.</li>
+<li><strong>Heal.</strong> Whenever the set of on-station drones changes, lay out a fresh Fibonacci lattice (equal area per drone) and move drones to slots by minimum total travel, again with the Hungarian method.</li>
+</ul>
+<p>One detail that mattered: capture is checked with swept-segment closest approach, not end-of-tick
+positions. At 60 m/s closing speed a single 50 ms tick covers 3 m, twice the 1.5 m capture radius, so
+checking only where things end up would let drones fly through their targets.</p>
+
+<h2>Results</h2>
+<p>Five scenarios ship with the simulator. A sweep over 16 seeds of each of the first four, 24 drones each:</p>
+<table>
+<thead><tr><th>Scenario</th><th>Per seed</th><th>Hostiles captured</th><th>Leaks</th><th>Benign touched</th></tr></thead>
+<tbody>
+<tr><td><code>probe</code></td><td>3 spaced hostiles (one weaving) + 2 passers-by</td><td>48 / 48</td><td>0</td><td>0</td></tr>
+<tr><td><code>raid</code></td><td>8 simultaneous hostiles from one sector</td><td>128 / 128</td><td>0</td><td>—</td></tr>
+<tr><td><code>surround</code></td><td>12 hostiles from every direction + 2 passers-by</td><td>192 / 192</td><td>0</td><td>0</td></tr>
+<tr><td><code>ambush</code></td><td>5 low threats at 40 m/s down one lane, faster than the drones</td><td>80 / 80</td><td>0</td><td>—</td></tr>
+<tr><td><strong>Total</strong></td><td></td><td><strong>448 / 448</strong></td><td><strong>0</strong></td><td><strong>0</strong></td></tr>
+</tbody>
+</table>
+<p><code>saturation</code> throws 36 hostiles (mixed speeds, 30% weaving) at 24 drones. Every drone
+makes exactly one capture before the shell runs out. That is the designed failure mode. The dome degrades by running out of drones,
+not by wasting them.</p>
+
+<h2>Known limits</h2>
+<ul>
+<li>Terminal accuracy against hard-maneuvering targets is the weakest link. A weaver can take several attempts. Augmented proportional navigation with a target-acceleration estimate would cut drone spend.</li>
+<li>No drone-to-drone collision avoidance in flight. Shell slots are spaced apart, but interceptors fly straight through each other.</li>
+<li>Drones are single-use. A recover-and-rearm cycle would turn the magazine limit into a throughput limit.</li>
+<li>One sensor, at the asset. Distributed sensing and track fusion would add low-altitude coverage.</li>
+</ul>
+
+<h2>Run it</h2>
+<pre><code>uv sync
+uv run aegis raid                # narrate one scenario, write replays/raid.html
+uv run aegis all --quiet         # every scenario, summaries only
+uv run aegis surround --seed 3 --drones 32
+uv run pytest</code></pre>
+<p>Open <code>replays/&lt;scenario&gt;.html</code> for a 3D replay (drag to orbit, scroll to zoom, scrub the
+timeline); append <code>#t=8.5</code> to open at a given moment. The dependencies are NumPy and SciPy.</p>
+
+<p class="foot">Code: <a href="https://github.com/jamesponwith/drone-dome">github.com/jamesponwith/drone-dome</a> · Replays: <a href="https://jamesponwith.github.io/drone-dome/">jamesponwith.github.io/drone-dome</a></p>
+</body>
+</html>

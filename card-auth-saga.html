@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>card-auth-saga — Card authorization as a Temporal saga · James Ponwith</title>
+<meta name="description" content="A card issuer backend in Go on Temporal with a double-entry MySQL ledger: what durable execution handled, what the ledger still had to get right, and the drills that prove it.">
+<link rel="canonical" href="https://jamesponwith.github.io/card-auth-saga.html">
+<meta property="og:title" content="card-auth-saga — Card authorization as a Temporal saga">
+<meta property="og:description" content="A card issuer backend in Go on Temporal with a double-entry MySQL ledger: what durable execution handled, what the ledger still had to get right, and the drills that prove it.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jamesponwith.github.io/card-auth-saga.html">
+<meta property="og:image" content="https://jamesponwith.github.io/assets/demos/card-auth-saga-demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-10-27">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "card-auth-saga — Card authorization as a Temporal saga", "description": "A card issuer backend in Go on Temporal with a double-entry MySQL ledger: what durable execution handled, what the ledger still had to get right, and the drills that prove it.", "datePublished": "2026-10-27", "image": "https://jamesponwith.github.io/assets/demos/card-auth-saga-demo.gif", "url": "https://jamesponwith.github.io/card-auth-saga.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
+</head>
+<body>
+<a class="back" href="/">← James Ponwith</a>
+<h1>card-auth-saga: card authorization as a Temporal saga</h1>
+<p class="meta">Oct 27, 2026 · 6 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>A card issuer's backend in Go: one Temporal workflow per authorization, one per card's statement cycle, a nightly auditor, and a double-entry MySQL ledger where every posting sums to zero.</li>
+<li>Temporal took the orchestration off my hands but not the ledger. With the row lock removed, MySQL accepted 20 holds worth 200 against a limit of 100, in 3 of 3 runs. With it, exactly 10 get through.</li>
+<li>Under load at 50-way concurrency, 400 simultaneous auths on one card approve exactly 5 (the velocity limit), and the audit afterwards is clean.</li>
+</ul></div>
+
+<p>Card authorization looks like one request, but it's a long-running process with money at every step.
+The issuer places a hold, waits up to a week for the merchant to capture, settles the captured amount,
+releases the rest, accrues rewards, and keeps taking refunds for another month. Every step has to
+survive retries, crashes and duplicate messages without posting money twice or losing it.</p>
+<p>At Capital One I built resiliency machinery for card authorizations the hard way: distributed leases
+on DynamoDB, and retry and failover logic we wrote and operated ourselves. This project asks a narrower
+question: how much of that does a durable-execution engine take off your hands, and what still has to be
+designed carefully? The answer turned out to be "the orchestration, but not the ledger".</p>
+
+<figure>
+<img src="/assets/demos/card-auth-saga-demo.gif" alt="Terminal recording of one card's story printed from real ledger postings: a $400 hold approved, raised $100, captured in two shipments, a crash after the last write that does not double-post, rewards, a refund and chargeback clawing points back, a velocity decline, and a balanced audit" loading="lazy">
+<figcaption>One card's story, printed from the real ledger postings by <code>TestDemo</code>. The last capture survives a crash after its write without posting twice.</figcaption>
+</figure>
+
+<h2>Shape</h2>
+<figure>
+<svg class="diagram" viewBox="0 0 560 520" role="img" aria-labelledby="cas-t">
+<title id="cas-t">Architecture: the card network sends an authorize update to a per-auth AuthorizeWorkflow; its activities post to a MySQL double-entry ledger; a per-card StatementWorkflow and a scheduled AuditWorkflow also use the ledger; the audit's findings surface on /healthz, which the Operate prober watches.</title>
+<defs><marker id="cas-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="170" y="8" width="220" height="44" rx="3"/>
+<rect x="10" y="100" width="540" height="130" rx="3" stroke="var(--acc)" stroke-width="2"/>
+<rect x="26" y="150" width="150" height="62" rx="3"/>
+<rect x="205" y="150" width="150" height="62" rx="3"/>
+<rect x="384" y="150" width="150" height="62" rx="3"/>
+<rect x="10" y="280" width="170" height="62" rx="3"/>
+<rect x="380" y="280" width="170" height="62" rx="3"/>
+<rect x="150" y="388" width="260" height="62" rx="3" stroke="var(--acc)" stroke-width="2"/>
+<rect x="380" y="474" width="170" height="40" rx="3"/>
+</g>
+<g stroke="currentColor" stroke-width="1.5" marker-end="url(#cas-a)">
+<line x1="280" y1="52" x2="280" y2="98"/>
+<line x1="176" y1="181" x2="203" y2="181"/>
+<line x1="355" y1="181" x2="382" y2="181"/>
+<line x1="280" y1="230" x2="280" y2="386"/>
+<line x1="120" y1="342" x2="190" y2="386"/>
+<line x1="440" y1="342" x2="370" y2="386"/>
+<line x1="465" y1="342" x2="465" y2="472"/>
+</g>
+<g font-size="13" fill="currentColor" text-anchor="middle">
+<text x="280" y="35" font-weight="700">Card network / CLI</text>
+<text x="292" y="80" text-anchor="start" font-size="11" fill="var(--acc)" font-family="JetBrains Mono, monospace">authorize (Update-with-Start)</text>
+<text x="280" y="126" font-weight="700">AuthorizeWorkflow · one per auth</text>
+<text x="101" y="176" font-weight="700">Hold</text>
+<text x="101" y="196" font-size="11">increments, partials</text>
+<text x="280" y="176" font-weight="700">Capture / release</text>
+<text x="280" y="196" font-size="11">or reverse, 7-day expiry</text>
+<text x="459" y="176" font-weight="700">Refunds, disputes</text>
+<text x="459" y="196" font-size="11">30-day window</text>
+<text x="95" y="306" font-weight="700">StatementWorkflow</text>
+<text x="95" y="326" font-size="11">per card, ContinueAsNew</text>
+<text x="465" y="306" font-weight="700">AuditWorkflow</text>
+<text x="465" y="326" font-size="11">Schedule, every 24 h</text>
+<text x="280" y="414" font-weight="700">MySQL double-entry ledger</text>
+<text x="280" y="434" font-size="11" font-family="JetBrains Mono, monospace">key &lt;workflow ID&gt;:&lt;step&gt;, unique</text>
+<text x="465" y="499" font-size="12" font-family="JetBrains Mono, monospace">/healthz → prober</text>
+<text x="290" y="262" text-anchor="start" font-size="11" font-family="JetBrains Mono, monospace">activities</text>
+</g>
+</svg>
+<figcaption>Workflows hold the process; the ledger holds the money. Every posting is keyed by workflow and step, so a retried activity hits the unique index and becomes a no-op.</figcaption>
+</figure>
+<ul>
+<li><strong>One workflow per authorization</strong> (<code>AuthorizeWorkflow</code>), which lives as long as the transaction. An <code>authorize</code> update, sent with Update-with-Start, returns approve or decline as soon as the hold is placed, with a reason: over the limit, velocity, frozen, closed, or unknown card. The hold takes increments and partial captures until a final capture, a reversal, or a 7-day timer closes it. After capture it takes refunds and disputes.</li>
+<li><strong>One workflow per card for statements</strong> (<code>StatementWorkflow</code>). Each run is one cycle: daily balance samples, a late fee on the due day, and interest on the average daily balance at close. Then it continues as new, so history never grows past a cycle.</li>
+<li><strong>A nightly auditor</strong> (<code>AuditWorkflow</code> on a Temporal Schedule) checks the ledger's invariants and looks for stuck or failed workflows. <code>/healthz</code> reports any findings, so the Operate stage's prober turns them into incidents.</li>
+<li><strong>Compensations, not mutations.</strong> Reversals, failed captures, refunds, provisional credits and rebills each post new balancing entries. History is never edited.</li>
+<li><strong>Rewards in points</strong>, funded by the brand partner's account, so points balance the same way money does.</li>
+</ul>
+
+<h2>What Temporal did not solve</h2>
+<p><strong>Check-then-act on the limit.</strong> The first milestone checked the card's limit in one
+activity and placed the hold in the next. Temporal ran both reliably, which didn't help: two concurrent
+authorizations on one card could both pass the check. The fix belongs in the ledger.
+<code>PostWithin</code> locks the card's account rows (<code>SELECT … FOR UPDATE</code>, in sorted order) so
+the check and the hold commit in one transaction. Removing the lock as an experiment let MySQL accept
+20 holds worth 200 against a limit of 100, in 3 of 3 runs. With it, exactly 10 get through.</p>
+<p><strong>A deadlock hiding in "create if missing".</strong> <code>INSERT IGNORE</code> on an account row that
+already exists takes a shared lock, and <code>FOR UPDATE</code> then needs to upgrade it. Two holds on one card
+would each hold the shared lock and wait on the other. Account rows are now created before the
+transaction starts.</p>
+<p><strong>Rounding.</strong> Clawing back each refund's own rounded points leaves stray points after a full
+refund ($2.00 refunded as $1.50 + $0.50 claws back 1 + 0 of 2 points). The clawback is instead
+points(remaining before) − points(remaining after), at the rate fixed at settlement, so a full refund
+always lands on exactly zero.</p>
+<p><strong>Check-then-act again, inside the workflow.</strong> Updates run as concurrent handlers. Workflow
+code is single-threaded, but every activity is a yield point, so a second capture could pass its
+validator while the first was still posting. Each step now claims its share before its first activity:
+a capture or release marks the hold busy, and a refund reserves its amount and ID. The test environment
+can't produce these races, since activities there take no time, so a drill with a slow ledger forces them.</p>
+
+<h2>Evidence</h2>
+<h3>Failure drills</h3>
+<p>The drills run the real worker against a real Temporal dev server, on the in-memory ledger or on MySQL.
+Each checks exact balances afterwards, then replays the recorded history. A selection:</p>
+<table>
+<thead><tr><th>Drill</th><th>What happens</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Worker killed mid-hold</td><td>Stop the only worker, signal capture while nothing runs, start a fresh worker</td><td>Capture lands once; hold cleared; rewards accrued</td></tr>
+<tr><td>Duplicate signals</td><td>3× the same capture, 3× the same refund ID</td><td>One capture, one refund, points 250</td></tr>
+<tr><td>Activity times out after writing</td><td>The ledger commits, then stalls past a 1s activity timeout, so Temporal retries</td><td>Every step posts exactly once</td></tr>
+<tr><td>Increments and split capture</td><td>+$200 approved, +$500 declined by the limit, $300 partial, $250 final</td><td>$550 captured, last $50 released, 550 points</td></tr>
+<tr><td>Disputes</td><td>One contested and won, one never answered, one contested and lost</td><td>$250 charged back, $50 rebilled, 150 points kept</td></tr>
+<tr><td>Updates mid-step</td><td>Every write stalls 1.5s; a refund sent the moment its capture returns, twice with one update ID, as the 1s window closes</td><td>One refund; points clawed back; a new update ID for the same refund is rejected</td></tr>
+</tbody>
+</table>
+<p>Every safeguard was also removed on purpose to confirm a test notices. Removing idempotency on posting
+keys makes the timeout drill post the capture twice (60,000 vs 30,000). Removing a <code>GetVersion</code>
+gate makes 5 of the 6 recordings from before that change fail to replay. Recorded histories live in
+<code>testdata/</code> and replay on every commit, so a nondeterministic workflow change fails CI with
+Temporal's <code>TMPRL1100</code>.</p>
+
+<h3>Under load</h3>
+<p><code>CAS_LOAD=1 go test -run TestLoad</code> drives the real worker against a Temporal dev server and
+MySQL 8.4 at 50-way concurrency, capturing each approved auth. Typical numbers from three runs on an Apple M5 Pro:</p>
+<table>
+<thead><tr><th>Scenario</th><th>Throughput</th><th>Decision p50 / p99</th><th>Approved</th></tr></thead>
+<tbody>
+<tr><td>Spread: 400 auths over 100 cards</td><td>~140 auths/s</td><td>~130 / ~570–770 ms</td><td>all 400</td></tr>
+<tr><td>Hot card: 400 at once on one card</td><td>~300–470 auths/s</td><td>~85 / ~240–340 ms</td><td>exactly 5</td></tr>
+<tr><td>Limit contention: 100 over 20 cards, limits cover 3 each</td><td>~200 auths/s</td><td>~110 / ~320 ms</td><td>exactly 60</td></tr>
+</tbody>
+</table>
+<p>The counts are the point: the velocity check admits exactly 5 of 400 simultaneous attempts on one card,
+the row locks admit exactly the 3 that each limit covers, and the auditor finds nothing afterwards.
+Running <code>PlaceHold</code> as a local activity cut median decision latency by 30–45%, and raising the
+idle connection pool from <code>database/sql</code>'s default of 2 to 64 took hot-card throughput from ~350 to ~470 auths/s.</p>
+<p>The same test against a throwaway copy of the Fly.io stack kept every count exact and the audit clean,
+but started at 2–3 auths/s. Three fixes, each found from the worker's own timers, got it to 18–31 auths/s
+with medians of 0.7–1.2s:</p>
+<table>
+<thead><tr><th>Fly stack</th><th>Spread (400)</th><th>Hot card (400)</th><th>Contention (100)</th></tr></thead>
+<tbody>
+<tr><td>As first deployed</td><td>3/s, p50 9.6s</td><td>2/s, p50 7.7s</td><td>3/s, p50 12.1s</td></tr>
+<tr><td>+ Temporal's SQLite in WAL mode</td><td>6/s, p50 6.3s</td><td>5/s, p50 5.6s</td><td>7/s, p50 6.0s</td></tr>
+<tr><td>+ 16 workflow / 8 activity pollers</td><td>6/s, p50 3.2s</td><td>5/s, p50 4.4s</td><td>8/s, p50 3.1s</td></tr>
+<tr><td>+ dedicated CPUs</td><td>18/s, p50 0.8s</td><td>31/s, p50 1.2s</td><td>27/s, p50 0.7s</td></tr>
+</tbody>
+</table>
+<p>Production runs on shared CPUs, so it has the first two fixes but not the third. Dedicated CPUs cost
+about $90/month for the three machines against about $10/month now; that's the change to make before
+real traffic.</p>
+
+<h2>Run it</h2>
+<pre><code>brew install temporal          # one-time: Temporal CLI
+temporal server start-dev      # local server + web UI on http://localhost:8233
+go test -short ./...           # unit + workflow tests (no server needed)
+
+docker run -d --name cas-mysql -e MYSQL_ROOT_PASSWORD=cas -e MYSQL_DATABASE=cas -p 3307:3306 mysql:8.4
+export CAS_MYSQL_DSN='root:cas@tcp(127.0.0.1:3307)/cas'
+go test ./...                  # adds the ledger contract, migrations and drills against MySQL
+
+go run .                       # worker on task queue card-auth
+go run . authorize auth-9 card-1 shell 1000   # approved, declined (Reason), or Timeout and reversed
+go run . audit                 # "audit: clean", or the findings and exit 1</code></pre>
+<p>The design is in <code>SPEC.md</code>, the decisions in <code>docs/adr/</code>, and the full account in
+<code>docs/writeup.md</code>.</p>
+
+<p class="foot">Code: <a href="https://github.com/jamesponwith/card-auth-saga">github.com/jamesponwith/card-auth-saga</a> · Full writeup: <a href="https://github.com/jamesponwith/card-auth-saga/blob/main/docs/writeup.md">docs/writeup.md</a> · Built with the <a href="https://github.com/jamesponwith/agentic-flywheel">agentic flywheel</a></p>
+</body>
+</html>

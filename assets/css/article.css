@@ -1,0 +1,66 @@
+/* Shared style for writeups and project pages. Same tokens as the home page (index.html).
+   Each page also needs, in <head>:
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+   <script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script> */
+:root{
+  --bg:#f1efe9; --ink:#121211; --mute:#66655f; --card:#e6e3db; --acc:#ff3b0a;
+  --line:color-mix(in srgb,var(--ink) 15%,transparent);
+  --sans:'Archivo',system-ui,sans-serif; --serif:'Instrument Serif',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0d0c;--ink:#ece9e1;--mute:#93918a;--card:#191917;--acc:#ff5a26;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d0d0c;--ink:#ece9e1;--mute:#93918a;--card:#191917;--acc:#ff5a26;color-scheme:dark}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0 auto;max-width:44rem;padding:clamp(24px,5vw,56px) 16px 96px;background:var(--bg);color:var(--ink);
+  font:400 18px/1.7 var(--sans);overflow-wrap:break-word}
+::selection{background:var(--acc);color:#fff}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--acc);text-decoration-thickness:1.5px;text-underline-offset:3px}
+a:hover{color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:2px}
+
+/* top bar: back link + optional series nav */
+.back{display:inline-block;font:500 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--mute)}
+.back:hover{color:var(--acc)}
+.series{display:flex;flex-wrap:wrap;gap:6px 18px;margin:28px 0 0;padding:12px 0;border-block:1px solid var(--line);font:500 11.5px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.series a{text-decoration:none;color:var(--mute)}
+.series a:hover{color:var(--acc)}
+.series [aria-current]{color:var(--ink)}
+
+h1{margin:40px 0 0;font-weight:800;font-stretch:80%;font-size:clamp(36px,6.4vw,58px);line-height:.98;letter-spacing:-.035em;text-wrap:balance}
+.meta{margin:18px 0 36px;font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+h2{margin:56px 0 12px;font-weight:700;font-stretch:85%;font-size:clamp(24px,3.4vw,30px);line-height:1.1;letter-spacing:-.02em}
+h3{margin:36px 0 8px;font-size:19px;font-weight:700}
+p,ul,ol{margin:0 0 20px}
+li{margin:4px 0}
+strong{font-weight:650}
+em{font-family:var(--serif);font-style:italic;font-size:1.08em}
+
+/* lead paragraph / TL;DR */
+.tldr{margin:0 0 36px;padding:18px 20px;background:var(--card);border-left:3px solid var(--acc);font-size:17px}
+.tldr b{display:block;margin-bottom:4px;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc)}
+.tldr ul{margin:0;padding-left:20px}
+
+img,video{display:block;max-width:100%;height:auto;margin:28px 0;border-radius:3px;background:var(--card)}
+figure{margin:32px 0}
+figure img,figure video,figure svg{margin:0}
+figcaption{margin-top:10px;font:500 12px/1.5 var(--mono);color:var(--mute)}
+svg.diagram{display:block;width:100%;height:auto;color:var(--ink)}
+
+code{font:500 .84em var(--mono);background:var(--card);padding:.12em .35em;border-radius:3px}
+pre{margin:24px 0;padding:18px 20px;background:#0f0f0e;color:#d9d6cd;border-radius:3px;overflow-x:auto;font:400 14px/1.65 var(--mono)}
+pre code{background:none;padding:0;font-size:inherit;color:inherit}
+
+table{width:100%;margin:24px 0;border-collapse:collapse;font:400 14px/1.45 var(--mono);font-variant-numeric:tabular-nums;display:block;overflow-x:auto}
+th,td{padding:9px 12px 9px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:500;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+
+blockquote{margin:24px 0;padding:0 0 0 20px;border-left:2px solid var(--acc);font:400 22px/1.35 var(--serif);color:var(--ink)}
+hr{border:0;border-top:1px solid var(--line);margin:48px 0}
+
+/* end matter: next/prev + repo line */
+.next{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:56px 0 0;padding-top:20px;border-top:1px solid var(--line);font:500 12px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.next a{text-decoration:none}
+.next a:hover{color:var(--acc)}
+.foot{margin-top:28px;font-size:15px;color:var(--mute)}

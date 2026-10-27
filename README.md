@@ -14,10 +14,12 @@ Static HTML on GitHub Pages: no framework, no build step for the home page.
 | `variations/` | Alternate home designs: `control-plane/`, `constellation/`, `os/`, plus a chooser at `variations/index.html`. |
 | `classic.html` | The previous home page, frozen. It keeps its own copy of the content. |
 | `tennis-part{1,2,3}.html`, `llm-router-lessons.html`, `flywheel-writeup.html` | Long-form writeups. |
+| `card-auth-saga.html`, `aegis.html`, `rocketlab.html` | Project case studies. |
 | `dora.html` | Live DORA metrics, read from each repo's `docs/dora.json`. |
-| `SeniorProject.html`, `posenetdemo.html`, `TeslaCNN.html`, `excelPreview.html` | Older project pages (Tailwind styling). |
+| `SeniorProject.html`, `posenetdemo.html` | Older project pages: Tello drone writeup and the live PoseNet demo. |
 | `theory-simulations/` | 53 interactive physics and math simulations; see its own README. |
-| `assets/` | Images, demo videos and GIFs, résumé, Tailwind CSS. |
+| `assets/css/article.css` | Shared stylesheet for every writeup, case study and project page (same tokens as the home page). |
+| `assets/` | Images, demo videos and GIFs, résumé, Tailwind CSS (`classic.html` only). |
 | `scripts/check_site.py` | Link and asset check, run in CI (`.github/workflows/check.yml`). |
 
 ## Preview locally
@@ -51,12 +53,12 @@ Add an entry to `projects` in `variations/data.js`:
 ## Checks
 
 ```sh
-python3 scripts/check_site.py   # every local href/src/poster resolves; home-page assets under 5 MB
+python3 scripts/check_site.py   # every local href/src/poster (root pages, variations/, theory-simulations/) and every path in data.js resolves; home-page assets under 5 MB
 ```
 
-## Tailwind (older pages only)
+## Tailwind (`classic.html` only)
 
-The older pages and `classic.html` use a prebuilt Tailwind file. After changing their classes:
+Only `classic.html` still uses the prebuilt Tailwind file. After changing its classes:
 
 ```sh
 npx tailwindcss@3 -c tailwind.config.js -i assets/css/tailwind.src.css -o assets/css/tailwind.css --minify

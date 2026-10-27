@@ -15,37 +15,20 @@
 <meta property="article:published_time" content="2026-08-15">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Teaching an agent to play tennis in JAX — Part 2", "description": "The return: six training runs, three reward hacks, 71.7% of serves returned.", "datePublished": "2026-08-15", "image": "https://jamesponwith.github.io/assets/demos/brax-tennis-demo-poster.jpg", "url": "https://jamesponwith.github.io/tennis-part2.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
 <link rel="icon" href="assets/img/teddy_bear.PNG">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root { color-scheme: light dark; }
-body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
-  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
-h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
-h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
-h2 { font-size: 1.25rem; margin-top: 2.2rem; }
-a { color: #0891b2; text-decoration: none; }
-a:hover { text-decoration: underline; }
-img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
-code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
-  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
-blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
-  color: #6b7280; font-size: 0.95em; }
-hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
-.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
-em { color: inherit; }
-@media (prefers-color-scheme: dark) {
-  body { color: #d1d5db; background: #030712; }
-  code { background: rgba(34,211,238,0.1); }
-  a { color: #22d3ee; }
-  blockquote { border-color: #22d3ee; color: #9ca3af; }
-  hr { border-top-color: #1f2937; }
-}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
 </head>
 <body>
-<a class="back" href="index.html">← jamesponwith.github.io</a>
+<a class="back" href="/">← James Ponwith</a>
+<nav class="series" aria-label="Series">Teaching an agent to play tennis · <a href="tennis-part1.html">1 Interception</a> <a href="tennis-part2.html" aria-current="page">2 The return</a> <a href="tennis-part3.html">3 The rally</a></nav>
 <h1>Teaching an agent to play tennis in JAX — Part 2: the return</h1>
+<p class="meta">Aug 15, 2026 · 3 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>Goal: return 70% of serves over the net into the far court. Final: 71.7% of 1000 random serves, after six training runs (10.9M env steps, about 90 minutes of laptop CPU).</li>
+<li>A scripted "perfect chaser" probe showed the task was physically impossible at first (0/40 contacts); fixing the paddle's restitution, height, and shaping target got it to 20/40, and dropping the tilt channel let PPO learn.</li>
+<li>The agent cheated by pinning the ball against the net to farm the contact bonus; a joint limit keeping it in the backcourt fixed it.</li>
+</ul></div>
 <p>Part 1 ended with a paddle that meets 95% of serves. Part 2 asks it to put
 the ball back over the net into the far court, 70% of the time. Final:
 <strong>71.7% of 1000 random serves returned.</strong></p>
@@ -101,6 +84,20 @@ charges the net for 1.2 seconds and asserts the paddle stays home.</p>
 on the final 1000-serve eval. 10.9M env steps, about 90 minutes of laptop
 CPU.</p>
 <p><img alt="returned rate" src="https://raw.githubusercontent.com/jamesponwith/brax-tennis-rl/main/docs/phase2_curve.png" /></p>
+<figure><video src="/assets/demos/brax-tennis-demo.mp4" poster="/assets/demos/brax-tennis-demo-poster.jpg" muted loop playsinline controls preload="none" width="560" height="360"></video><figcaption>The Phase 2 policy: net up, player-height paddle, returning serves into the far court. Rendered from <a href="https://github.com/jamesponwith/brax-tennis-rl/blob/main/docs/phase2_demo.gif">docs/phase2_demo.gif</a>.</figcaption></figure>
+<table>
+<thead><tr><th>Run / stage</th><th>What changed</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Random-policy eval</td><td>Detector counted net rebounds as returns</td><td>"Returned" 85%</td></tr>
+<tr><td>Random-policy eval, fixed</td><td>Serves must clear the net at spawn</td><td>0.0%</td></tr>
+<tr><td>First real run</td><td>—</td><td>Flatlined at 0%</td></tr>
+<tr><td>Scripted probe</td><td>Perfect chaser, before fixes</td><td>0/40 contacts</td></tr>
+<tr><td>Scripted probe</td><td>Bouncier paddle face, player-height paddle, shaping toward the strike plane</td><td>20/40 returned</td></tr>
+<tr><td>PPO after the fixes</td><td>—</td><td>Still refused to learn, until the tilt action channel was dropped</td></tr>
+<tr><td>Wall-ball run</td><td>—</td><td>79% returns at four million steps, then 3170% contact rate and 17% returns</td></tr>
+<tr><td>Run six</td><td>Joint limit keeps the receiver in the backcourt</td><td>Contact ~97%, 71.7% returned (10.9M steps, ~90 min CPU)</td></tr>
+</tbody>
+</table>
 <h2>What I'd tell past me</h2>
 <ul>
 <li>Log per-term reward components before you need them. All three hacks were
@@ -113,10 +110,9 @@ CPU.</p>
 <li>Prefer mechanical fixes — a joint limit, a taller paddle — over reward
   surgery. Physics can't be reward-hacked.</li>
 </ul>
-<p>Next: <a href="tennis-part3.html">Part 3</a> — self-play, and the bug that beat every
-probe.</p>
-<p><em>Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>
+<nav class="next" aria-label="Series"><a href="tennis-part1.html">← Part 1: interception</a><a href="tennis-part3.html">Part 3: self-play, and the bug that beat every probe →</a></nav>
+<p class="foot">Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>
 — every fix above landed as a gated PR with tests. The repo is
-<a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</em></p>
+<a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</p>
 </body>
 </html>

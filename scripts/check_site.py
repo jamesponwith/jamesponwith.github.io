@@ -1,4 +1,4 @@
-"""Fail if any page links a local file that doesn't exist, or the home page pulls in a heavy asset.
+"""Fail if any page (or variations/data.js) links a local file that doesn't exist, or the home page pulls in a heavy asset.
 
 Run: python3 scripts/check_site.py
 """
@@ -16,17 +16,23 @@ def local_refs(html):
     for ref in REF.findall(html):
         ref = ref.removeprefix("https://jamesponwith.github.io/")
         if not re.search(r"^(?:[a-z]+:|//)|\s|\$\{", ref) and "." in ref.rsplit("/", 1)[-1]:
-            yield ref.lstrip("/")
+            yield ref
 
 
 def problems():
-    for page in sorted(ROOT.glob("*.html")):
+    pages = [*ROOT.glob("*.html"), *ROOT.glob("variations/**/index.html"), ROOT / "theory-simulations/index.html"]
+    for page in sorted(pages):
+        name = page.relative_to(ROOT).as_posix()
         for ref in sorted(set(local_refs(page.read_text(encoding="utf-8")))):
-            path = ROOT / ref
+            path = ROOT / ref.lstrip("/") if ref.startswith("/") else page.parent / ref
             if not path.is_file():
-                yield f"{page.name}: missing {ref}"
-            elif page.name == "index.html" and path.stat().st_size > MAX_HOME_ASSET:
-                yield f"{page.name}: {ref} is {path.stat().st_size / 1e6:.1f} MB"
+                yield f"{name}: missing {ref}"
+            elif name == "index.html" and path.stat().st_size > MAX_HOME_ASSET:
+                yield f"{name}: {ref} is {path.stat().st_size / 1e6:.1f} MB"
+    data = (ROOT / "variations/data.js").read_text(encoding="utf-8")
+    for ref in sorted(set(re.findall(r"'(/[^'\s]*)'", data))):
+        if not (ROOT / ref.lstrip("/")).exists():
+            yield f"variations/data.js: missing {ref}"
 
 
 if __name__ == "__main__":

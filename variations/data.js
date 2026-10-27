@@ -43,10 +43,10 @@ window.SITE = {
     {
       id: 'saga', title: 'card-auth-saga', subtitle: 'Card authorization as a Temporal saga',
       kind: 'Payments & Workflows', tags: ['tech', 'finance'], year: 2025,
-      blurb: 'A card issuer backend in Go: authorize, hold, capture or release. Every money movement posts to a double-entry ledger that always sums to zero; idempotency keys mean retries never double-post.',
+      blurb: 'A card issuer backend in Go: authorize, hold, capture or release. Every money movement posts to a double-entry ledger that always sums to zero; idempotency keys mean retries never double-post. Thirteen failure drills against a real Temporal server (worker killed mid-hold, duplicate signals, a MySQL outage) each assert exact balances, and a nightly audit checks the whole ledger sums to zero.',
       stack: ['Go', 'Temporal', 'MySQL', 'Double-entry ledger'],
       media: { type: 'img', src: '/assets/demos/card-auth-saga-demo.gif' },
-      links: [{ label: 'GitHub', href: 'https://github.com/jamesponwith/card-auth-saga' }]
+      links: [{ label: 'Case study', href: '/card-auth-saga.html' }, { label: 'GitHub', href: 'https://github.com/jamesponwith/card-auth-saga' }]
     },
     {
       id: 'phux', title: 'Phux', subtitle: 'Terminal control plane',
@@ -78,7 +78,7 @@ window.SITE = {
       blurb: 'Liquid rocket engine simulator in the browser: equilibrium chemistry, regen cooling, turbopump power balance, aerospikes and RDEs. Matches RS-25, Raptor 2 and Merlin 1D within 2% on Isp.',
       stack: ['Python', 'Pyodide', 'Thermochemistry'],
       media: { type: 'img', src: '/assets/demos/rocketlab-demo.gif' },
-      links: [{ label: 'Launch', href: 'https://jamesponwith.github.io/rocketlab/' }]
+      links: [{ label: 'Case study', href: '/rocketlab.html' }, { label: 'Launch', href: 'https://jamesponwith.github.io/rocketlab/' }]
     },
     {
       id: 'f1', title: 'Power Unit Forge', subtitle: 'F1 engine design lab',
@@ -94,7 +94,7 @@ window.SITE = {
       blurb: 'A swarm holds a hemispherical shell and intercepts inbound threats: IMM trackers on noisy radar, Hungarian assignment, self-healing shell. 448/448 hostiles captured across a 16-seed sweep.',
       stack: ['Python', 'IMM tracking', 'Hungarian', 'Three.js'],
       media: { type: 'video', src: '/assets/demos/drone-dome-demo.mp4', poster: '/assets/demos/drone-dome-demo-poster.jpg' },
-      links: [{ label: 'Replays', href: 'https://jamesponwith.github.io/drone-dome/' }]
+      links: [{ label: 'Case study', href: '/aegis.html' }, { label: 'Replays', href: 'https://jamesponwith.github.io/drone-dome/' }]
     },
     {
       id: 'strata', title: 'Strata', subtitle: 'Earth, layer by layer',
@@ -123,7 +123,7 @@ window.SITE = {
     {
       id: 'recsys', title: 'Music RecSys Ecosystem', subtitle: 'Spotify Million Playlist Dataset',
       kind: 'Recommender Systems', tags: ['tech'], year: 2025,
-      blurb: 'Five apps, each answering a question the last raised: NL playlist generation, sequence-aware continuation, an exposure audit, and a feedback-loop simulation that inverted its own hypothesis.',
+      blurb: 'Five apps, each answering a question the last raised: NL playlist generation, sequence-aware continuation, an exposure audit, and a feedback-loop simulation that inverted its own hypothesis. 43.6% of exposure goes to 1% of artists, and no amount of re-ranking fixes it; playlist order alone cuts Clicks 13.7%.',
       stack: ['Python', 'scikit-learn', 'RRF · MMR'],
       term: ['$ cadence play "chill acoustic, rainy sunday"', '1  Ray Charles   acoustic 0.66', '2  Iron & Wine   6B→7B harmonic', '3  Diana Krall   7B→7B harmonic', '20 tracks · 79.9 min'],
       media: null, links: [{ label: 'GitHub', href: 'https://github.com/jamesponwith/spotify-recsys-ecosystem' }]
@@ -134,7 +134,7 @@ window.SITE = {
       blurb: 'Native app for a family tennis shop: live Shopify storefront with Apple Pay, stringing orders with push notifications, price alerts, a map of every US court, and a mic-based shot tracker.',
       stack: ['React Native', 'Expo', 'Shopify', 'Supabase'],
       media: { type: 'img', src: '/assets/img/aat-mobile.jpg' },
-      links: [{ label: 'App Store', href: 'https://apps.apple.com/us/app/id6801365777' }]
+      links: [{ label: 'App Store', href: 'https://apps.apple.com/us/app/id6801365777' }, { label: 'Shop site', href: 'https://allabouttennis.com/' }]
     },
     {
       id: 'court-finder', title: 'Court Finder', subtitle: 'Every public court in the US',

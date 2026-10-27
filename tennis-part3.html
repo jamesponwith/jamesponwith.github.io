@@ -15,37 +15,20 @@
 <meta property="article:published_time" content="2026-08-15">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Teaching an agent to play tennis in JAX — Part 3", "description": "The rally: self-play generations, the wrist that buys aim, and the bug that beat every probe.", "datePublished": "2026-08-15", "image": "https://jamesponwith.github.io/assets/demos/brax-tennis-demo-poster.jpg", "url": "https://jamesponwith.github.io/tennis-part3.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
 <link rel="icon" href="assets/img/teddy_bear.PNG">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root { color-scheme: light dark; }
-body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
-  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
-h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
-h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
-h2 { font-size: 1.25rem; margin-top: 2.2rem; }
-a { color: #0891b2; text-decoration: none; }
-a:hover { text-decoration: underline; }
-img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
-code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
-  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
-blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
-  color: #6b7280; font-size: 0.95em; }
-hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
-.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
-em { color: inherit; }
-@media (prefers-color-scheme: dark) {
-  body { color: #d1d5db; background: #030712; }
-  code { background: rgba(34,211,238,0.1); }
-  a { color: #22d3ee; }
-  blockquote { border-color: #22d3ee; color: #9ca3af; }
-  hr { border-top-color: #1f2937; }
-}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
 </head>
 <body>
-<a class="back" href="index.html">← jamesponwith.github.io</a>
+<a class="back" href="/">← James Ponwith</a>
+<nav class="series" aria-label="Series">Teaching an agent to play tennis · <a href="tennis-part1.html">1 Interception</a> <a href="tennis-part2.html">2 The return</a> <a href="tennis-part3.html" aria-current="page">3 The rally</a></nav>
 <h1>Teaching an agent to play tennis in JAX — Part 3: the rally</h1>
+<p class="meta">Aug 15, 2026 · 3 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>A tilt-wrist warm start scored 68% deterministic but 0.4% stochastic: sampled actions dug the paddle's edge into the court and friction jammed it. Floating the box two centimeters fixed it (70.3%).</li>
+<li>The wrist buys aim, not consistency: 67.5% returns vs the 71.7% flat baseline, but episode reward up two points.</li>
+<li>Self-play with mirrored observations: rallies grow generation over generation (1.77 → 1.86, then ~1.95), plateauing near two crossings.</li>
+</ul></div>
 <p>Part 2 ended with a paddle that returns 71.7% of serves. Part 3 puts a
 second paddle on the far baseline and asks the only question left: can two
 of them keep a point alive?</p>
@@ -63,6 +46,13 @@ through the trainer still scored 75%). The evaluator was honest (a flat
 control scored 69%). Per-step action distributions were <em>identical</em> between
 deterministic and stochastic modes. And yet: deterministic eval 68%,
 stochastic eval 0.4%.</p>
+<table>
+<thead><tr><th>Eval mode</th><th>Warm start, before the fix</th></tr></thead>
+<tbody>
+<tr><td>Deterministic</td><td>68%</td></tr>
+<tr><td>Stochastic</td><td>0.4%</td></tr>
+</tbody>
+</table>
 <p>The action trace ended the mystery. Under stochastic control, the paddle
 was commanded at 6.4 m/s in x — and moved <strong>ten centimeters in 1.2
 seconds.</strong> Jammed. The paddle box sat exactly flush on the court; the tilt
@@ -114,8 +104,9 @@ upgrade is the documented next rung.</p>
 put it back, then to keep a point alive against itself. The collegiate
 tennis player taught an agent to play — and the agent's best lessons were
 the ones it tried to cheat on.</p>
-<p><em>Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>
+<nav class="next" aria-label="Series"><a href="tennis-part2.html">← Part 2: the return</a><a href="tennis-part1.html">Start of series: Part 1 →</a></nav>
+<p class="foot">Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>
 — every fix above landed as a gated PR with tests. The repo is
-<a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</em></p>
+<a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</p>
 </body>
 </html>

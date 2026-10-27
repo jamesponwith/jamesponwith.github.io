@@ -15,37 +15,20 @@
 <meta property="article:published_time" content="2026-08-15">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Teaching an agent to play tennis in JAX — Part 1", "description": "Interception: 95.2% of serves met. And the three things that broke before any learning happened.", "datePublished": "2026-08-15", "image": "https://jamesponwith.github.io/assets/demos/brax-tennis-demo-poster.jpg", "url": "https://jamesponwith.github.io/tennis-part1.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
 <link rel="icon" href="assets/img/teddy_bear.PNG">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root { color-scheme: light dark; }
-body { font-family: Inter, system-ui, sans-serif; line-height: 1.65; max-width: 46rem;
-  margin: 0 auto; padding: 3rem 1.25rem 5rem; color: #1f2937; background: #f8fafc; }
-h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
-h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
-h2 { font-size: 1.25rem; margin-top: 2.2rem; }
-a { color: #0891b2; text-decoration: none; }
-a:hover { text-decoration: underline; }
-img { max-width: 100%; border-radius: 10px; margin: 1.2rem 0; }
-code { font-family: "JetBrains Mono", monospace; font-size: 0.85em;
-  background: rgba(8,145,178,0.08); padding: 0.12em 0.35em; border-radius: 4px; }
-blockquote { border-left: 3px solid #0891b2; margin: 1rem 0; padding: 0.2rem 1rem;
-  color: #6b7280; font-size: 0.95em; }
-hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
-.back { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
-em { color: inherit; }
-@media (prefers-color-scheme: dark) {
-  body { color: #d1d5db; background: #030712; }
-  code { background: rgba(34,211,238,0.1); }
-  a { color: #22d3ee; }
-  blockquote { border-color: #22d3ee; color: #9ca3af; }
-  hr { border-top-color: #1f2937; }
-}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
 </head>
 <body>
-<a class="back" href="index.html">← jamesponwith.github.io</a>
+<a class="back" href="/">← James Ponwith</a>
+<nav class="series" aria-label="Series">Teaching an agent to play tennis · <a href="tennis-part1.html" aria-current="page">1 Interception</a> <a href="tennis-part2.html">2 The return</a> <a href="tennis-part3.html">3 The rally</a></nav>
 <h1>Teaching an agent to play tennis in JAX — Part 1: interception</h1>
+<p class="meta">Aug 15, 2026 · 2 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>Phase 1 goal: intercept 95% of random serves. Result: 95.2% over 1000 serves with stock PPO, 9.3M env steps, twenty minutes on a laptop CPU.</li>
+<li>The env is a box paddle sliding in x/y, rewarded for closing the distance to the ball's predicted landing point.</li>
+<li>Three things broke before any learning: a backend that ignores restitution, an MJX contact setting where the solver injects energy (dampratio 0.1 bounced a 1m drop to 1.9m), and brax 0.14's PPO crashing on jax ≥ 0.11.</li>
+</ul></div>
 <p>I played NCAA D1 tennis. The first thing every coach teaches is not the
 swing — it's being where the ball will land. So when I set out to train an
 RL agent to play tennis in <a href="https://github.com/google/brax">Brax</a>, Phase 1
@@ -63,6 +46,17 @@ the distance from the paddle to the ball's <strong>predicted landing point</stro
 closed-form ballistics, re-predicted every step so bounces self-correct.
 Not distance-to-ball. Distance-to-where-the-ball-will-be. Split-step, read,
 move.</p>
+<pre><code>incoming = ball_vel[1] &lt;= 0.0  # serves fly -y; vy &gt; 0 only after a paddle hit
+landing = predict_landing(ball_pos, ball_vel)
+shaping = jp.where(
+    incoming, -cfg.shaping_scale * jp.linalg.norm(paddle_pos[:2] - landing), 0.0
+)
+...
+if not cfg.net:  # Phase 1: episode ends at contact
+    contact = near
+    reward_contact = jp.where(contact, cfg.contact_bonus, 0.0)
+    reward = shaping + reward_contact</code></pre>
+<p class="foot">The Phase 1 reward in <code>Tennis.step</code>, <a href="https://github.com/jamesponwith/brax-tennis-rl/blob/main/envs/tennis.py">envs/tennis.py</a> (trimmed).</p>
 <h2>Three things that broke first</h2>
 <p><strong>The backend that couldn't bounce.</strong> My spec required a bounce-fidelity
 smoke test before committing to a physics backend. Good thing: the
@@ -88,15 +82,15 @@ Five minutes with a failing test; a lost evening without one.</p>
 <p>Per-term reward components are logged from day one, because Phase 2's risk
 register says reward hacking shows up in curves before it shows up in gifs.
 (It did. Three times. That's Part 2.)</p>
+<figure><video src="/assets/demos/brax-tennis-phase1.mp4" poster="/assets/demos/brax-tennis-phase1-poster.jpg" muted loop playsinline controls preload="none" width="560" height="360"></video><figcaption>The trained Phase 1 policy: the paddle (blue) slides to meet random serves. No net yet. Rendered from <a href="https://github.com/jamesponwith/brax-tennis-rl/blob/main/docs/phase1_demo.gif">docs/phase1_demo.gif</a>.</figcaption></figure>
 <h2>The curve</h2>
 <p><img alt="interception rate" src="https://raw.githubusercontent.com/jamesponwith/brax-tennis-rl/main/docs/phase1_curve.png" /></p>
 <p>Random policy: 11.5%. Steep climb to ~4M steps, then a stable 94–95.6%
 plateau. The metric rides the evaluator itself — the env emits
 <code>interception</code> only on the contact step, so the episode-summed metric <em>is</em>
 the interception rate over 1000 fresh serves.</p>
-<p>Next: <a href="tennis-part2.html">Part 2</a> — the net goes up, and the agent starts
-cheating.</p>
-<p><em>Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>.
-The repo is <a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</em></p>
+<nav class="next" aria-label="Next"><span></span><a href="tennis-part2.html">Part 2: the net goes up, and the agent starts cheating →</a></nav>
+<p class="foot">Built inside a <a href="https://github.com/jamesponwith/agentic-flywheel">personal agentic flywheel</a>.
+The repo is <a href="https://github.com/jamesponwith/brax-tennis-rl">jamesponwith/brax-tennis-rl</a>.</p>
 </body>
 </html>

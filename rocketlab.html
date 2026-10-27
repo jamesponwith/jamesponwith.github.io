@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RocketLab — Liquid rocket engine design platform · James Ponwith</title>
+<meta name="description" content="A coupled liquid rocket engine model, from Gibbs-minimisation thermochemistry to stage payload, validated against six flight engines and run in the browser through Pyodide.">
+<link rel="canonical" href="https://jamesponwith.github.io/rocketlab.html">
+<meta property="og:title" content="RocketLab — Liquid rocket engine design platform">
+<meta property="og:description" content="A coupled liquid rocket engine model, from Gibbs-minimisation thermochemistry to stage payload, validated against six flight engines and run in the browser through Pyodide.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://jamesponwith.github.io/rocketlab.html">
+<meta property="og:image" content="https://jamesponwith.github.io/assets/demos/rocketlab-demo.gif">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="article:published_time" content="2026-10-27">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "RocketLab — Liquid rocket engine design platform", "description": "A coupled liquid rocket engine model, from Gibbs-minimisation thermochemistry to stage payload, validated against six flight engines and run in the browser through Pyodide.", "datePublished": "2026-10-27", "image": "https://jamesponwith.github.io/assets/demos/rocketlab-demo.gif", "url": "https://jamesponwith.github.io/rocketlab.html", "author": {"@type": "Person", "name": "James Ponwith", "url": "https://jamesponwith.github.io/"}}</script>
+<link rel="icon" href="assets/img/teddy_bear.PNG">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem('ed-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="/assets/css/article.css">
+</head>
+<body>
+<a class="back" href="/">← James Ponwith</a>
+<h1>RocketLab: a liquid rocket engine design platform</h1>
+<p class="meta">Oct 27, 2026 · 5 min read</p>
+<div class="tldr"><b>TL;DR</b><ul>
+<li>A physics model of a liquid rocket engine that couples every discipline that sets real performance, from equilibrium thermochemistry to stage payload, so an optimiser can't win by violating physics somewhere else.</li>
+<li>Against six flight engines (RS-25, RD-180, Merlin 1D, RL10B-2, Raptor 2, Vulcain 2), modelled Isp is within 1.8% and mass within 12%.</li>
+<li>Optimising 34 architectures for stage payload, full-flow staged combustion comes out best for every propellant, but by 0.3–1%, which is within model uncertainty. The same Python runs in the browser through Pyodide.</li>
+</ul></div>
+
+<p>Engine design is a coupled problem. Chamber pressure sets Isp, but also the heat flux the regenerative
+cooling has to carry, which sets the coolant pressure drop, which sets the pump power the cycle has to
+find, which sets turbine temperature and engine mass, which feed back into what the stage can lift. A
+model that optimises any one of these in isolation will find designs that don't close. RocketLab chains
+them and returns the constraint violations along with the performance.</p>
+
+<figure>
+<img src="/assets/demos/rocketlab-demo.gif" alt="The RocketLab browser dashboard: an engine design with its performance, cooling and cycle results" loading="lazy">
+<figcaption>The browser build runs the same <code>rocketlab</code> package as the CLI, inside a Pyodide web worker.</figcaption>
+</figure>
+
+<h2>The model chain</h2>
+<figure>
+<svg class="diagram" viewBox="0 0 560 330" role="img" aria-labelledby="rl-t">
+<title id="rl-t">RocketLab pipeline: thermochemistry, nozzle and losses, sizing, contour, regenerative cooling iterating with the power cycle, mass, then stage delta-v or payload; the optimiser varies chamber pressure, mixture ratio, expansion ratio and film fraction and re-runs the chain.</title>
+<defs><marker id="rl-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="14" y="30" width="122" height="70" rx="3"/>
+<rect x="150" y="30" width="122" height="70" rx="3"/>
+<rect x="286" y="30" width="122" height="70" rx="3"/>
+<rect x="422" y="30" width="122" height="70" rx="3"/>
+<rect x="422" y="150" width="122" height="70" rx="3"/>
+<rect x="286" y="150" width="122" height="70" rx="3"/>
+<rect x="150" y="150" width="122" height="70" rx="3"/>
+<rect x="14" y="150" width="122" height="70" rx="3" stroke="var(--acc)" stroke-width="2"/>
+<rect x="14" y="262" width="530" height="58" rx="3" stroke-dasharray="5 4"/>
+</g>
+<g stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#rl-a)">
+<line x1="136" y1="65" x2="148" y2="65"/>
+<line x1="272" y1="65" x2="284" y2="65"/>
+<line x1="408" y1="65" x2="420" y2="65"/>
+<line x1="483" y1="100" x2="483" y2="148"/>
+<line x1="408" y1="177" x2="420" y2="177"/>
+<line x1="422" y1="193" x2="410" y2="193"/>
+<line x1="286" y1="185" x2="274" y2="185"/>
+<line x1="150" y1="185" x2="138" y2="185"/>
+<line x1="75" y1="220" x2="75" y2="260"/>
+<path d="M14 291 H5 V12 H75 V28"/>
+</g>
+<g font-size="14" fill="currentColor" text-anchor="middle">
+<text x="75" y="58" font-weight="700">Thermochem</text><text x="75" y="78" font-size="11">Gibbs min., soot</text>
+<text x="211" y="58" font-weight="700">Nozzle, losses</text><text x="211" y="78" font-size="11">shifting / frozen</text>
+<text x="347" y="58" font-weight="700">Sizing</text><text x="347" y="78" font-size="11">throat, L*</text>
+<text x="483" y="58" font-weight="700">Contour</text><text x="483" y="78" font-size="11">Rao / Angelino</text>
+<text x="483" y="178" font-weight="700">Regen cooling</text><text x="483" y="198" font-size="11">Bartz, real fluid</text>
+<text x="347" y="178" font-weight="700">Power cycle</text><text x="347" y="198" font-size="11">pumps, turbines</text>
+<text x="211" y="178" font-weight="700">Mass</text><text x="211" y="198" font-size="11">walls, turbo</text>
+<text x="75" y="178" font-weight="700">Stage</text><text x="75" y="198" font-size="11">Δv / payload</text>
+<text x="279" y="287" font-weight="700">Optimiser</text>
+<text x="279" y="306" font-size="11" font-family="JetBrains Mono, monospace">LHS → differential evolution → Nelder-Mead</text>
+<text x="88" y="16" text-anchor="start" font-size="11" fill="var(--acc)" font-family="JetBrains Mono, monospace">Pc, O/F, ε, film fraction</text>
+</g>
+</svg>
+<figcaption>Cooling and the power cycle iterate on pressure until they agree. The optimiser re-runs the whole chain for each candidate and penalises constraint violations.</figcaption>
+</figure>
+<ul>
+<li><strong>Thermochemistry.</strong> NASA 7-term polynomials and Gibbs minimisation by the RP-1311 (CEA) element-potential Newton method, including condensed-phase carbon for fuel-rich kerosene gas generators. Pre-computed (O/F, Pc, ε) maps answer queries with under 0.05% interpolation error.</li>
+<li><strong>Nozzle.</strong> Rao thrust-optimised bells, cones, Angelino aerospike plugs with altitude compensation, and a Schmucker separation check at the deep-throttle point.</li>
+<li><strong>Cooling.</strong> A 1-D counter-flow regen march with a calibrated Bartz gas side, Peng-Robinson real-fluid coolants through the pseudo-critical region, coolant-specific Nusselt laws, film cooling, coking and decomposition limits, and channel-width limits for additively manufactured liners.</li>
+<li><strong>Cycles.</strong> Pump and turbine power balance for pressure-fed, electric-pump, gas-generator, expander, fuel- and ox-rich staged, and full-flow staged combustion, with preburner gas from equilibrium at the turbine temperature limit.</li>
+<li><strong>Rotating detonation.</strong> Chapman-Jouguet detonation, with the pressure gain expressed as an equivalent chamber pressure and a realisation factor η<sub>pg</sub> (0 = no gain, 1 = ideal; default 0.35).</li>
+<li><strong>Stage.</strong> Trajectory-averaged Isp, engine count from lift-off T/W, tank mass from propellant density and tank pressure, then Δv, or payload at a required Δv.</li>
+</ul>
+
+<h2>Validation</h2>
+<p><code>python -m rocketlab validate</code> builds each reference engine from its published cycle, chamber
+pressure, mixture ratio and expansion ratio, and compares:</p>
+<table>
+<thead><tr><th>Engine</th><th>Vacuum Isp, s<br>model / actual</th><th>Sea-level Isp, s<br>model / actual</th><th>Mass, kg<br>model / actual</th></tr></thead>
+<tbody>
+<tr><td>RS-25</td><td>449.1 / 452.3</td><td>369.1 / 366.0</td><td>3210 / 3177</td></tr>
+<tr><td>RD-180</td><td>341.5 / 338.4</td><td>314.9 / 311.3</td><td>4865 / 5480</td></tr>
+<tr><td>Merlin 1D</td><td>313.2 / 311.0</td><td>283.2 / 282.0</td><td>444 / 470</td></tr>
+<tr><td>RL10B-2</td><td>463.9 / 465.5</td><td>—</td><td>265 / 301</td></tr>
+<tr><td>Raptor 2</td><td>353.2 / 347.0</td><td>331.5 / 327.0</td><td>1610 / 1630</td></tr>
+<tr><td>Vulcain 2</td><td>436.2 / 431.0</td><td>318.7 / 318.0</td><td>2052 / 2040</td></tr>
+</tbody>
+</table>
+<p>Isp is within 1.8% for all six (Raptor 2 vacuum is the worst case) and mass within 12% (RD-180).
+Ideal Isp matches CEA within 0.5%, and Chapman-Jouguet velocities for H₂/O₂ and CH₄/O₂ match the
+literature within 0.1%. The test suite (44 tests) pins these as regressions.</p>
+<p>These are engineering-fidelity models for conceptual and preliminary design, not CFD. Several pieces
+are calibrated to flight-engine data: the Bartz coefficient (×0.82), the finite-rate kinetic loss
+correlation, a ×0.7 separation knock-down on Schmucker for thrust-optimised bells, and plumbing and
+controls mass. Coolant transport properties near the pseudo-critical point are approximate (±15–20%).</p>
+
+<h2>Trade study</h2>
+<p>Each of 34 architectures was optimised for Pc, O/F, ε and film fraction under all constraints, then
+scored by stage payload:</p>
+<table>
+<thead><tr><th>Stage</th><th>Optimum</th><th>Pc / O/F / ε</th><th>Isp SL / vac</th><th>Payload</th></tr></thead>
+<tbody>
+<tr><td>Heavy booster (3,400 t propellant, Δv 3 km/s)</td><td>LOX/LH₂ full-flow staged</td><td>317 bar / 5.52 / 64</td><td>401 / 448 s</td><td>2,915 t</td></tr>
+<tr><td>… best dense propellant</td><td>LOX/CH₄ full-flow staged</td><td>353 bar / 3.69 / 90</td><td>322 / 370 s</td><td>2,271 t, with 0.6× the dry mass</td></tr>
+<tr><td>Upper stage (120 t propellant, Δv 5.5 km/s, 3 m exit)</td><td>LOX/LH₂ full-flow staged</td><td>124 bar / 6.81 / 399</td><td>— / 469 s</td><td>39.6 t</td></tr>
+</tbody>
+</table>
+<p>Full-flow staged combustion wins for every propellant, but its margin over the next-best cycle is
+0.3–1%, inside the model's uncertainty, so the ranking is a lean rather than a verdict. Kerosene is
+capped by coking.</p>
+<p>The rotating-detonation result was the one I most wanted to check. <code>scripts/rde_breakeven.py</code>
+re-optimises the methane full-flow booster with a detonation combustor at four realisation factors:</p>
+<table>
+<thead><tr><th>η<sub>pg</sub></th><th>Payload</th><th>Vacuum T/W</th></tr></thead>
+<tbody>
+<tr><td>0.35 (default)</td><td>2,051 t</td><td>166</td></tr>
+<tr><td>0.6</td><td>2,062 t</td><td>179</td></tr>
+<tr><td>0.85</td><td>2,042 t</td><td>191</td></tr>
+<tr><td>1.0 (ideal)</td><td>1,989 t</td><td>194</td></tr>
+<tr><td>Conventional LOX/CH₄ full-flow</td><td>2,271 t</td><td>136</td></tr>
+</tbody>
+</table>
+<p>Limited by heat flux, the detonation booster never breaks even with the conventional engine, even at the
+ideal pressure gain. It does give the lightest engine.</p>
+
+<h2>In the browser</h2>
+<p>The live site runs the unmodified Python package in a web worker through Pyodide (CPython, NumPy and
+SciPy in WebAssembly): design, sweeps, validation and optimisation. The architecture trade studies are
+precomputed and published as a report. Locally, the first run builds the thermochemistry maps with the
+full equilibrium solver, about 20 s per propellant pair, and caches them in <code>~/.cache/rocketlab</code>.</p>
+
+<h2>Run it</h2>
+<pre><code>python -m venv .venv && .venv/bin/pip install numpy scipy pytest
+.venv/bin/python -m rocketlab serve            # web dashboard at http://127.0.0.1:8765
+.venv/bin/python -m rocketlab validate         # model vs RS-25, RD-180, Merlin, RL10, Raptor, Vulcain
+.venv/bin/python -m rocketlab analyze --fuel LCH4 --cycle ffsc --pc 300 --of 3.6 --eps 34
+.venv/bin/python -m rocketlab optimize --cycle ffsc --stage booster --objective payload
+.venv/bin/python scripts/run_trades.py all     # booster + upper-stage trade studies -> results/
+.venv/bin/python -m pytest tests               # 44 validation / regression tests</code></pre>
+
+<p class="foot">Code: <a href="https://github.com/jamesponwith/rocketlab">github.com/jamesponwith/rocketlab</a> · Live: <a href="https://jamesponwith.github.io/rocketlab/">jamesponwith.github.io/rocketlab</a></p>
+</body>
+</html>
