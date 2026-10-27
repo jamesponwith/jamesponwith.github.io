@@ -38,7 +38,7 @@ Its git history is the trend line. Part of the
 <script>
 var REPOS = ["jamesponwith/llm-resiliency-router", "jamesponwith/flywheel-template",
              "jamesponwith/flywheel-template-py", "jamesponwith/brax-tennis-rl"];
-function fmt(v, unit){ return v ? v.toFixed(1) + unit : "n/a"; }
+function fmt(v, unit){ return v != null ? v.toFixed(1) + unit : "n/a"; }
 function section(repo){
   var el = document.createElement("div");
   el.innerHTML = "<h2><a href='https://github.com/" + repo + "'>" + repo + "</a></h2>" +
@@ -53,12 +53,13 @@ function section(repo){
         "<div class='grid'>" +
         "<div class='card'><b>" + fmt(df.per_week, "/wk") + "</b><span>deploy frequency<br>" +
           df.releases_total + " releases, " + df.releases_last_30d + " in 30d</span></div>" +
-        "<div class='card'><b>" + fmt(lt.median, "h") + "</b><span>lead time (median)<br>" +
+        "<div class='card'><b>" + fmt(lt.samples ? lt.median : null, "h") + "</b><span>lead time (median)<br>" +
           lt.samples + " samples</span></div>" +
         "<div class='card'><b>" + (cf.releases ? (cf.rate * 100).toFixed(0) + "%" : "n/a") +
-          "</b><span>change-failure rate<br>" + cf.incidents + " incidents / " +
-          cf.releases + " releases</span></div>" +
-        "<div class='card'><b>" + fmt(mt.median, "h") + "</b><span>MTTR (median)<br>" +
+          "</b><span>change-failure rate<br>" +
+          (cf.failed_changes != null ? cf.failed_changes + " failed / " + cf.releases + " changes · " + cf.incidents + " incidents"
+                                     : cf.incidents + " incidents / " + cf.releases + " releases") + "</span></div>" +
+        "<div class='card'><b>" + fmt(mt.samples ? mt.median : null, "h") + "</b><span>MTTR (median)<br>" +
           mt.samples + " samples</span></div></div>" +
         "<div class='meta'>snapshot " + d.generated_at + "</div>";
     })
