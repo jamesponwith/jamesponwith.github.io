@@ -1,40 +1,67 @@
-# Studorlio
+# jamesponwith.github.io
 
-Studorlio is a template for your own personal site. You can have yours running on the cloud in exactly 10 seconds. But first, make sure you have a GitHub account. Ready, set, go!
+Portfolio and writing of James Ponwith, Principal Software Engineer (resiliency systems for real-time card payments). Live at **https://jamesponwith.github.io**.
 
-![Display Image](https://raw.githubusercontent.com/helfi92/studorlio/master/assets/img/studorlio.png)
+Static HTML on GitHub Pages: no framework, no build step for the home page.
 
-## Getting Started
-1. Fork the repository to make it yours.
-2. Rename the forked repository to `username.github.io`, where `username` is your GitHub username.
-3. That's it! Navigate to `username.github.io` to see your website :) 
+## Layout
 
-If this is your first time making a website and is having trouble getting started, that's ok. Head over to the [FAQ](#faq) section and let me try help you.
+| Path | What it is |
+|---|---|
+| `index.html` | Home page (Editorial design). Renders every project from `variations/data.js`. |
+| `variations/data.js` | **The content.** Bio, stats and every project card. Edit this, not the HTML. |
+| `variations/sim.js` | The live resiliency-engine simulation, shared by the home page and Control Plane. |
+| `variations/` | Alternate home designs: `control-plane/`, `constellation/`, `os/`, plus a chooser at `variations/index.html`. |
+| `classic.html` | The previous home page, frozen. It keeps its own copy of the content. |
+| `tennis-part{1,2,3}.html`, `llm-router-lessons.html`, `flywheel-writeup.html` | Long-form writeups. |
+| `dora.html` | Live DORA metrics, read from each repo's `docs/dora.json`. |
+| `SeniorProject.html`, `posenetdemo.html`, `TeslaCNN.html`, `excelPreview.html` | Older project pages (Tailwind styling). |
+| `theory-simulations/` | 53 interactive physics and math simulations; see its own README. |
+| `assets/` | Images, demo videos and GIFs, résumé, Tailwind CSS. |
+| `scripts/check_site.py` | Link and asset check, run in CI (`.github/workflows/check.yml`). |
 
-## Demo
-[http://www.hassanali.me/studorlio/](http://www.hassanali.me/studorlio/)
+## Preview locally
 
-## FAQ
-* [How do I fork this repository?](#how-do-i-fork-this-repository)
-* [How do I rename the forked repository?](#how-do-i-rename-the-forked-repository)
-* [How do I run the portfolio locally?](#how-do-i-run-the-portfolio-locally)
+```sh
+python3 -m http.server 8000
+```
 
-### How do I fork this repository?
-1. Make sure you're logged into GitHub with your account
-2. Click the Fork button on the upper right-hand side of this page
+Open **http://127.0.0.1:8000/**, not `localhost`: some browsers force HTTPS for `localhost`, which this server can't answer, and the page loads blank. Opening `index.html` from disk doesn't work either, because `data.js` uses root-absolute paths.
 
-### How do I rename the forked repository?
-1. Navigate to the main page of the repository. It should be `https://github.com/username/studorlio/`, where `username` is your GitHub username
-2. Click Settings
-3. Under the Repository name heading, type `username.github.io` then click Rename
+## Add or edit a project
 
-### How do I run the portfolio locally?
-1. Right click (Windows) or double click (Mac) `index.html` and select "Open with"
-2. Pick your browser of choice
+Add an entry to `projects` in `variations/data.js`:
 
-## Bugs and Issues
-Have a bug or an issue with this template? [Open a new issue](https://github.com/helfi92/studorlio/issues)
+```js
+{
+  id: 'my-project', title: 'My Project', subtitle: 'One line',
+  kind: 'Simulation', tags: ['tech'], year: 2026,        // tags: tech | finance | sport
+  blurb: 'Problem, what was built, and a number.',
+  stack: ['Go', 'AWS'],
+  media: { type: 'video', src: '/assets/demos/x.mp4', poster: '/assets/demos/x-poster.jpg' }, // or { type: 'img', src } or null
+  term: ['$ some command', 'output line'],               // shown as a terminal when media is null
+  links: [{ label: 'GitHub', href: 'https://github.com/...' }]
+}
+```
 
-## License
-Code released under the [MIT](https://github.com/helfi92/studorlio/blob/master/LICENSE) license
+- Paths are root-absolute (`/assets/...`).
+- Prefer MP4 with a poster over GIF; keep home-page assets under 5 MB.
+- `featured: true` puts a project in the big spread with the simulation. Only Resiliency Engine uses it.
 
+## Checks
+
+```sh
+python3 scripts/check_site.py   # every local href/src/poster resolves; home-page assets under 5 MB
+```
+
+## Tailwind (older pages only)
+
+The older pages and `classic.html` use a prebuilt Tailwind file. After changing their classes:
+
+```sh
+npx tailwindcss@3 -c tailwind.config.js -i assets/css/tailwind.src.css -o assets/css/tailwind.css --minify
+```
+
+## Credits
+
+Started in 2017 from Hassan Ali's [Studorlio](https://github.com/helfi92/studorlio) template (MIT, see `LICENSE`); since rewritten.

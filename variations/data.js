@@ -59,15 +59,15 @@ window.SITE = {
     {
       id: 'llm-router', title: 'LLM Resiliency Router', subtitle: 'Failover for AI serving',
       kind: 'AI Infrastructure', tags: ['tech'], year: 2025,
-      blurb: 'Reverse proxy that keeps LLM traffic flowing through provider outages — health cells with ejection and half-open probes, priority failover mid-stream, zero client-visible errors.',
+      blurb: 'Reverse proxy that keeps LLM traffic flowing through provider outages — health cells with ejection and half-open probes, priority failover when a provider dies mid-traffic, a quality canary that ejects providers returning garbage, and hedging for streams that stall before the first token. Zero client-visible errors.',
       stack: ['Go', 'OpenAI-compatible', 'Chaos harness'],
       media: { type: 'img', src: '/assets/demos/llm-router-demo.gif' },
-      links: [{ label: 'GitHub', href: 'https://github.com/jamesponwith/llm-resiliency-router' }, { label: 'Writeup', href: '/llm-router-lessons.html' }, { label: 'DORA', href: '/dora.html' }]
+      links: [{ label: 'GitHub', href: 'https://github.com/jamesponwith/llm-resiliency-router' }, { label: 'Writeup', href: '/llm-router-lessons.html' }, { label: 'How it was built', href: '/flywheel-writeup.html' }, { label: 'DORA', href: '/dora.html' }]
     },
     {
       id: 'ramp-graph', title: 'ramp-graph', subtitle: 'Graph database in Rust',
       kind: 'Database · Systems', tags: ['tech'], year: 2026,
-      blurb: "A Rust rewrite of LemonGraph: log-structured, transactional graph DB on LMDB with point-in-time history. 3.6–7.7× faster inserts and 6–17× faster queries than upstream on a 1M-node graph.",
+      blurb: "A Rust rewrite of LemonGraph: log-structured, transactional graph DB on LMDB with point-in-time history. 5.2–7.7× faster inserts and 14–17× faster lookups and queries than upstream on a 1M-node graph.",
       stack: ['Rust', 'LMDB', 'Query engine'],
       media: { type: 'img', src: '/assets/img/ramp-graph.jpg' },
       links: [{ label: 'GitHub', href: 'https://github.com/jamesponwith/ramp-graph' }]
@@ -105,7 +105,7 @@ window.SITE = {
       links: [{ label: 'Journey', href: 'https://jamesponwith.github.io/world-layers/' }]
     },
     {
-      id: 'theory', title: 'Theory Simulations', subtitle: '39 live models of big ideas',
+      id: 'theory', title: 'Theory Simulations', subtitle: '53 live models of big ideas',
       kind: 'Interactive Science', tags: ['tech'], year: 2025,
       blurb: "A browser atlas of live physics and math: double-slit interference, Bell's theorem, the three-body problem, Hawking radiation, Turing patterns and more.",
       stack: ['JavaScript', 'Canvas', 'Physics'],
@@ -115,7 +115,7 @@ window.SITE = {
     {
       id: 'brax', title: 'Brax Tennis RL', subtitle: 'Teaching an agent to play tennis',
       kind: 'Reinforcement Learning', tags: ['tech', 'sport'], year: 2025,
-      blurb: "PPO agent in Google's JAX physics engine: 95% interception, 72% returns over the net, self-play rallies that lengthen every generation — reward hacks and all.",
+      blurb: "PPO agent in Google's JAX physics engine: 95% interception, 72% returns over the net, self-play rallies that grow from 1.77 to ~1.95 net crossings across two generations — reward hacks and all.",
       stack: ['JAX', 'Brax / MJX', 'PPO', 'Self-play'],
       media: { type: 'video', src: '/assets/demos/brax-tennis-demo.mp4', poster: '/assets/demos/brax-tennis-demo-poster.jpg' },
       links: [{ label: 'Writeup', href: '/tennis-part1.html' }]
